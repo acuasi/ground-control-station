@@ -32,7 +32,10 @@
   "devDependencies": {
     "grunt": "~0.3.17",
     "grunt-contrib": "",
-    "bbb": ""
+    "bbb": "",
+    "mocha": "",
+    "grunt-simple-mocha": "",
+    "should": ""
   },
   "keywords": []
 }

@@ -5,6 +5,7 @@ module.exports = function(grunt) {
 
   // Add in some additional modules
   grunt.loadNpmTasks('grunt-contrib');
+  grunt.loadNpmTasks('grunt-simple-mocha');
 
   grunt.initConfig({
 
@@ -164,16 +165,23 @@ module.exports = function(grunt) {
       wrap: false
     },
 
-    // The headless QUnit testing environment is provided for "free" by Grunt.
-    // Simply point the configuration to your test directory.
-    qunit: {
-      all: ["test/qunit/*.html"]
-    },
-
     // The headless Jasmine testing is provided by grunt-jasmine-task. Simply
     // point the configuration to your test directory.
     jasmine: {
       all: ["test/jasmine/*.html"]
+    },
+
+    simplemocha: {
+      all: {
+        src: 'test/mocha/*.js',
+        options: {
+          globals: ['should'],
+          timeout: 3000,
+          ignoreLeaks: false,
+          ui: 'bdd',
+          reporter: 'xunit',
+        }
+      }
     },
 
     // The watch task can be used to monitor the filesystem and execute
