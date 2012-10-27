@@ -1,0 +1,38 @@
+{
+  "name": "pffr-gcs",
+  "description": "Poker Flat Research Range GCS",
+  "version": "0.0.1",
+  "homepage": "https://github.com/poker-flat/ground-control-station",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/poker-flat/ground-control-station.git"
+  },
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/poker-flat/ground-control-station/issues"
+  },
+  "licenses": [
+    {
+      "type": "CC",
+      "url": "https://github.com/poker-flat/ground-control-station/blob/master/LICENSE-CC"
+    }
+  ],
+  "main": "lib/pffr-gcs",
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+    "express": "3.x",
+    "serialport": "",
+    "now": ""
+  },
+  "devDependencies": {
+    "grunt": "~0.3.17",
+    "grunt-contrib": "",
+    "bbb": ""
+  },
+  "keywords": []
+}

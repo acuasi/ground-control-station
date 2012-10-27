@@ -1,4 +1,3 @@
-ground-control-station
-======================
+# pffr-gcs
 
-UAS Ground Station
+Poker Flat Research Range GCS
