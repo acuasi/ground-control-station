@@ -1,4 +1,4 @@
-var pffr_gcs = require('../lib/pffr-gcs.js');
+var pfrr_gcs = require('../lib/pfrr-gcs.js');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -28,7 +28,7 @@ exports['awesome'] = {
   'no args': function(test) {
     test.expect(1);
     // tests here
-    test.equal(pffr_gcs.awesome(), 'awesome', 'should be awesome.');
+    test.equal(pfrr_gcs.awesome(), 'awesome', 'should be awesome.');
     test.done();
   }
 };

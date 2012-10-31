@@ -1,5 +1,5 @@
 {
-  "name": "pffr-gcs",
+  "name": "pfrr-gcs",
   "description": "Poker Flat Research Range GCS",
   "version": "0.0.1",
   "homepage": "https://github.com/poker-flat/ground-control-station",
@@ -17,7 +17,7 @@
       "url": "https://github.com/poker-flat/ground-control-station/blob/master/LICENSE-CC"
     }
   ],
-  "main": "lib/pffr-gcs",
+  "main": "lib/pfrr-gcs",
   "engines": {
     "node": ">= 0.6.0"
   },
