@@ -27,7 +27,8 @@
   "dependencies": {
     "express": "3.x",
     "serialport": "",
-    "now": ""
+    "now": "",
+    "backbone" : ""
   },
   "devDependencies": {
     "grunt": "~0.3.17",
@@ -35,7 +36,8 @@
     "bbb": "",
     "mocha": "",
     "grunt-simple-mocha": "",
-    "should": ""
+    "should": "",
+    "sinon": ""
   },
   "keywords": []
 }
