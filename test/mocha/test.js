@@ -1,6 +1,8 @@
-var assert = require("assert")
-describe('Mocha test suite', function(){
-  it('should exist + work', function(){
-    assert.equal(true, true);
+var pfrr_gcs = require('../../lib/pfrr-gcs.js'),
+  should = require('should');
+
+describe('PFRR test suite', function(){
+  it('work for running tests', function(){
+    should.exist(true)
   })
 })

@@ -167,6 +167,8 @@ module.exports = function(grunt) {
 
     // The headless Jasmine testing is provided by grunt-jasmine-task. Simply
     // point the configuration to your test directory.
+    //
+    // Still need to get this working with xunit output.
     jasmine: {
       all: ["test/jasmine/*.html"]
     },
@@ -178,8 +180,7 @@ module.exports = function(grunt) {
           globals: ['should'],
           timeout: 3000,
           ignoreLeaks: false,
-          ui: 'bdd',
-          reporter: 'xunit',
+          ui: 'bdd'
         }
       }
     },
@@ -207,5 +208,8 @@ module.exports = function(grunt) {
   // The release task will run the debug tasks and then minify the
   // dist/debug/require.js file and CSS files.
   grunt.registerTask("release", "debug min mincss");
+
+  // The test task runs all tests in a format suitable for the command line
+  grunt.registerTask("test", "jasmine simplemocha");
 
 };
