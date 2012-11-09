@@ -38,7 +38,8 @@
     "mocha": "",
     "grunt-simple-mocha": "",
     "should": "",
-    "sinon": ""
+    "sinon": "",
+    "jshint" : ""
   },
   "keywords": []
 }

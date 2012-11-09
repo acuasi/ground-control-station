@@ -8,6 +8,8 @@ nconf.argv()
        .env()
        .file({ file: '../../config.json' });
 
+// centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
+
 describe("Connection manager", function() {
 
   before(function() {

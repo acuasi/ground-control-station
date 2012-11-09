@@ -19,7 +19,7 @@ module.exports = function(grunt) {
     // https://github.com/cowboy/grunt/blob/master/docs/task_lint.md
     lint: {
       files: [
-        "build/config.js", "app/**/*.js"
+        "build/config.js", "app/**/*.js", "lib/**/*.js", "test/**/*.js"
       ]
     },
 
