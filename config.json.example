@@ -1,0 +1,4 @@
+{
+  "serial:master" : "/dev/master",
+  "serial:slave" : "/dev/slave"
+}

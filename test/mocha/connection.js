@@ -1,7 +1,12 @@
 var SerialPort = require("serialport").SerialPort
   , Connection = require("../../lib/Connection.js")
   , MAVLink = require("../../lib/MAVLink")
-  , sinon = require("sinon");
+  , sinon = require("sinon")
+  , nconf = require("nconf");
+
+nconf.argv()
+       .env()
+       .file({ file: '../../config.json' });
 
 describe("Connection manager", function() {
 
@@ -14,10 +19,10 @@ describe("Connection manager", function() {
 
     // Use this: http://code.google.com/p/macosxvirtualserialport/
     // or similar.  Set up a serial port connection,   
-    this.serial = new SerialPort("/dev/master", {
+    this.serial = new SerialPort(nconf.get('serial:master'), {
       baudrate: 9600
     });
-    var slave = new SerialPort("/dev/slave", {
+    var slave = new SerialPort(nconf.get('serial:slave'), {
       baudrate: 9600
     });
 
