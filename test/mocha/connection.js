@@ -1,15 +1,13 @@
 var SerialPort = require("serialport").SerialPort
   , Connection = require("../../lib/Connection.js")
   //, MAVLink = require("../../lib/MAVLink")
-  , MAVLink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
+  , mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
   , sinon = require("sinon")
   , nconf = require("nconf");
 
 nconf.argv()
        .env()
        .file({ file: '../../config.json' });
-
-// centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
 
 describe("Connection manager", function() {
 
@@ -18,23 +16,20 @@ describe("Connection manager", function() {
     this.connection = new Connection;
 
     // Wrap with try/catch to prevent the master/slave failure from preventing any test results
-    try {
+    
 
-    // Use this: http://code.google.com/p/macosxvirtualserialport/
-    // or similar.  Set up a serial port connection,   
-    this.serial = new SerialPort(nconf.get('serial:master'), {
+    // centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
+    this.master = new SerialPort(nconf.get('serial:master'), {
       baudrate: 9600
     });
-    var slave = new SerialPort(nconf.get('serial:slave'), {
+    this.slave = new SerialPort(nconf.get('serial:slave'), {
       baudrate: 9600
     });
 
-    } catch(e) {
-      // TODO: make this fail the test case
-    }
+    
 
-    this.connection.setBuffer(slave);
-    this.connection.setProtocol(new MAVLink);
+    this.connection.setBuffer(this.slave);
+    this.connection.setProtocol(new mavlink);
 
   });
 
