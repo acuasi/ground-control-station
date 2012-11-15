@@ -29,7 +29,8 @@
     "serialport": "",
     "now": "",
     "backbone" : "",
-    "nconf": ""
+    "nconf": "",
+    "underscore": ""
   },
   "devDependencies": {
     "grunt": "~0.3.17",

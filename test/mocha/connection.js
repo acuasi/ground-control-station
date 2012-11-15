@@ -1,6 +1,7 @@
 var SerialPort = require("serialport").SerialPort
   , Connection = require("../../lib/Connection.js")
-  , MAVLink = require("../../lib/MAVLink")
+  //, MAVLink = require("../../lib/MAVLink")
+  , MAVLink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
   , sinon = require("sinon")
   , nconf = require("nconf");
 
