@@ -103,5 +103,4 @@ describe("Connection manager", function() {
     sinon.assert.calledWith(spy, 'valid mavlink object TBD in fixtures');
 
   });
-*/
 });
