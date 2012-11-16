@@ -1,3 +1,7 @@
+Buffer.prototype.toByteArray = function () {
+  return Array.prototype.slice.call(this, 0)
+}
+
 var SerialPort = require("serialport").SerialPort
   , Connection = require("../../lib/Connection.js")
   , mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
@@ -37,13 +41,15 @@ describe("Connection manager", function() {
 
   });
 
+  // Once corrected, this is a kind of integration test: it involves a buffer,
+  // a protocol and comms over the wire.
   it("can send a heartbeat back and forth", function(done) {
 
     // Register the event handler
     masterSerial.on('data', function(data) {
       
       var m = new mavlink();
-      var unpacked = m.decode(data);
+      var unpacked = m.decode(data.toByteArray());
 
       unpacked.type.should.equal(mavlink.MAV_TYPE_GENERIC);
       unpacked.autopilot.should.equal(mavlink.MAV_AUTOPILOT_ARDUPILOTMEGA);
@@ -97,5 +103,5 @@ describe("Connection manager", function() {
     sinon.assert.calledWith(spy, 'valid mavlink object TBD in fixtures');
 
   });
-
+*/
 });
