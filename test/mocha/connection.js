@@ -19,17 +19,22 @@ describe("Connection manager", function() {
     
 
     // centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
-    this.master = new SerialPort(nconf.get('serial:master'), {
-      baudrate: 9600
-    });
-    this.slave = new SerialPort(nconf.get('serial:slave'), {
-      baudrate: 9600
-    });
+    this.master = new SerialPort("/dev/ttys005");
+    this.slave = new SerialPort("/dev/ttys006");
 
     
 
     this.connection.setBuffer(this.slave);
     this.connection.setProtocol(new mavlink);
+
+    this.heartbeat = new mavlink.messages.heartbeat(
+      mavlink.MAV_TYPE_GENERIC,
+      mavlink.MAV_AUTOPILOT_ARDUPILOTMEGA,
+      mavlink.MAV_MODE_FLAG_SAFETY_ARMED,
+      0, // custom bitfield
+      mavlink.MAV_STATE_STANDBY
+      // The sixth field is apparently implicit, for the heartbeat (mavlink version)
+    );
 
   });
 
@@ -37,9 +42,17 @@ describe("Connection manager", function() {
 
   });
 
+  it("can send a heartbeat back and forth", function(){
+    this.slave.on('data', function(data){
+      console.log(data);
+
+    });
+    this.master.write(new Buffer("hello"));
+
+  });
   // Point being the client can provision the connection, so various
   // buffer/protocol combinations are possible.
-  it("has an IO buffer", function() {
+  /*it("has an IO buffer", function() {
     this.connection.should.have.a.property('buffer');
     this.connection.buffer.should.be.a('object');
   });
@@ -74,5 +87,6 @@ describe("Connection manager", function() {
     sinon.assert.calledWith(spy, 'valid mavlink object TBD in fixtures');
 
   });
+*/
 
 });
