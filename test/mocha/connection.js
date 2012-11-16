@@ -1,30 +1,25 @@
 var SerialPort = require("serialport").SerialPort
   , Connection = require("../../lib/Connection.js")
-  //, MAVLink = require("../../lib/MAVLink")
   , mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
   , sinon = require("sinon")
   , nconf = require("nconf");
 
-nconf.argv()
-       .env()
-       .file({ file: '../../config.json' });
+nconf.argv().env().file({ file: 'config.json' });
+
+// centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
+global.masterSerial = new SerialPort(nconf.get('serial:master'), {
+  baudrate: 115200
+});
+global.slaveSerial = new SerialPort(nconf.get('serial:slave'), {
+  baudrate: 115200
+});
 
 describe("Connection manager", function() {
 
   before(function() {
 
     this.connection = new Connection;
-
-    // Wrap with try/catch to prevent the master/slave failure from preventing any test results
-    
-
-    // centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
-    this.master = new SerialPort("/dev/ttys005");
-    this.slave = new SerialPort("/dev/ttys006");
-
-    
-
-    this.connection.setBuffer(this.slave);
+    this.connection.setBuffer(global.slaveSerial);
     this.connection.setProtocol(new mavlink);
 
     this.heartbeat = new mavlink.messages.heartbeat(
@@ -42,17 +37,32 @@ describe("Connection manager", function() {
 
   });
 
-  it("can send a heartbeat back and forth", function(){
-    this.slave.on('data', function(data){
-      console.log(data);
+  it("can send a heartbeat back and forth", function(done) {
 
-    });
-    this.master.write(new Buffer("hello"));
+    // Register the event handler
+    masterSerial.on('data', function(data) {
+      
+      var m = new mavlink();
+      var unpacked = m.decode(data);
+
+      unpacked.type.should.equal(mavlink.MAV_TYPE_GENERIC);
+      unpacked.autopilot.should.equal(mavlink.MAV_AUTOPILOT_ARDUPILOTMEGA);
+      unpacked.base_mode.should.equal(mavlink.MAV_MODE_FLAG_SAFETY_ARMED);
+      unpacked.custom_mode.should.equal(0);
+      unpacked.system_status.should.equal(mavlink.MAV_STATE_STANDBY);
+      
+      done(); // tell Mocha to wait until this happens to complete the test (async)
+
+    });    
+
+    // Write the packet
+    slaveSerial.write(new Buffer(this.heartbeat.pack()));
 
   });
+
   // Point being the client can provision the connection, so various
   // buffer/protocol combinations are possible.
-  /*it("has an IO buffer", function() {
+  it("has an IO buffer", function() {
     this.connection.should.have.a.property('buffer');
     this.connection.buffer.should.be.a('object');
   });
@@ -87,6 +97,5 @@ describe("Connection manager", function() {
     sinon.assert.calledWith(spy, 'valid mavlink object TBD in fixtures');
 
   });
-*/
 
 });
