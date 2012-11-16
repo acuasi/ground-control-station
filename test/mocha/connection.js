@@ -22,6 +22,7 @@ describe("Connection manager", function() {
 
   before(function() {
 
+    this.serial = global.slaveSerial;
     this.connection = new Connection;
     this.connection.setBuffer(global.slaveSerial);
     this.connection.setProtocol(new mavlink);
@@ -63,30 +64,45 @@ describe("Connection manager", function() {
 
     // Write the packet
     slaveSerial.write(new Buffer(this.heartbeat.pack()));
-
+    masterSerial.removeAllListeners('data');
   });
 
   // Point being the client can provision the connection, so various
   // buffer/protocol combinations are possible.
   it("has an IO buffer", function() {
-    this.connection.should.have.a.property('buffer');
     this.connection.buffer.should.be.a('object');
   });
 
   it("has a protocol en/decoder", function() {
-    this.connection.should.have.a.property('protocol');
     this.connection.protocol.should.be.a('object');
   });
 
-  it("watches the data event on the buffer and decodes data whenever possible", function() {
-    var spy = sinon.spy(this.connection, 'decode');
+  it("watches the data event on the buffer and attempts to decode data whenever possible", function() {
+    var spy = sinon.spy(this.connection, 'attemptDecode');
     this.serial.write('message data');
-    spy.called.should.equal.true;
+  });
+
+  it("maintains an accumulator of unparsed/undecoded data", function(done) {
+
+    // bind an event so we don't have async woe
+    this.connection.on('accumulator', function() {
+      this.connection.accumulator.should.equal('message data');
+      done();
+    });
+
+    this.serial.write('message data');
+
+  });
+
+  it("can flush its accumulator", function() {
+    this.connection.accumulator = 'nonempty';
+    this.connection.flush();
+    this.connection.should.have.property('accumulator', null);
   });
 
   // Existence test only, later will test for capture of data
-  it("sends data on demand, encoding it", function() {
-    var spy = sinon.spy(this.connection, 'encode');
+  it("sends data on demand", function() {
+    var spy = sinon.spy(this.connection, 'send');
     this.connection.send('test data');
     spy.called.should.equal.true;
   });
