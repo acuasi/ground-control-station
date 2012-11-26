@@ -1,4 +1,6 @@
 {
-  "serial:master" : "/var/lib/jenkins/dev/master",
-  "serial:slave" : "/var/lib/jenkins/dev/slave"
+  "serial" : {
+    "master" : "/var/lib/jenkins/dev/master",
+    "slave" : "/var/lib/jenkins/dev/slave"
+  }
 }
