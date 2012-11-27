@@ -10,7 +10,10 @@ var SerialPort = require("serialport").SerialPort
 
 nconf.argv().env().file({ file: 'config.json' });
 
-// centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
+// mkdir $HOME/dev/
+// OSX: socat -d -d PTY,link=$HOME/dev/master,raw,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,ispeed=115200,ospeed=115200,echo=0 &
+// CentOS: socat -d -d PTY,link=$HOME/dev/master,raw,b115200,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,b115200,ispeed=115200,ospeed=115200,echo=0 &
+// [previous] centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
 global.masterSerial = new SerialPort(nconf.get('serial:master'), {
   baudrate: 115200
 });
@@ -39,7 +42,7 @@ describe("Connection manager", function() {
   });
 
   after(function() {
-
+    global.masterSerial.removeAllListeners('data');
   });
 
   // Once corrected, this is a kind of integration test: it involves a buffer,
@@ -64,7 +67,7 @@ describe("Connection manager", function() {
 
     // Write the packet
     slaveSerial.write(new Buffer(this.heartbeat.pack()));
-    masterSerial.removeAllListeners('data');
+    
   });
 
   // Point being the client can provision the connection, so various
@@ -77,9 +80,13 @@ describe("Connection manager", function() {
     this.connection.protocol.should.be.a('object');
   });
 
-  it("watches the data event on the buffer and attempts to decode data whenever possible", function() {
+  it("watches the data event on the buffer and attempts to decode data whenever possible", function(done) {
     var spy = sinon.spy(this.connection, 'attemptDecode');
-    this.serial.write('message data');
+    this.serial.on('data', function() {
+      spy.called.should.equal.true;
+      done();
+    })
+    global.masterSerial.write('message data');
   });
 
   it("maintains an accumulator of unparsed/undecoded data", function(done) {
