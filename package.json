@@ -30,7 +30,8 @@
     "now": "",
     "backbone" : "",
     "nconf": "",
-    "underscore": ""
+    "underscore": "",
+    "winston": ""
   },
   "devDependencies": {
     "grunt": "~0.3.17",

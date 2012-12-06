@@ -1,12 +1,9 @@
-Buffer.prototype.toByteArray = function () {
-  return Array.prototype.slice.call(this, 0)
-}
-
 var SerialPort = require("serialport").SerialPort
   , Connection = require("../../lib/Connection.js")
   , mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
   , sinon = require("sinon")
-  , nconf = require("nconf");
+  , nconf = require("nconf")
+  , fs = require("fs");
 
 nconf.argv().env().file({ file: 'config.json' });
 
@@ -21,13 +18,17 @@ global.slaveSerial = new SerialPort(nconf.get('serial:slave'), {
   baudrate: 115200
 });
 
+// Actual data stream taken from the serial port, should work for integration testing.
+global.fixtures = global.fixtures || {};
+global.fixtures.serialStream = fs.readFileSync("test/serial-data-fixture");
+
 describe("Connection manager", function() {
 
   before(function() {
 
     this.serial = global.slaveSerial;
     this.connection = new Connection;
-    this.connection.setBuffer(global.slaveSerial);
+    this.connection.setBuffer(global.masterSerial);
     this.connection.setProtocol(new mavlink);
 
     this.heartbeat = new mavlink.messages.heartbeat(
@@ -50,11 +51,11 @@ describe("Connection manager", function() {
   it("can send a heartbeat back and forth", function(done) {
 
     // Register the event handler
-    masterSerial.on('data', function(data) {
-      
+    this.connection.on('data', function(data) {
+
       var m = new mavlink();
       var unpacked = m.decode(data.toByteArray());
-
+console.log(data);
       unpacked.type.should.equal(mavlink.MAV_TYPE_GENERIC);
       unpacked.autopilot.should.equal(mavlink.MAV_AUTOPILOT_ARDUPILOTMEGA);
       unpacked.base_mode.should.equal(mavlink.MAV_MODE_FLAG_SAFETY_ARMED);
@@ -64,9 +65,9 @@ describe("Connection manager", function() {
       done(); // tell Mocha to wait until this happens to complete the test (async)
 
     });    
-
+console.log(this.heartbeat.pack());
     // Write the packet
-    slaveSerial.write(new Buffer(this.heartbeat.pack()));
+    this.serial.write(new Buffer(this.heartbeat.pack()));
     
   });
 
@@ -80,19 +81,21 @@ describe("Connection manager", function() {
     this.connection.protocol.should.be.a('object');
   });
 
+  // This is happening here (multiple calls to done()...)
+  // https://github.com/visionmedia/mocha/issues/316#commit-ref-3b17e85
   it("watches the data event on the buffer and attempts to decode data whenever possible", function(done) {
     var spy = sinon.spy(this.connection, 'attemptDecode');
     this.serial.on('data', function() {
       spy.called.should.equal.true;
       done();
     })
-    global.masterSerial.write('message data');
+    this.serial.write('message data');
   });
 
   it("maintains an accumulator of unparsed/undecoded data", function(done) {
 
     // bind an event so we don't have async woe
-    this.connection.on('accumulator', function() {
+    this.connection.on('data', function() {
       this.connection.accumulator.should.equal('message data');
       done();
     });
@@ -125,5 +128,15 @@ describe("Connection manager", function() {
     sinon.assert.calledOnce(spy);
     sinon.assert.calledWith(spy, 'valid mavlink object TBD in fixtures');
 
+  });
+
+  // The intent of this test is to ensure that a known number of MAVLink packets
+  // get decoded from an actual recorded stream of data.
+  it("correctly parses a stream of binary data from the serial port", function(done) {
+    this.connection.on("message", function() {
+      console.log("got a message in test");
+    });
+
+    this.serial.write(global.fixtures.serialStream);
   });
 });
