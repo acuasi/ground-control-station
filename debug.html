@@ -9,17 +9,29 @@
 
 <style>
 * {
+  background-color: #b6ccb8;
+  color: #1f3642;
   font-family: 'Maven Pro', sans-serif;
   font-size: 14px;
 }
 
-div.packet {
-  margin: 0 1em 1em 0;
-  padding: 0 1em 1em 0;
-  width: 25em;
-  min-height: 25em;
-  border: 1px solid #eee;
-  float: left;
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  padding: 1ex;
+  margin: 0;
+  text-align: left;
+}
+
+tr.HEARTBEAT td, tr.SYSTEM_STATUS td {
+  background-color: #b6ccb8;
+}
+
+td {
+  background-color: #ffe2b3;
+  color: #56493f;
 }
 
 </style>
@@ -28,7 +40,7 @@ div.packet {
 $(document).ready(function(){
 
   now.receiveMessage = function(message){
-    $("#messages").prepend('<tr>' + message + '</tr>');
+    $("#messages").prepend(message);
   }
 
 });
@@ -37,6 +49,9 @@ $(document).ready(function(){
 
 <body>
   <h1>MAVLink Debug Stream</h1>
-  <table id="messages"></table>
+  <table>
+    <thead><tr><th scope="col">Message Type</th><th scope="col">seq#</th><th scope="col">Payload</th></tr></thead>
+    <tbody  id="messages"></tbody>
+  </table>
 </body>
 </html>

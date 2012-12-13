@@ -26,12 +26,14 @@
   },
   "dependencies": {
     "express": "3.x",
-    "serialport": "",
-    "now": "",
-    "backbone" : "",
-    "nconf": "",
-    "underscore": "",
-    "winston": ""
+    "serialport": "*",
+    "now": "*",
+    "backbone" : "*",
+    "nconf": "*",
+    "underscore": "*",
+    "winston": "*",
+    "jade": "*",
+    "less-middleware": "*"
   },
   "devDependencies": {
     "grunt": "~0.3.17",
