@@ -7,7 +7,7 @@ var SerialPort = require("serialport").SerialPort
   , app = express()
   , http = require('http')
   , nowjs = require("now")
-  , routes = require('./routes')
+  //, routes = require('./routes')
   , path = require('path')
 
   // Little HTML scratchpad, temporary, will remove

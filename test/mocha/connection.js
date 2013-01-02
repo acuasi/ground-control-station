@@ -20,16 +20,16 @@ global.slaveSerial = new SerialPort(nconf.get('serial:slave'), {
 
 // Actual data stream taken from the serial port, should work for integration testing.
 global.fixtures = global.fixtures || {};
-global.fixtures.serialStream = fs.readFileSync("test/serial-data-fixture");
+global.fixtures.serialStream = fs.readFileSync("test/binary-capture-57600");
 
 describe("Connection manager", function() {
 
   before(function() {
 
     this.serial = global.slaveSerial;
-    this.connection = new Connection;
+    this.connection = new Connection();
     this.connection.setBuffer(global.masterSerial);
-    this.connection.setProtocol(new mavlink);
+    this.connection.setProtocol(new MAVLink());
 
     this.heartbeat = new mavlink.messages.heartbeat(
       mavlink.MAV_TYPE_GENERIC,
