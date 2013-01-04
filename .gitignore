@@ -3,3 +3,5 @@ node_modules/*
 *.sublime-workspace
 config.json
 *.DS_Store
+.monitor
+public/stylesheets/*.css

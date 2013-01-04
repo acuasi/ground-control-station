@@ -1,9 +1,10 @@
 define([
   // Application.
-  "app"
+  "app",
+  "Views/Try"
 ],
 
-function(app) {
+function(app, TryView) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
@@ -12,7 +13,8 @@ function(app) {
     },
 
     index: function() {
-
+      var v = new TryView();
+      v.render();
     }
   });
 

@@ -1,29 +1,7 @@
 body {
   padding: 50px;
-  background-color: #b6ccb8;
-  color: #1f3642;
-  font-family: 'Maven Pro', sans-serif;
-  font-size: 14px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
-table {
-  border-collapse: collapse;
-  padding: 5em;
-}
-td,
-th {
-  padding: 1ex;
-  margin: 0;
-  text-align: left;
-}
-tr.HEARTBEAT td,
-tr.SYSTEM_STATUS td {
-  background-color: #b6ccb8;
-}
-td {
-  background-color: #ffe2b3;
-  color: #56493f;
-}
-#console {
-  max-height: 15em;
-  overflow: auto;
+a {
+  color: #00B7FF;
 }

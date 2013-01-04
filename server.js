@@ -4,14 +4,11 @@ var SerialPort = require("serialport").SerialPort
   , masterSerial = new SerialPort('/dev/tty.usbserial-A900XUV3', { baudrate: 57600 })
   , mavlinkParser = new MAVLink()
   , express = require('express')
+  , routes = require('./routes')
   , app = express()
   , http = require('http')
   , nowjs = require("now")
-  //, routes = require('./routes')
-  , path = require('path')
-
-  // Little HTML scratchpad, temporary, will remove
-  , html = require('fs').readFileSync(__dirname+'/debug.html');
+  , path = require('path');
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -21,8 +18,6 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.cookieParser('gobbleblork'));
-  app.use(express.session());
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -45,14 +40,4 @@ mavlinkParser.on('message', function(message) {
 
 masterSerial.on('data', function(data) {
   mavlinkParser.parseBuffer(data);
-});
-
-// Serve the little html shim
-app.get('/debug', function(req, res) {
-  res.set('Content-Type', 'text/html');
-  res.send(html);
-});
-
-app.get('/status', function(req, res) {
-  res.render('status', { title: 'Status' } );
 });

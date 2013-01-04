@@ -5,26 +5,28 @@ require.config({
   deps: ["main"],
 
   paths: {
-    // JavaScript folders.
+    // libs is for any utility libraries written for this project.
     libs: "../assets/js/libs",
-    plugins: "../assets/js/plugins",
+
+    // vendor is for external, 3rd party libraries used in this project.
     vendor: "../assets/vendor",
 
     // Libraries.
-    jquery: "../assets/js/libs/jquery",
-    lodash: "../assets/js/libs/lodash",
-    backbone: "../assets/js/libs/backbone"
+    jquery: "../assets/js/vendor/jquery",
+    underscore: "../assets/js/vendor/underscore",
+    backbone: "../assets/js/vendor/backbone",
+    jade: "../assets/js/vendor/jade"
+    
   },
 
   shim: {
+
     // Backbone library depends on lodash and jQuery.
     backbone: {
-      deps: ["lodash", "jquery"],
+      deps: ["underscore", "jquery"],
       exports: "Backbone"
-    },
-
-    // Backbone.LayoutManager depends on Backbone.
-    "plugins/backbone.layoutmanager": ["backbone"]
+      
+    }
   }
 
 });

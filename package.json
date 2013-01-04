@@ -11,15 +11,8 @@
   "bugs": {
     "url": "https://github.com/poker-flat/ground-control-station/issues"
   },
-  "licenses": [
-    {
-      "type": "CC",
-      "url": "https://github.com/poker-flat/ground-control-station/blob/master/LICENSE-CC"
-    }
-  ],
-  "main": "lib/pfrr-gcs",
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 0.8.0"
   },
   "scripts": {
     "test": "grunt test"
@@ -36,13 +29,19 @@
     "less-middleware": "*"
   },
   "devDependencies": {
-    "grunt": "~0.3.17",
-    "grunt-contrib": "",
-    "bbb": "",
     "mocha": "",
     "grunt-simple-mocha": "",
     "should": "",
-    "sinon": ""
+    "sinon": "",
+    "grunt": "~0.3.17",
+    "grunt-contrib": "*",
+    "grunt-contrib-requirejs": "~0.3.4",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-jade-plugin": "*",
+    "grunt-jasmine-task": "*",
+    "grunt-linter":"*",
+    "grunt-contrib-less":"*"
   },
   "keywords": []
 }

@@ -15,29 +15,56 @@
   <!-- Testing libs -->
   <script src="vendor/jasmine.js"></script>
   <script src="vendor/jasmine-html.js"></script>
+  <script src="vendor/jasmine-jquery.js"></script>
 
   <!-- Application libs -->
-  <script src="../../assets/js/libs/jquery.js"></script>
-  <script src="../../assets/js/libs/lodash.js"></script>
-  <script src="../../assets/js/libs/backbone.js"></script>
+  <script src="../../assets/js/vendor/jquery.js"></script>
+  <script src="../../assets/js/vendor/underscore.js"></script>
+  <script src="../../assets/js/vendor/backbone.js"></script>
   
   <!-- Load application -->
   <script data-main="../../app/config"
-    src="../../assets/js/libs/require.js"></script>
+    src="../../assets/js/vendor/require.js"></script>
 
   <!-- Declare your spec files to be run here -->
   <script>
     // Ensure you point to where your spec folder is, base directory is app/,
     // which is why ../test is necessary
-    require({ paths: { spec: "../test/jasmine/spec" } }, [
+    require(
+      {
+        paths: { 
+          spec: "../test/jasmine/spec"
+        }
+
+      }, [
 
       // Load the example spec, replace this and add your own spec
-      "spec/example"
+      "spec/TrySpec",
+
+      // Load application files
+      "main",
+      "router" 
 
     ], function() {
-      // Set up the jasmine reporters once each spec has been loaded
-      jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-      jasmine.getEnv().execute();
+      
+      var jasmineEnv = jasmine.getEnv();
+      jasmineEnv.updateInterval = 1000;
+
+      var htmlReporter = new jasmine.HtmlReporter();
+
+      jasmineEnv.addReporter(htmlReporter);
+
+      jasmineEnv.specFilter = function(spec) {
+        return htmlReporter.specFilter(spec);
+      };
+
+      // Without this setTimeout, the specs don't always get execute in webKit browsers, I don't know why
+      // Seems to be also true in Firefox 15/OSX
+      // See: https://github.com/podefr/jasmine-reqjs-jstd/wiki/how-to-setup-a-spec-runner-in-an-html-page
+      setTimeout(function () {
+          jasmineEnv.execute();
+      }, 25);
+
     });
   </script>
 </body>
