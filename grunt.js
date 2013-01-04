@@ -69,26 +69,6 @@ module.exports = function(grunt) {
       }
     },
 
-    linter: { // configure the task
-        files: [ // some example files
-            'grunt.js',
-            'app/**/*.js'
-        ],
-        directives: { // example directives
-            browser: true,
-            todo: true
-        },
-        globals: {
-            jQuery: true
-        },
-        options: {
-            junit: 'out/junit.xml', // write the output to a JUnit XML
-            log: 'out/lint.log',
-            errorsOnly: true, // only display errors
-            linter: 'assets/js/vendor/jshint.js'
-        }
-    },
-
     // Not really necessary since Express is doing it, but perhaps
     // for bundling/packaging.
     less: {
@@ -97,7 +77,7 @@ module.exports = function(grunt) {
           'public/stylesheets/assets.css' : 'assets/less/style.less'
         }
       }
-    } 
+    }
   });
 
   // Load additional tasks.
@@ -105,7 +85,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jade-plugin');
   grunt.loadNpmTasks('grunt-jasmine-task');
-  grunt.loadNpmTasks('grunt-linter');
   grunt.loadNpmTasks('grunt-contrib-less');
 
   // Task registration.

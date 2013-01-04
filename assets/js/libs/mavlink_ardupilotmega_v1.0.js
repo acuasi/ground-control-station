@@ -6,16 +6,16 @@ Generated from: ardupilotmega.xml,common.xml
 Note: this file has been auto-generated. DO NOT EDIT
 */
 
-jspack = require("../lib/node-jspack-master/jspack.js").jspack,
-    mavutil = require("../lib/mavutil.js"),
+jspack = require("./node-jspack-master/jspack.js").jspack,
+    mavutil = require("./mavutil.js"),
     _ = require("underscore"),
     events = require("events"),
     util = require("util");
 
 // Add a convenience method to Buffer
 Buffer.prototype.toByteArray = function () {
-  return Array.prototype.slice.call(this, 0)
-}
+  return Array.prototype.slice.call(this, 0);
+};
 
 mavlink = function(){};
 

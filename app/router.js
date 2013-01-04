@@ -1,7 +1,6 @@
 define([
   // Application.
-  "app",
-  "Views/Try"
+  "app"
 ],
 
 function(app, TryView) {
@@ -12,10 +11,8 @@ function(app, TryView) {
       "": "index"
     },
 
-    index: function() {
-      var v = new TryView();
-      v.render();
-    }
+    index: function() {}
+
   });
 
   return Router;
