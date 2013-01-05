@@ -1,6 +1,6 @@
-require(['Views/Try'], function(TryView) {
+require(['Views/Widgets/Speed'], function(TryView) {
 
-  describe("TryView", function() {
+  describe("SpeedWidget", function() {
     
     beforeEach(function() {
       setFixtures(sandbox({id:'try'}));
