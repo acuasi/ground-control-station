@@ -4,9 +4,10 @@ module.exports = function(grunt) {
   grunt.initConfig({
 
     // Define some common paths to reuse through the config
+    // TODO, this isn't working, fix.
     meta : {
-      src   : 'app/**/*.js',
-      specs : 'spec/**/*.js'
+      src   : './app/**/*.js',
+      specs : './spec/**/*.js'
     },
 
     // The Jade task must be run prior to this task, because the Backbone views
@@ -24,21 +25,15 @@ module.exports = function(grunt) {
 
     watch: {
       
-      scripts: {
-        files: '<%= meta.src %>',
+      all: {
+        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js'],
         tasks: ['default'],
         options: {
-          interrupt: true
-        }
-      },
-
-      templates: {
-        files: 'app/Templates/**/*.jade',
-        tasks: ['jade requirejs'],
-        options: {
-          interrupt: true
+          interrupt: true,
+          forceWatchMethod: 'old'
         }
       }
+
     },
 
     jade: {
@@ -48,7 +43,7 @@ module.exports = function(grunt) {
           runtimeName: 'jade'
         },
         files: {
-          'app/Templates.js': 'app/Templates/*.jade'
+          'build/Templates.js': 'app/Templates/*.jade'
         }
       }
     },
