@@ -35,12 +35,14 @@ var server = http.createServer(app).listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+// Set up connections between clients/server
 var everyone = nowjs.initialize(server);
 
-mavlinkParser.on('message', function(message) {
-  everyone.now.receiveMessage(message);
+mavlinkParser.on('message', function() {
+  console.log(message);
 });
 
+// Try and parse incoming data through the serial connection
 masterSerial.on('data', function(data) {
   mavlinkParser.parseBuffer(data);
 });
