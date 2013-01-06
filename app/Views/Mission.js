@@ -4,11 +4,14 @@ define(['backbone', 'Templates',
   'Models/Mission',
 
   // Widgets (subviews)
-  'Views/Widgets/Speed'
+  'Views/Widgets/Speed',
+  'Views/Widgets/Map'
 
   ], function(Backbone, template,
     Mission,
-    SpeedWidget) {
+    SpeedWidget,
+    MapWidget
+  ) {
   
   var MissionView = Backbone.View.extend({
 
@@ -17,7 +20,7 @@ define(['backbone', 'Templates',
     hasRendered: false,
 
     initialize: function() {
-      
+      _.bindAll(this);
     },
     
     render: function() {
@@ -34,9 +37,15 @@ define(['backbone', 'Templates',
       
       // Instantiate subviews, now that their elements are present on the page
       this.speedWidget = new SpeedWidget({model: this.model.get('platform')});
+      this.mapWidget = new MapWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
+      this.mapWidget.render();
+
+      this.model.get('platform').on('change', function(e) {
+        console.log('changed');
+      });
     }
 
   });

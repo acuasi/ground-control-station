@@ -26,7 +26,7 @@ module.exports = function(grunt) {
     watch: {
       
       all: {
-        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js', 'assets/less/**/*.less'],
+        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js', 'assets/less/**/*.less', 'assets/js/libs/**/*.js'],
         tasks: ['default'],
         options: {
           interrupt: true
@@ -69,7 +69,17 @@ module.exports = function(grunt) {
     less: {
       all: {
         files: {
-          'public/stylesheets/assets.css' : 'assets/less/assets.less'
+          'build/less.css' : 'assets/less/assets.less'
+        }
+      }
+    },
+
+    // Must be after the less task, or that won't get minified
+    // into the final client file.
+    mincss: {
+      compress: {
+        files: {
+          "public/stylesheets/min.css": ["build/less.css", "assets/css/**/*.css"]
         }
       }
     }
@@ -81,10 +91,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jade-plugin');
   grunt.loadNpmTasks('grunt-jasmine-task');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-mincss');
 
   // Task registration.
   // Jade must be compiled to templates before the requirejs task can run,
   // because the Backbone views require templates.
-  grunt.registerTask('default', 'jade requirejs less');
+  grunt.registerTask('default', 'jade requirejs less mincss');
 
 };

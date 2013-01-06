@@ -28,7 +28,6 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
 });
 
@@ -47,8 +46,30 @@ var server = http.createServer(app).listen(app.get('port'), function() {
 // Set up connections between clients/server
 var everyone = nowjs.initialize(server);
 
-mavlinkParser.on('message', function(message) {
+// This won't scale =P
+// The reason to do it this way to start with is because the final
+// interface of the node-mavlink itself isn't quite locked down,
+// and this code is exploratory/"known to work".
+// Once we see more how these events interact with the client, we
+// can surely do better.
+mavlinkParser.on('HEARTBEAT', function(message) {
+  everyone.now.heartbeat(message);
+});
+mavlinkParser.on('GLOBAL_POSITION_INT', function(message) {
+  everyone.now.global_position_int(message);
   console.log(message);
+});
+mavlinkParser.on('SYS_STATUS', function(message) {
+  everyone.now.sys_status(message);
+});
+mavlinkParser.on('ATTITUDE', function(message) {
+  everyone.now.attitude(message);
+});
+mavlinkParser.on('VFR_HUD', function(message) {
+  everyone.now.vfr_hud(message);
+});
+mavlinkParser.on('GPS_RAW_INT', function(message) {
+  everyone.now.attitude(message);
 });
 
 // Try and parse incoming data through the serial connection

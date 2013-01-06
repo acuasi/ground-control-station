@@ -1,10 +1,10 @@
 define(['backbone'], function(Backbone) {
 
   var Platform = Backbone.Model.extend({
-    
+
     defaults: {
       
-      speed: 0, // kph
+      speed: 0, // kph.  Who the hell sets this?? TODO =P
 
       // Set by mavlink.global_position_int packets
       lat: undefined,
@@ -41,10 +41,29 @@ define(['backbone'], function(Backbone) {
       current_battery: undefined,
       battery_remaining: undefined,
       drop_rate_comm: undefined,
-      errors_comm: undefined
+      errors_comm: undefined,
 
+      // Set by mavlink.vfr_hud packets
+      airspeed: undefined,
+      groundspeed: undefined,
+      heading: undefined,
+      throttle: undefined,
+      climb: undefined
+
+    },
+
+    initialize: function() {
+      this.on('change', function() {
+      }, this);
+    },
+
+    validate: function(attrs) {
+      attrs.lat /= 1e07;
+      attrs.lon /= 1e07;
     }
+
   });
+
   return Platform;
   
 });

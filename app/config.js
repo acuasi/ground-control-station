@@ -22,7 +22,9 @@ require.config({
     jquery: "../assets/js/vendor/jquery",
     underscore: "../assets/js/vendor/underscore",
     backbone: "../assets/js/vendor/backbone",
-    jade: "../assets/js/vendor/jade"
+    jade: "../assets/js/vendor/jade",
+    leaflet: "../assets/js/vendor/leaflet",
+    now: "../assets/js/libs/now" // we just don't talk about this one.
     
   },
 
@@ -32,7 +34,10 @@ require.config({
     backbone: {
       deps: ["underscore", "jquery"],
       exports: "Backbone"
-      
+    },
+
+    leaflet: {
+      exports: "L"
     }
   }
 

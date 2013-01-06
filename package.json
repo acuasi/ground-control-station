@@ -41,7 +41,8 @@
     "grunt-jade-plugin": "*",
     "grunt-jasmine-task": "*",
     "grunt-linter":"*",
-    "grunt-contrib-less":"*"
+    "grunt-contrib-less":"*",
+    "grunt-contrib-mincss":"*"
   },
   "keywords": []
 }

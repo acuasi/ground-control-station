@@ -5,4 +5,4 @@ config.json
 *.DS_Store
 .monitor
 public/stylesheets/*.css
-app/Templates.js
+build/
