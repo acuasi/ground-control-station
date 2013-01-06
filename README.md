@@ -23,7 +23,6 @@ nodemon server.js
 │   ├── config.js <<< Config point for require.js
 │   ├── main.js <<< Like main() in C, this is the code entry execution point for the client GUI
 │   └── router.js <<< Standard Backbone router, if we need multiple they should go in a Routers/ dir
-├── app.js <<< Node.js server (rename gcs-server?)
 ├── assets <<< We may write the code.  Static/external/other code used in the build process.
 │   ├── js
 │   │   ├── libs <<< Code we maintain, non-Backbone or otherwise odd; we may need to wrap for AMD, etc.
@@ -51,6 +50,7 @@ nodemon server.js
 ├── routes <<< Express routes
 │   ├── index.js
 │   └── user.js
+├── server.js <<< Node.js server (rename gcs-server?)
 ├── test
 │   └── jasmine <<< It's in a bad state with Grunt 0.3.x vs 0.4.x, no CI possible now
 │       ├── index.html
