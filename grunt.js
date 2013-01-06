@@ -11,7 +11,8 @@ module.exports = function(grunt) {
           baseUrl: "app/",
           mainConfigFile: "app/config.js",
           out: "public/javascripts/required.js",
-          name: "main"
+          name: "main",
+          optimize: "none"
         }
       }
     },

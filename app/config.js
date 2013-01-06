@@ -23,7 +23,9 @@ require.config({
     underscore: "../assets/js/vendor/underscore",
     backbone: "../assets/js/vendor/backbone",
     jade: "../assets/js/vendor/jade",
-    leaflet: "../assets/js/vendor/leaflet",
+
+    // Libraries where we modify the source code in one way or another
+    leaflet: "../assets/js/libs/leaflet",
     now: "../assets/js/libs/now" // we just don't talk about this one.
     
   },
