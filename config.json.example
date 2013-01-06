@@ -1,6 +1,15 @@
 {
+  
   "serial" : {
-    "master" : "/var/lib/jenkins/dev/master",
-    "slave" : "/var/lib/jenkins/dev/slave"
+    "device" : "/dev/tty.usbserial-A900XUV3",
+    "baudrate" : 57600
+  },
+
+  "testing" : {
+    "serial" : {
+      "master" : "/var/lib/jenkins/dev/master",
+      "slave" : "/var/lib/jenkins/dev/slave"
+    }
   }
+  
 }

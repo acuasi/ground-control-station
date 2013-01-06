@@ -1,14 +1,23 @@
 var SerialPort = require("serialport").SerialPort,
   mavlink = require("./assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
   fs = require('fs'),
-  masterSerial = new SerialPort('/dev/tty.usbserial-A900XUV3', { baudrate: 57600 }),
   mavlinkParser = new MAVLink(),
   express = require('express'),
   routes = require('./routes'),
   app = express(),
   http = require('http'),
   nowjs = require("now"),
-  path = require('path');
+  path = require('path'),
+  nconf = require("nconf");
+
+// Fetch configuration information.
+nconf.argv().env().file({ file: 'config.json' });
+
+// Open the serial connection -- TODO, make this resiliant/trying until it finds it / GUI driven, etc.
+masterSerial = new SerialPort(
+  nconf.get('serial:device'),
+  { baudrate: nconf.get('serial:baudrate') }
+);
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -38,7 +47,7 @@ var server = http.createServer(app).listen(app.get('port'), function() {
 // Set up connections between clients/server
 var everyone = nowjs.initialize(server);
 
-mavlinkParser.on('message', function() {
+mavlinkParser.on('message', function(message) {
   console.log(message);
 });
 
