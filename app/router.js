@@ -2,24 +2,34 @@ define([
   // Application.
   "app",
 
+  // Models
+  "Models/Mission",
+  "Models/Platform",
+
   // Dependent views
   "Views/Mission"
 ],
 
-
-function(app, MissionView) {
+function(app,
+  Mission,
+  Platform,
+  MissionView) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     routes: {
-      "": "index",
+      "": "mission",
       "mission": "mission"
     },
-
-    index: function() {},
-
+    
     mission: function() {
-      this.missionView = new MissionView();
+      this.platform = new Platform();
+      this.mission = new Mission({
+        platform: this.platform
+      });
+      this.missionView = new MissionView({
+        model: this.mission
+      });
       this.missionView.render();
     }
 

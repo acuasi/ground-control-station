@@ -26,11 +26,11 @@ module.exports = function(grunt) {
     watch: {
       
       all: {
-        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js'],
+        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js', 'assets/less/**/*.less'],
         tasks: ['default'],
         options: {
-          interrupt: true,
-          forceWatchMethod: 'old'
+          interrupt: true
+       //   forceWatchMethod: 'old'
         }
       }
 
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
     less: {
       all: {
         files: {
-          'public/stylesheets/assets.css' : 'assets/less/style.less'
+          'public/stylesheets/assets.css' : 'assets/less/assets.less'
         }
       }
     }

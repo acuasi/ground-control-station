@@ -6,7 +6,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div>#speedWidget</div><div>#batteryWidget</div><div>#altitudeWidget</div><div>#mapWidget</div><div>#commsWidget</div><div>#gpsWidget</div><div>#healthWidget</div><div>#stateWidget</div>');
+buf.push('<div id="speedWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="mapWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="gpsWidget" class="widget"></div><div id="healthWidget" class="widget"></div><div id="stateWidget" class="widget"></div>');
 }
 return buf.join("");
 };
@@ -16,7 +16,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = speed) == null ? '' : interp) + '</span><span class="units">km/h</span>');
+buf.push('<span class="value">' + ((interp = speed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
 }
 return buf.join("");
 };

@@ -1,11 +1,21 @@
-require(['Views/Mission'], function(MissionView) {
+require(['Models/Mission', 'Models/Platform', 'Views/Mission'], function(Mission, Platform, MissionView) {
 
   describe("MissionView", function() {
     
     beforeEach(function() {
+      
+      this.platform = new Platform();
+      this.mission = new Mission({
+        platform: this.platform
+      });
+
       setFixtures(sandbox({id:'missionView'}));
-      var v = new MissionView();
-      v.render();
+      this.missionView = new MissionView({
+        model: this.mission
+      });
+
+      this.missionView.render();
+
     });
 
     it('Renders a scaffolding template with IDs for subviews', function() {
@@ -21,7 +31,7 @@ require(['Views/Mission'], function(MissionView) {
     });
 
     it('Renders its subviews', function() {
-      console.log($('#speedWidget').html());
+      console.log(this.missionView);
       expect($('#speedWidget').html()).not.toBeUndefined();
       expect($('#batteryWidget').html()).not.toBeUndefined();
       expect($('#altitudeWidget').html()).not.toBeUndefined();
