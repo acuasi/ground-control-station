@@ -3,13 +3,6 @@ module.exports = function(grunt) {
   // Project configuration
   grunt.initConfig({
 
-    // Define some common paths to reuse through the config
-    // TODO, this isn't working, fix.
-    meta : {
-      src   : './app/**/*.js',
-      specs : './spec/**/*.js'
-    },
-
     // The Jade task must be run prior to this task, because the Backbone views
     // reference templates via require().
     requirejs: {
@@ -26,11 +19,18 @@ module.exports = function(grunt) {
     watch: {
       
       all: {
-        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js', 'assets/less/**/*.less', 'assets/js/libs/**/*.js'],
-        tasks: ['default'],
+        files: ['./app/**/*.js', './app/Templates/**/*.jade', './spec/**/*.js', 'assets/js/libs/**/*.js'],
+        tasks: ['jade requirejs'],
         options: {
           interrupt: true
-       //   forceWatchMethod: 'old'
+        }
+      },
+
+      styles: {
+        files: ['assets/less/**/*.less', 'assets/css/**/*.css'],
+        tasks: ['less mincss'],
+        options: {
+          interrupt: true
         }
       }
 
