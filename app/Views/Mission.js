@@ -5,12 +5,27 @@ define(['backbone', 'Templates',
 
   // Widgets (subviews)
   'Views/Widgets/Speed',
-  'Views/Widgets/Map'
+  'Views/Widgets/Map',
+  'Views/Widgets/Comms',
+  'Views/Widgets/Altitude',
+  'Views/Widgets/Gps',
+  'Views/Widgets/Health',
+  'Views/Widgets/State',
+  'Views/Widgets/Battery'
 
   ], function(Backbone, template,
+    // Models
     Mission,
+
+    // Widgets (subviews)
     SpeedWidget,
-    MapWidget
+    MapWidget,
+    CommsWidget,
+    AltitudeWidget,
+    GpsWidget,
+    HealthWidget,
+    StateWidget,
+    BatteryWidget
   ) {
   
   var MissionView = Backbone.View.extend({

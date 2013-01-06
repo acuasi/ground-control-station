@@ -1181,6 +1181,108 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
   return MapWidget;
 
 });
+define('Views/Widgets/Comms',['backbone', 'Templates'], function(Backbone, template) {
+  
+  var CommsWidget = Backbone.View.extend({
+    
+    el: '#commsWidget',
+    className: 'widget',
+    
+    render: function() {
+
+      this.$el.html(template['app/Templates/commsWidget.jade']());
+    
+    }
+    
+  });
+  return CommsWidget;
+
+});
+define('Views/Widgets/Altitude',['backbone', 'Templates'], function(Backbone, template) {
+  
+  var AltitudeWidget = Backbone.View.extend({
+    
+    el: '#altitudeWidget',
+    className: 'widget',
+    
+    render: function() {
+
+      this.$el.html(template['app/Templates/altitudeWidget.jade']());
+    
+    }
+    
+  });
+  return AltitudeWidget;
+
+});
+define('Views/Widgets/Gps',['backbone', 'Templates'], function(Backbone, template) {
+  
+  var GpsWidget = Backbone.View.extend({
+    
+    el: '#gpsWidget',
+    className: 'widget',
+    
+    render: function() {
+
+      this.$el.html(template['app/Templates/gpsWidget.jade']());
+    
+    }
+    
+  });
+  return GpsWidget;
+
+});
+define('Views/Widgets/Health',['backbone', 'Templates'], function(Backbone, template) {
+  
+  var HealthWidget = Backbone.View.extend({
+    
+    el: '#healthWidget',
+    className: 'widget',
+    
+    render: function() {
+
+      this.$el.html(template['app/Templates/healthWidget.jade']());
+    
+    }
+    
+  });
+  return HealthWidget;
+
+});
+define('Views/Widgets/State',['backbone', 'Templates'], function(Backbone, template) {
+  
+  var StateWidget = Backbone.View.extend({
+    
+    el: '#StateWidget',
+    className: 'widget',
+    
+    render: function() {
+
+      this.$el.html(template['app/Templates/stateWidget.jade']());
+    
+    }
+    
+  });
+  return StateWidget;
+
+});
+define('Views/Widgets/Battery',['backbone', 'Templates'], function(Backbone, template) {
+  
+  var BatteryWidget = Backbone.View.extend({
+    
+    el: '#batteryWidget',
+    className: 'widget',
+    
+    render: function() {
+
+      this.$el.html(template['app/Templates/batteryWidget.jade']());
+    
+    }
+    
+  });
+  return BatteryWidget;
+
+});
 define('Views/Mission',['backbone', 'Templates',
 
   // Models
@@ -1188,12 +1290,27 @@ define('Views/Mission',['backbone', 'Templates',
 
   // Widgets (subviews)
   'Views/Widgets/Speed',
-  'Views/Widgets/Map'
+  'Views/Widgets/Map',
+  'Views/Widgets/Comms',
+  'Views/Widgets/Altitude',
+  'Views/Widgets/Gps',
+  'Views/Widgets/Health',
+  'Views/Widgets/State',
+  'Views/Widgets/Battery'
 
   ], function(Backbone, template,
+    // Models
     Mission,
+
+    // Widgets (subviews)
     SpeedWidget,
-    MapWidget
+    MapWidget,
+    CommsWidget,
+    AltitudeWidget,
+    GpsWidget,
+    HealthWidget,
+    StateWidget,
+    BatteryWidget
   ) {
   
   var MissionView = Backbone.View.extend({
