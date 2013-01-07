@@ -53,13 +53,14 @@ define(['backbone', 'Templates',
       // Instantiate subviews, now that their elements are present on the page
       this.speedWidget = new SpeedWidget({model: this.model.get('platform')});
       this.mapWidget = new MapWidget({model: this.model.get('platform')});
+      this.altitudeWidget = new AltitudeWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
       this.mapWidget.render();
+      this.altitudeWidget.render();
 
       this.model.get('platform').on('change', function(e) {
-        console.log('changed');
       });
     }
 

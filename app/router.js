@@ -57,14 +57,14 @@ function(app, now,
 
         now.global_position_int = function(message) {
           self.platform.set({
-            lat: message.lat,
-            lon: message.lon,
-            alt: message.alt,
-            relative_alt: message.relative_alt,
-            vx: message.vx,
-            vy: message.vy,
-            vz: message.vz,
-            hdg: message.hdg
+            lat: message.lat/10000000,
+            lon: message.lon/10000000,
+            alt: message.alt/1000,
+            relative_alt: message.relative_alt/1000,
+            vx: message.vx/100,
+            vy: message.vy/100,
+            vz: message.vz/100,
+            hdg: message.hdg/100
           });
         };
 

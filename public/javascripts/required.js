@@ -757,6 +757,7 @@ define('Models/Platform',['backbone'], function(Backbone) {
     validate: function(attrs) {
       attrs.lat /= 1e07;
       attrs.lon /= 1e07;
+      attrs.alt /=100;
     }
 
   });
@@ -951,6 +952,16 @@ return jade;
 define('Templates',['jade'], function(jade) {
 this["Templates"] = this["Templates"] || {};
 
+this["Templates"]["app/Templates/altitudeWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span>');
+}
+return buf.join("");
+};
+
 this["Templates"]["app/Templates/missionLayout.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
@@ -1144,20 +1155,42 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
 
       _.bindAll(this);
       this.model.on('change:lat change:lon', this.render);
+      this.model.on('change:alt', this.render);
+      this.breadcrumb = [];
     },
 
     render: function() {
+      lat = this.model.get('lat') || 64.88317;
+      lon = this.model.get('lon') || -147.6137;
+      console.log(this.model.toJSON());
+      
       if( false === this.hasRendered ) {
         // Do initial map setup
         this.renderLayout();
         this.hasRendered = true;
       }
 
-      lat = this.model.get('lat') || 64.88317;
-      lon = this.model.get('lon') || -147.6137;
-      console.log(lat + ',' + lon);
-      this.map.panTo( new L.LatLng(lat, lon) ).setZoom(13);
+      var LatLng = new L.LatLng(lat, lon);
 
+      var m = new L.CircleMarker(LatLng).setRadius(10);
+      this.breadcrumb.unshift(m);
+      
+      if(this.breadcrumb.length>50){
+        this.breadcrumb[1].addTo(this.map);
+        this.map.removeLayer(this.breadcrumb.pop());
+        _.each(this.breadcrumb, function(e, i, l) {
+          e.setStyle({
+            fillOpacity: 1/ (i + 1),
+            opacity: 2 * (1/ (1 + i))
+          });
+        }, this);
+      }
+
+      this.map.panTo( LatLng );
+      
+      this.marker.setLatLng( LatLng );
+
+      
     },
 
     renderLayout: function() {
@@ -1165,8 +1198,17 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       // create a map in the "map" div, set the view to a given place and zoom
       this.map = L.map('mapWidget', {
         minZoom: 1,
-        maxZoom: 15
-      }).setView([64.9, -147.1], 10);
+        maxZoom: 22
+      }).setView([64.9, -147.1], 16);
+
+      this.myIcon = L.icon({
+          iconUrl: 'images/jet.svg',
+          iconSize: [25, 50],
+          iconAnchor: [12, 25],
+          popupAnchor: [-3, -76]
+      });
+
+      this.marker = L.marker([64.9, -147.1], {icon: this.myIcon}).addTo(this.map);
 
       var bing = new L.BingLayer("ArSmVTJNY8ZXaAjsxCHf989sG9OqZW3Qf0t1SAdM43Rn9pZpFyWU1jfYv_FFQlLO", {
         zIndex: 0
@@ -1204,11 +1246,14 @@ define('Views/Widgets/Altitude',['backbone', 'Templates'], function(Backbone, te
     
     el: '#altitudeWidget',
     className: 'widget',
-    
-    render: function() {
 
-      this.$el.html(template['app/Templates/altitudeWidget.jade']());
-    
+    initialize: function(){
+      _.bindAll(this);
+      this.model.on("change:alt", this.render, this);
+    },
+    render: function() {
+      console.log("rendering alt");
+      this.$el.html(template['app/Templates/altitudeWidget.jade']({alt: this.model.get('alt')}));
     }
     
   });
@@ -1338,13 +1383,14 @@ define('Views/Mission',['backbone', 'Templates',
       // Instantiate subviews, now that their elements are present on the page
       this.speedWidget = new SpeedWidget({model: this.model.get('platform')});
       this.mapWidget = new MapWidget({model: this.model.get('platform')});
+      this.altitudeWidget = new AltitudeWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
       this.mapWidget.render();
+      this.altitudeWidget.render();
 
       this.model.get('platform').on('change', function(e) {
-        console.log('changed');
       });
     }
 
@@ -1412,14 +1458,14 @@ function(app, now,
 
         now.global_position_int = function(message) {
           self.platform.set({
-            lat: message.lat,
-            lon: message.lon,
-            alt: message.alt,
-            relative_alt: message.relative_alt,
-            vx: message.vx,
-            vy: message.vy,
-            vz: message.vz,
-            hdg: message.hdg
+            lat: message.lat/10000000,
+            lon: message.lon/10000000,
+            alt: message.alt/1000,
+            relative_alt: message.relative_alt/1000,
+            vx: message.vx/100,
+            vy: message.vy/100,
+            vz: message.vz/100,
+            hdg: message.hdg/100
           });
         };
 

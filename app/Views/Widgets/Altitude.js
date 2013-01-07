@@ -4,11 +4,14 @@ define(['backbone', 'Templates'], function(Backbone, template) {
     
     el: '#altitudeWidget',
     className: 'widget',
-    
-    render: function() {
 
-      this.$el.html(template['app/Templates/altitudeWidget.jade']());
-    
+    initialize: function(){
+      _.bindAll(this);
+      this.model.on("change:alt", this.render, this);
+    },
+    render: function() {
+      console.log("rendering alt");
+      this.$el.html(template['app/Templates/altitudeWidget.jade']({alt: this.model.get('alt')}));
     }
     
   });
