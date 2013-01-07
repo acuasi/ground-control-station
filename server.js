@@ -57,7 +57,6 @@ mavlinkParser.on('HEARTBEAT', function(message) {
 });
 mavlinkParser.on('GLOBAL_POSITION_INT', function(message) {
   everyone.now.global_position_int(message);
-  console.log(message);
 });
 mavlinkParser.on('SYS_STATUS', function(message) {
   everyone.now.sys_status(message);

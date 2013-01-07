@@ -11,7 +11,6 @@ define(['backbone', 'leaflet'], function(Backbone, L) {
 
       _.bindAll(this);
       this.model.on('change:lat change:lon', this.render);
-      this.model.on('change:alt', this.render);
       this.breadcrumb = [];
     },
 

@@ -962,6 +962,16 @@ buf.push('<span class="value">' + ((interp = alt) == null ? '' : interp) + '</sp
 return buf.join("");
 };
 
+this["Templates"]["app/Templates/batteryWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
+}
+return buf.join("");
+};
+
 this["Templates"]["app/Templates/missionLayout.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
@@ -1155,7 +1165,6 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
 
       _.bindAll(this);
       this.model.on('change:lat change:lon', this.render);
-      this.model.on('change:alt', this.render);
       this.breadcrumb = [];
     },
 
@@ -1252,7 +1261,6 @@ define('Views/Widgets/Altitude',['backbone', 'Templates'], function(Backbone, te
       this.model.on("change:alt", this.render, this);
     },
     render: function() {
-      console.log("rendering alt");
       this.$el.html(template['app/Templates/altitudeWidget.jade']({alt: this.model.get('alt')}));
     }
     
@@ -1318,9 +1326,20 @@ define('Views/Widgets/Battery',['backbone', 'Templates'], function(Backbone, tem
     el: '#batteryWidget',
     className: 'widget',
     
+    initialize: function() {
+
+      _.bindAll(this);
+      this.model.on('change:battery_remaining', this.render);
+
+    },
+
     render: function() {
 
-      this.$el.html(template['app/Templates/batteryWidget.jade']());
+      this.$el.html(template['app/Templates/batteryWidget.jade'](
+        {
+          battery_remaining: this.model.get('battery_remaining')
+        }
+      ));
     
     }
     
@@ -1384,11 +1403,13 @@ define('Views/Mission',['backbone', 'Templates',
       this.speedWidget = new SpeedWidget({model: this.model.get('platform')});
       this.mapWidget = new MapWidget({model: this.model.get('platform')});
       this.altitudeWidget = new AltitudeWidget({model: this.model.get('platform')});
+      this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
       this.mapWidget.render();
       this.altitudeWidget.render();
+      this.batteryWidget.render();
 
       this.model.get('platform').on('change', function(e) {
       });
