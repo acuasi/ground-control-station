@@ -63,6 +63,7 @@ mavlinkParser.on('SYS_STATUS', function(message) {
 });
 mavlinkParser.on('ATTITUDE', function(message) {
   everyone.now.attitude(message);
+  console.log(message);
 });
 mavlinkParser.on('VFR_HUD', function(message) {
   everyone.now.vfr_hud(message);
@@ -75,3 +76,4 @@ mavlinkParser.on('GPS_RAW_INT', function(message) {
 masterSerial.on('data', function(data) {
   mavlinkParser.parseBuffer(data);
 });
+
