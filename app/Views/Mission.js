@@ -57,6 +57,7 @@ define(['backbone', 'Templates',
       this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
       this.healthWidget = new HealthWidget({model: this.model.get('platform')});
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
+      this.commsWidget = new CommsWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
@@ -65,6 +66,7 @@ define(['backbone', 'Templates',
       this.batteryWidget.render();
       this.healthWidget.render();
       this.gpsWidget.render();
+      this.commsWidget.render();
 
       this.model.get('platform').on('change', function(e) {
       });
