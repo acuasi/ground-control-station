@@ -730,7 +730,7 @@ define('Models/Platform',['backbone'], function(Backbone) {
       autopilot: undefined,
       base_mode: undefined,
       custom_mode: undefined,
-      system_status: undefined,
+      system_status: "no connection",
       mavlink_version: undefined,
 
       // Set by mavlink.SYS_STATUS packets
@@ -968,6 +968,16 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
+}
+return buf.join("");
+};
+
+this["Templates"]["app/Templates/healthWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<p>span.value ' + ((interp = type) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = autopilot) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = base_mode) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = custom_mode) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = system_status) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = mavlink_version) == null ? '' : interp) + '&nbsp;</p>');
 }
 return buf.join("");
 };
@@ -1292,9 +1302,30 @@ define('Views/Widgets/Health',['backbone', 'Templates'], function(Backbone, temp
     el: '#healthWidget',
     className: 'widget',
     
+    initialize: function() {
+
+      _.bindAll(this);
+      this.model.on('change:type', this.render);
+      this.model.on('change:autopilot', this.render);
+      this.model.on('change:base_model', this.render);
+      this.model.on('change:custom_mode', this.render);
+      this.model.on('change:system_status', this.render);
+      this.model.on('change:mavlink_version', this.render);
+
+    },
+
     render: function() {
 
-      this.$el.html(template['app/Templates/healthWidget.jade']());
+        this.$el.html(template['app/Templates/healthWidget.jade'](
+            {
+                type: this.model.get('type'),
+                autopilot: this.model.get('autopilot'),
+                base_mode: this.model.get('base_mode'),
+                custom_mode: this.model.get('custom_mode'),
+                system_status: this.model.get('system_status'),
+                mavlink_version: this.model.get('mavlink_version')
+            }
+        ));
     
     }
     
@@ -1302,6 +1333,7 @@ define('Views/Widgets/Health',['backbone', 'Templates'], function(Backbone, temp
   return HealthWidget;
 
 });
+
 define('Views/Widgets/State',['backbone', 'Templates'], function(Backbone, template) {
   
   var StateWidget = Backbone.View.extend({
@@ -1404,12 +1436,14 @@ define('Views/Mission',['backbone', 'Templates',
       this.mapWidget = new MapWidget({model: this.model.get('platform')});
       this.altitudeWidget = new AltitudeWidget({model: this.model.get('platform')});
       this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
+      this.healthWidget = new HealthWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
       this.mapWidget.render();
       this.altitudeWidget.render();
       this.batteryWidget.render();
+      this.healthWidget.render();
 
       this.model.get('platform').on('change', function(e) {
       });

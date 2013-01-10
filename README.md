@@ -69,6 +69,11 @@ nodemon server.js
 ```
 
 ### Development
+you'll need to install the driver from here:
+http://www.ftdichip.com/Drivers/VCP.htm
+
+if connecting via the usb, be sure to set the baudrate in config.json:
+"baudrate" : 115200
 
 Many things are dependent upon the build cycle.
 

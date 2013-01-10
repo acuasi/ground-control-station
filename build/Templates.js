@@ -21,6 +21,16 @@ buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : i
 return buf.join("");
 };
 
+this["Templates"]["app/Templates/healthWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<p>span.value ' + ((interp = type) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = autopilot) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = base_mode) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = custom_mode) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = system_status) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = mavlink_version) == null ? '' : interp) + '&nbsp;</p>');
+}
+return buf.join("");
+};
+
 this["Templates"]["app/Templates/missionLayout.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];

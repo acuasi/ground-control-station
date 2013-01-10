@@ -33,7 +33,7 @@ define(['backbone'], function(Backbone) {
       autopilot: undefined,
       base_mode: undefined,
       custom_mode: undefined,
-      system_status: undefined,
+      system_status: "no connection",
       mavlink_version: undefined,
 
       // Set by mavlink.SYS_STATUS packets
