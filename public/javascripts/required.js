@@ -1171,7 +1171,6 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
     render: function() {
       lat = this.model.get('lat') || 64.88317;
       lon = this.model.get('lon') || -147.6137;
-      console.log(this.model.toJSON());
       
       if( false === this.hasRendered ) {
         // Do initial map setup
@@ -1198,7 +1197,6 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       this.map.panTo( LatLng );
       
       this.marker.setLatLng( LatLng );
-
       
     },
 
