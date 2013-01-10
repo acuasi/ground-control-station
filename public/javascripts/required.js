@@ -972,6 +972,16 @@ buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : i
 return buf.join("");
 };
 
+this["Templates"]["app/Templates/commsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div id="comms"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div>');
+}
+return buf.join("");
+};
+
 this["Templates"]["app/Templates/gpsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
@@ -1259,9 +1269,20 @@ define('Views/Widgets/Comms',['backbone', 'Templates'], function(Backbone, templ
     el: '#commsWidget',
     className: 'widget',
     
+    initialize: function() {
+      _.bindAll(this);
+      this.model.on('change:drop_rate_comm', this.render);
+      this.model.on('change:errors_comm', this.render);
+    },
+
     render: function() {
 
-      this.$el.html(template['app/Templates/commsWidget.jade']());
+        this.$el.html(template['app/Templates/commsWidget.jade'](
+            {
+                drop_rate_comm: this.model.get('drop_rate_comm'),
+                errors_comm: this.model.get('errors_comm')
+            }
+        ));
     
     }
     
@@ -1469,6 +1490,7 @@ define('Views/Mission',['backbone', 'Templates',
       this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
       this.healthWidget = new HealthWidget({model: this.model.get('platform')});
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
+      this.commsWidget = new CommsWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
@@ -1477,6 +1499,7 @@ define('Views/Mission',['backbone', 'Templates',
       this.batteryWidget.render();
       this.healthWidget.render();
       this.gpsWidget.render();
+      this.commsWidget.render();
 
       this.model.get('platform').on('change', function(e) {
       });

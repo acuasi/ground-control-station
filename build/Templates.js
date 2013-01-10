@@ -21,6 +21,16 @@ buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : i
 return buf.join("");
 };
 
+this["Templates"]["app/Templates/commsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div id="comms"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div>');
+}
+return buf.join("");
+};
+
 this["Templates"]["app/Templates/gpsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
