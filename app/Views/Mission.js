@@ -55,12 +55,14 @@ define(['backbone', 'Templates',
       this.mapWidget = new MapWidget({model: this.model.get('platform')});
       this.altitudeWidget = new AltitudeWidget({model: this.model.get('platform')});
       this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
+      this.healthWidget = new HealthWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();
       this.mapWidget.render();
       this.altitudeWidget.render();
       this.batteryWidget.render();
+      this.healthWidget.render();
 
       this.model.get('platform').on('change', function(e) {
       });
