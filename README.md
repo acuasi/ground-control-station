@@ -4,7 +4,7 @@ UAV ground station software emphasizing data collection and mission operations.
 
 ### Running the project
 
-```
+```bash
 nodemon server.js
 ```
 
@@ -72,7 +72,8 @@ nodemon server.js
 
 Many things are dependent upon the build cycle.
 
-```
+```bash
+grunt
 grunt watch
 ```
 
