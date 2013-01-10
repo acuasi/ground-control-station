@@ -21,12 +21,22 @@ buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : i
 return buf.join("");
 };
 
+this["Templates"]["app/Templates/gpsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div id="position"><span class="units">lat &nbsp;</span><span class="value">' + ((interp = lat) == null ? '' : interp) + ' &nbsp;</span><span class="units">lon &nbsp;</span><span class="value">' + ((interp = lon) == null ? '' : interp) + ' &nbsp;</span></div><div id="gps_stats"><span class="units">fix_type &nbsp;</span><span class="value">' + ((interp = fix_type) == null ? '' : interp) + ' &nbsp;</span><span class="units">satellites_visible &nbsp;</span><span class="value">' + ((interp = satellites_visible) == null ? '' : interp) + ' &nbsp;</span></div>');
+}
+return buf.join("");
+};
+
 this["Templates"]["app/Templates/healthWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<p>span.value ' + ((interp = type) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = autopilot) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = base_mode) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = custom_mode) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = system_status) == null ? '' : interp) + '&nbsp;</p><p>span.value ' + ((interp = mavlink_version) == null ? '' : interp) + '&nbsp;</p>');
+buf.push('<div id="type"><span class="units">type &nbsp;</span><span class="value">' + ((interp = type) == null ? '' : interp) + '</span></div><div id="autopilot"><span class="units">autopilot &nbsp;</span><span class="value">' + ((interp = autopilot) == null ? '' : interp) + '</span></div><div id="base_mode"><span class="units">base_mode &nbsp;</span><span class="value">' + ((interp = base_mode) == null ? '' : interp) + '</span></div><div id="custom_mode"><span class="units">custom_mode &nbsp;</span><span class="value">' + ((interp = custom_mode) == null ? '' : interp) + '</span></div><div id="system_status"><span class="units">system_status &nbsp;</span><span class="value">' + ((interp = system_status) == null ? '' : interp) + '</span></div><div id="mavlink_version"><span class="units">mavlink_version &nbsp;</span><span class="value">' + ((interp = mavlink_version) == null ? '' : interp) + '</span></div>');
 }
 return buf.join("");
 };
