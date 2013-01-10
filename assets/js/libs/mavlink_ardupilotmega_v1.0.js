@@ -6,8 +6,8 @@ Generated from: ardupilotmega.xml,common.xml
 Note: this file has been auto-generated. DO NOT EDIT
 */
 
-jspack = require("../lib/node-jspack-master/jspack.js").jspack,
-    mavutil = require("../lib/mavutil.js"),
+jspack = require("./node-jspack-master/jspack.js").jspack,
+    mavutil = require("./mavutil.js"),
     _ = require("underscore"),
     events = require("events"),
     util = require("util");
@@ -1383,7 +1383,7 @@ mavlink.enums.MAV_MISSION_RESULT_ENUM_END = {
 mavlink.MAV_SEVERITY_EMERGENCY = 0 // System is unusable. This is a "panic" condition.
 mavlink.enums.MAV_SEVERITY_EMERGENCY = {
 	 name: "MAV_SEVERITY_EMERGENCY",
-	description:"System is unusable. This is a "panic" condition."
+	description:"System is unusable. This is a panic condition."
 }
 mavlink.MAV_SEVERITY_ALERT = 1 // Action should be taken immediately. Indicates error in non-critical
                         // systems.
