@@ -1,5 +1,5 @@
 var SerialPort = require("serialport").SerialPort,
-  mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js"),
+  mavlink = require("../../assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
   sinon = require("sinon"),
   nconf = require("nconf"),
   fs = require("fs");
@@ -10,10 +10,10 @@ nconf.argv().env().file({ file: 'config.json' });
 // OSX: socat -d -d PTY,link=$HOME/dev/master,raw,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,ispeed=115200,ospeed=115200,echo=0 &
 // CentOS: socat -d -d PTY,link=$HOME/dev/master,raw,b115200,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,b115200,ispeed=115200,ospeed=115200,echo=0 &
 // [previous] centos: socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
-global.masterSerial = new SerialPort(nconf.get('serial:master'), {
+global.masterSerial = new SerialPort(nconf.get('testing:serial:master'), {
   baudrate: 115200
 });
-global.slaveSerial = new SerialPort(nconf.get('serial:slave'), {
+global.slaveSerial = new SerialPort(nconf.get('testing:serial:slave'), {
   baudrate: 115200
 });
 
