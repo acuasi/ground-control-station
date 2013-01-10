@@ -72,6 +72,10 @@ mavlinkParser.on('GPS_RAW_INT', function(message) {
   everyone.now.attitude(message);
 });
 
+mavlinkParser.on('message', function(message) {
+  console.log(message);
+});
+
 // Try and parse incoming data through the serial connection
 masterSerial.on('data', function(data) {
   mavlinkParser.parseBuffer(data);
