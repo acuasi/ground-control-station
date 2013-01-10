@@ -1,9 +1,8 @@
-var SerialPort = require("serialport").SerialPort
-  , Connection = require("../../lib/Connection.js")
-  , mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js")
-  , sinon = require("sinon")
-  , nconf = require("nconf")
-  , fs = require("fs");
+var SerialPort = require("serialport").SerialPort,
+  mavlink = require("../../lib/mavlink_ardupilotmega_v1.0.js"),
+  sinon = require("sinon"),
+  nconf = require("nconf"),
+  fs = require("fs");
 
 nconf.argv().env().file({ file: 'config.json' });
 
@@ -114,7 +113,7 @@ console.log(this.heartbeat.pack());
   it("sends data on demand", function() {
     var spy = sinon.spy(this.connection, 'send');
     this.connection.send('test data');
-    spy.called.should.equal.true;
+    spy.called.should.equal(true);
   });
 
   // The events that this emits are higher-level than the serial port events,
