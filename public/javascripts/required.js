@@ -701,7 +701,7 @@ define('Models/Platform',['backbone'], function(Backbone) {
 
     defaults: {
       
-      speed: 0, // kph.  Who the hell sets this?? TODO =P
+      speed: undefined, // kph.  Who the hell sets this?? TODO =P
 
       // Set by mavlink.global_position_int packets
       lat: undefined,
@@ -742,7 +742,7 @@ define('Models/Platform',['backbone'], function(Backbone) {
 
       // Set by mavlink.vfr_hud packets
       airspeed: undefined,
-      groundspeed: undefined,
+      groundspeed: 0,
       heading: undefined,
       throttle: undefined,
       climb: undefined
@@ -957,7 +957,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span>');
+buf.push('<span class="units">Altitude: &nbsp;</span><span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span>');
 }
 return buf.join("");
 };
@@ -967,7 +967,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
+buf.push('<span class="units">Battery: &nbsp;</span><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
 }
 return buf.join("");
 };
@@ -1017,7 +1017,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = speed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
+buf.push('<span class="units">Groundspeed &nbsp;</span><span class="value">' + ((interp = groundspeed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
 }
 return buf.join("");
 };
@@ -1030,9 +1030,14 @@ define('Views/Widgets/Speed',['backbone', 'Templates'], function(Backbone, templ
     el: '#speedWidget',
     className: 'widget',
     
+    initialize: function() {
+      _.bindAll(this);
+      this.model.on('change:groundspeed', this.render);
+    },
+
     render: function() {
 
-      this.$el.html(template['app/Templates/speedWidget.jade']({speed: this.model.get('speed')}));
+      this.$el.html(template['app/Templates/speedWidget.jade']({groundspeed: this.model.get('groundspeed')}));
     
     }
     

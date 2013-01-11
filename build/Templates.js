@@ -6,7 +6,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span>');
+buf.push('<span class="units">Altitude: &nbsp;</span><span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span>');
 }
 return buf.join("");
 };
@@ -16,7 +16,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
+buf.push('<span class="units">Battery: &nbsp;</span><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
 }
 return buf.join("");
 };
@@ -66,7 +66,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="value">' + ((interp = speed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
+buf.push('<span class="units">Groundspeed &nbsp;</span><span class="value">' + ((interp = groundspeed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
 }
 return buf.join("");
 };

@@ -63,7 +63,6 @@ mavlinkParser.on('SYS_STATUS', function(message) {
 });
 mavlinkParser.on('ATTITUDE', function(message) {
   everyone.now.attitude(message);
-  console.log(message);
 });
 mavlinkParser.on('VFR_HUD', function(message) {
   everyone.now.vfr_hud(message);
