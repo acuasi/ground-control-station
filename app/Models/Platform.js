@@ -4,7 +4,7 @@ define(['backbone'], function(Backbone) {
 
     defaults: {
       
-      speed: 0, // kph.  Who the hell sets this?? TODO =P
+      speed: undefined, // kph.  Who the hell sets this?? TODO =P
 
       // Set by mavlink.global_position_int packets
       lat: undefined,
@@ -45,7 +45,7 @@ define(['backbone'], function(Backbone) {
 
       // Set by mavlink.vfr_hud packets
       airspeed: undefined,
-      groundspeed: undefined,
+      groundspeed: 0,
       heading: undefined,
       throttle: undefined,
       climb: undefined
