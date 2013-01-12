@@ -1,14 +1,32 @@
 var SerialPort = require("serialport").SerialPort,
   mavlink = require("./assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
   fs = require('fs'),
-  mavlinkParser = new MAVLink(),
   express = require('express'),
   routes = require('./routes'),
   app = express(),
   http = require('http'),
   nowjs = require("now"),
   path = require('path'),
-  nconf = require("nconf");
+  nconf = require("nconf"),
+  requirejs = require("requirejs"),
+  winston = require("winston");
+
+requirejs.config({
+    //Pass the top-level main.js/index.js require
+    //function to requirejs so that node modules
+    //are loaded relative to the top-level JS file.
+    //nodeRequire: require,
+    baseUrl: './app'
+});
+
+// Logger
+var logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.File)({ filename: 'mavlink.dev.log' })
+  ]
+});
+
+var mavlinkParser = new MAVLink(logger);
 
 // Fetch configuration information.
 nconf.argv().env().file({ file: 'config.json' });
@@ -46,38 +64,90 @@ var server = http.createServer(app).listen(app.get('port'), function() {
 // Set up connections between clients/server
 var everyone = nowjs.initialize(server);
 
-// This won't scale =P
-// The reason to do it this way to start with is because the final
-// interface of the node-mavlink itself isn't quite locked down,
-// and this code is exploratory/"known to work".
-// Once we see more how these events interact with the client, we
-// can surely do better.
-mavlinkParser.on('HEARTBEAT', function(message) {
-  everyone.now.heartbeat(message);
-});
-mavlinkParser.on('GLOBAL_POSITION_INT', function(message) {
-  everyone.now.global_position_int(message);
-});
-mavlinkParser.on('SYS_STATUS', function(message) {
-  everyone.now.sys_status(message);
-});
-mavlinkParser.on('ATTITUDE', function(message) {
-  everyone.now.attitude(message);
-  console.log(message);
-});
-mavlinkParser.on('VFR_HUD', function(message) {
-  everyone.now.vfr_hud(message);
-});
-mavlinkParser.on('GPS_RAW_INT', function(message) {
-  everyone.now.attitude(message);
-});
-
-mavlinkParser.on('message', function(message) {
-  console.log(message);
-});
-
 // Try and parse incoming data through the serial connection
 masterSerial.on('data', function(data) {
   mavlinkParser.parseBuffer(data);
 });
 
+requirejs(["Models/Platform"], function(Platform) {
+
+  // Debugging
+  mavlinkParser.on('message', function(message) {
+    //console.log(message);
+    //everyone.now.updatePlatform();
+  });
+
+  var platform = {};
+  
+  // This won't scale =P still
+  // But it's closer to what we want to do.
+  mavlinkParser.on('HEARTBEAT', function(message) {
+    platform = _.extend(platform, {
+      type: message.type,
+      autopilot: message.autopilot,
+      base_mode: message.base_mode,
+      custom_mode: message.custom_mode,
+      system_status: message.system_status,
+      mavlink_version: message.mavlink_version
+    });
+    everyone.now.updatePlatform(platform);
+  });
+
+  mavlinkParser.on('GLOBAL_POSITION_INT', function(message) {
+    platform = _.extend(platform, {
+      lat: message.lat/10000000,
+      lon: message.lon/10000000,
+      alt: message.alt/1000,
+      relative_alt: message.relative_alt/1000,
+      vx: message.vx/100,
+      vy: message.vy/100,
+      vz: message.vz/100,
+      hdg: message.hdg/100
+    });
+    everyone.now.updatePlatform(platform);
+  });
+
+  mavlinkParser.on('SYS_STATUS', function(message) {
+    platform = _.extend(platform, {
+      voltage_battery: message.voltage_battery,
+      current_battery: message.current_battery,
+      battery_remaining: message.battery_remaining,
+      drop_rate_comm: message.drop_rate_comm,
+      errors_comm: message.errors_comm
+    });
+    everyone.now.updatePlatform(platform);
+  });
+
+  mavlinkParser.on('ATTITUDE', function(message) {
+    platform = _.extend(platform, {
+      pitch: message.pitch,
+      roll: message.roll,
+      yaw: message.yaw,
+      pitchspeed: message.pitchspeed,
+      rollspeed: message.rollspeed,
+      yawspeed: message.yawspeed
+    });
+    everyone.now.updatePlatform(platform);
+  });
+
+  mavlinkParser.on('VFR_HUD', function(message) {
+    platform = _.extend(platform, {
+      airspeed: message.airspeed,
+      groundspeed: message.groundspeed,
+      heading: message.heading,
+      throttle: message.throttle,
+      climb: message.climb
+    });
+    everyone.now.updatePlatform(platform);
+
+  });
+
+  mavlinkParser.on('GPS_RAW_INT', function(message) {
+    platform = _.extend(platform, {
+      fix_type: message.fix_type,
+      satellites_visible: message.satellites_visible
+    });
+    everyone.now.updatePlatform(platform);
+  });
+
+}); // end scope of requirejs

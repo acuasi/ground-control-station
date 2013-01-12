@@ -26,7 +26,8 @@
     "underscore": "*",
     "winston": "*",
     "jade": "*",
-    "less-middleware": "*"
+    "less-middleware": "*",
+    "winston": "*"
   },
   "devDependencies": {
     "mocha": "",
