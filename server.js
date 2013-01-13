@@ -31,6 +31,16 @@ var mavlinkParser = new MAVLink(logger);
 // Fetch configuration information.
 nconf.argv().env().file({ file: 'config.json' });
 
+fs.readdir('/dev', function (err, files) {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  var re = new RegExp("tty");
+  var ttyFiles = _.filter(files, function(file){ return re.test(file); });
+  console.log(ttyFiles);
+});
+
 // Open the serial connection -- TODO, make this resiliant/trying until it finds it / GUI driven, etc.
 masterSerial = new SerialPort(
   nconf.get('serial:device'),
