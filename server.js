@@ -9,7 +9,8 @@ var SerialPort = require("serialport").SerialPort,
   path = require('path'),
   nconf = require("nconf"),
   requirejs = require("requirejs"),
-  winston = require("winston");
+  winston = require("winston"),
+  child = require("child_process");
 
 requirejs.config({
     //Pass the top-level main.js/index.js require
@@ -31,21 +32,51 @@ var mavlinkParser = new MAVLink(logger);
 // Fetch configuration information.
 nconf.argv().env().file({ file: 'config.json' });
 
-fs.readdir('/dev', function (err, files) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  var re = new RegExp("tty");
-  var ttyFiles = _.filter(files, function(file){ return re.test(file); });
-  console.log(ttyFiles);
-});
-
 // Open the serial connection -- TODO, make this resiliant/trying until it finds it / GUI driven, etc.
-masterSerial = new SerialPort(
+// trying to adapt from this code:
+//    https://github.com/ecto/duino/blob/master/lib/board.js
+
+var detect = function(baudrate){
+  child.exec('ls /dev | grep usb', function(err, stdout, stderr){
+    console.log('Looking for a usbserial device');
+      var usb = stdout.slice(0, -1).split('\n'),
+          found = false,
+          possible, temp;
+
+      while ( usb.length ) {
+        possible = usb.pop();
+
+        if (possible.slice(0, 2) !== 'cu') {
+          try {
+            temp = new serial.SerialPort('/dev/' + possible, {
+              baudrate: baudrate,
+              parser: serial.parsers.readline('\n')
+            });
+          } catch (e) {
+            err = e;
+          }
+          if (!err) {
+            found = temp;
+            console.log('Found board at ' + temp.port);
+            return found;
+          } else {
+            //err = new Error('Could not find Arduino');
+            console.log('Could not find a usbserial device');
+          }
+        }
+      }
+
+      //callback(err, found);
+    });
+};
+
+masterSerial = detect(nconf.get('serial:baudrate'));
+/*new SerialPort(
   nconf.get('serial:device'),
   { baudrate: nconf.get('serial:baudrate') }
-);
+);*/
+
+
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
