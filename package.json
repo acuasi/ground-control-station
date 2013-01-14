@@ -28,6 +28,7 @@
     "jade": "*",
     "less-middleware": "*",
     "winston": "*",
+    "colors": "*",
     "requirejs": "*"
   },
   "devDependencies": {
