@@ -38,7 +38,7 @@ nconf.argv().env().file({ file: 'config.json' });
  * The main Arduino constructor
  * Connect to the serial port and bind
  */
-var Board = function (options) {
+var UsbConnection = function (options) {
   this.log('info', 'initializing');
   this.debug = options && options.debug || false;
   this.baudrate = options && options.baudrate || 115200;
@@ -56,16 +56,22 @@ var Board = function (options) {
       self.emit('connected');
 
       self.log('info', 'binding serial events');
-      self.serial.on('data', function(data){
+
+      // Try and parse incoming data through the serial connection
+      self.serial.on('data', function(data) {
+        self.log('receive', data.toString().red);
+        mavlinkParser.parseBuffer(data);
+      });
+      /*self.serial.on('data', function(data){
         self.log('receive', data.toString().red);
         self.emit('data', data);
-      });
+      });*/
 
       setTimeout(function(){
         self.log('info', 'board ready');
-        self.sendClearingBytes();
+        //self.sendClearingBytes();
 
-        if (self.debug) {
+        /*if (self.debug) {
           self.log('info', 'sending debug mode toggle on to board');
           self.write('99' + self.normalizePin(0) + self.normalizeVal(1));
           process.on('SIGINT', function(){
@@ -80,13 +86,13 @@ var Board = function (options) {
 
         if (self.writeBuffer.length > 0) {
           self.processWriteBuffer();
-        }
+        }*/
 
-        self.emit('ready');      
+        self.emit('ready');
       }, 500);
     }
   });
-}
+};
 
 /*
  * EventEmitter, I choose you!
@@ -100,18 +106,22 @@ util.inherits(UsbConnection, events.EventEmitter);
 UsbConnection.prototype.detect = function(callback){
   child.exec('ls /dev | grep usb', function(err, stdout, stderr){
     console.log('Looking for a usbserial device');
+    console.log("stdout: ", stdout);
       var usb = stdout.slice(0, -1).split('\n'),
           found = false,
-          possible, temp;
+          possible,
+          temp;
+
+      console.log("usb", usb);
 
       while ( usb.length ) {
         possible = usb.pop();
+        console.log("possible: ", possible);
 
         if (possible.slice(0, 2) !== 'cu') {
           try {
-            temp = new serial.SerialPort('/dev/' + possible, {
-              baudrate: baudrate,
-              parser: serial.parsers.readline('\n')
+            temp = new SerialPort('/dev/' + possible, {
+              baudrate: 115200
             });
           } catch (e) {
             err = e;
@@ -121,7 +131,7 @@ UsbConnection.prototype.detect = function(callback){
             console.log('Found board at ' + temp.port);
             break;
           } else {
-            //err = new Error('Could not find Arduino');
+            err = new Error('Could not find usbserial device');
             console.log('Could not find a usbserial device');
           }
         }
@@ -139,14 +149,14 @@ UsbConnection.prototype.log = function (/*level, message*/) {
   if (this.debug) {
     console.log(String(+new Date()).grey + ' duino '.blue + args.shift().magenta + ' ' + args.join(', '));
   }
-}
+};
 
-masterSerial = detect(nconf.get('serial:baudrate'));
+//masterSerial = detect(nconf.get('serial:baudrate'));
 /*new SerialPort(
   nconf.get('serial:device'),
   { baudrate: nconf.get('serial:baudrate') }
 );*/
-
+masterSerial = new UsbConnection();
 
 
 app.configure(function(){
@@ -176,16 +186,13 @@ var server = http.createServer(app).listen(app.get('port'), function() {
 // Set up connections between clients/server
 var everyone = nowjs.initialize(server);
 
-// Try and parse incoming data through the serial connection
-masterSerial.on('data', function(data) {
-  mavlinkParser.parseBuffer(data);
-});
+
 
 requirejs(["Models/Platform"], function(Platform) {
 
   // Debugging
   mavlinkParser.on('message', function(message) {
-    //console.log(message);
+    console.log(message);
     //everyone.now.updatePlatform();
   });
 
