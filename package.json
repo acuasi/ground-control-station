@@ -27,7 +27,9 @@
     "winston": "*",
     "jade": "*",
     "less-middleware": "*",
-    "winston": "*"
+    "winston": "*",
+    "colors": "*",
+    "requirejs": "*"
   },
   "devDependencies": {
     "mocha": "",
