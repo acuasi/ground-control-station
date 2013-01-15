@@ -2,13 +2,41 @@
 
 UAV ground station software emphasizing data collection and mission operations.
 
-### Running the project
+### Installation (for development)
 
-```bash
-nodemon server.js
+#### Prerequisites
+
+You need ```git```, ```node```, ```npm``` (distributed with node, usually), and ```grunt```.  On OSX, [install Node.js from an installer](http://nodejs.org/#download), then the rest with brew and npm:
+
+```
+brew install git
+npm install -g grunt
 ```
 
-### Project structure
+#### Running
+
+After installing prerequisites, clone this project and install dependencies, then build runtime files with ```grunt```:
+
+```
+git clone git@github.com:poker-flat/ground-control-station.git
+npm install
+grunt
+```
+
+### Configuration
+
+Work in progress, you may need to specify the serial port in the ```config.json``` file at the root of the project (copy/paste the ```config.json.example``` file as a template) but it's changing very fast right now (1/14/2013).
+
+### Running the project
+
+Running the project has two parts: starting the node server process, and launching the grunt watcher process.  This kicks off a new build anytime any files that are used by the client are modified -- it takes a few moments, so when you save the file, it may be a few seconds before your changes are visibile in the restarted node process.
+
+```bash
+nodemon server.js &
+grunt && grunt watch
+```
+
+### Project architecture and structure
 
 ```
 ├── app <<< We write the code. Shared code (mainly/exclusively Backbone + RequireJS) between server/client
@@ -68,18 +96,24 @@ nodemon server.js
     └── layout.jade
 ```
 
+[Grunt](http://gruntjs.com/) is used as the Javascript build system, and our build file (```grunt.js```) is a work in progress.  [Backbone](http://backbonejs.org/) handles the heavy lifting on the client side, and [express](http://expressjs.com/) is the routing architecture/middleware manager on the server.
+
 ### Development
-you'll need to install the driver from here:
-http://www.ftdichip.com/Drivers/VCP.htm
+(OSX) You'll need to install the [FTDI Arduino MegaPilot driver](http://www.ftdichip.com/Drivers/VCP.htm) before the system will recognize the system.
 
 if connecting via the usb, be sure to set the baudrate in config.json:
-"baudrate" : 115200
 
-Many things are dependent upon the build cycle.
+```json
+{
+  ...
+  "baudrate" : 115200
+  ...
+}
+
+Many things are dependent upon the build cycle, so you usually want to have this running:
 
 ```bash
-grunt
-grunt watch
+grunt && grunt watch
 ```
 
 ### Testing
@@ -90,16 +124,28 @@ The ```config.json.example``` file is used to configure Jenkins' runtime environ
 
 #### Running tests
 
-There's two different collections of test suites: ones that run on the server, and ones that run on the GUI/interface layer.  Mocha is used for the server-side tests, Jasmine for the GUI layer.
+Some additional prerequsites may be required:
 
-To run tests in the development environment:
-
-```bash
-grunt test
+```
+npm install -g grunt
 ```
 
-To run Mocha tests for xunit output:
+There's two different collections of test suites: ones that run on the server, and ones that run on the GUI/interface layer.  Mocha is used for the server-side tests, Jasmine for the GUI layer.
+
+To run server-side (mocha) tests in the development environment:
+
+```bash
+mocha test
+```
+
+To run Mocha tests for xunit output (for CI/Jenkins):
 
 ```bash
 mocha --reporter xunit test/mocha
+```
+
+Running client-side Jasmine tests through grunt:
+
+```bash
+grunt jasmine
 ```
