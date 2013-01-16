@@ -957,7 +957,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="units">Altitude: &nbsp;</span><span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span>');
+buf.push('<h3>Altitude</h3><div><span class="value">' + ((interp = alt) == null ? '' : interp) + '</span><span class="units">&nbsp;meters</span></div>');
 }
 return buf.join("");
 };
@@ -967,7 +967,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="units">Battery: &nbsp;</span><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span>');
+buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div>');
 }
 return buf.join("");
 };
@@ -1007,7 +1007,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="speedWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="mapWidget" class="widget"></div><fieldset><legend>Live Data Feed</legend><div id="commsWidget" class="widget"></div><div id="gpsWidget" class="widget"></div><div id="healthWidget" class="widget"></div><div id="stateWidget" class="widget"></div></fieldset>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="gpsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div>');
 }
 return buf.join("");
 };
@@ -1017,7 +1017,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<span class="units">Groundspeed &nbsp;</span><span class="value">' + ((interp = groundspeed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
+buf.push('<h3>Ground Speed</h3><span class="value">' + ((interp = groundspeed) == null ? '' : interp) + '</span><span class="units">&nbsp;km/h</span>');
 }
 return buf.join("");
 };
@@ -1259,6 +1259,12 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       this.map.on('click', function(e) {
         alert(e.latlng);
       });
+
+      // Resize to fill the screen; respond to screen size change events.
+      $('#mapWidget').height($(window).height());
+      $('#mapWidget').width($(window).width());
+      this.map.invalidateSize(false); // force Leaflet resize, do not animate
+      $(window).resize($.proxy(function(e) { this.map.invalidateSize(false); }, this));
 
     }
   });

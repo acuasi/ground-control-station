@@ -1,6 +1,7 @@
 
 @import "variables.less";
 @import "fonts.less";
+@import "missionWidgets.less";
 
 // We'll refactor this file apart as we go: watch for blocks of related things,
 // then @import(url) them.
@@ -8,6 +9,8 @@ body {
    color: @text;
    background-color: @background;
    font-family: 'Source Sans Pro';
+   margin: 0;
+   padding: 0;
 }
 
 .widget {
@@ -18,7 +21,7 @@ body {
 
 div#mapWidget {
   min-height: 500px;
-  max-width: 1000px;
+  min-width: 1000px;
 }
 
 fieldset {

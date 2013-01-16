@@ -71,6 +71,12 @@ define(['backbone', 'leaflet'], function(Backbone, L) {
         alert(e.latlng);
       });
 
+      // Resize to fill the screen; respond to screen size change events.
+      $('#mapWidget').height($(window).height());
+      $('#mapWidget').width($(window).width());
+      this.map.invalidateSize(false); // force Leaflet resize, do not animate
+      $(window).resize($.proxy(function(e) { this.map.invalidateSize(false); }, this));
+
     }
   });
   return MapWidget;

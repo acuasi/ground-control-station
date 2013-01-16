@@ -1,0 +1,32 @@
+#missionView {
+  #widgets {
+  
+    z-index: 100;
+    position: absolute;
+    right: 0;
+
+    .widget {
+      margin: 15px;
+      border-radius: @roundness;
+      background-color: rgba(0, 0, 0, .5);
+      box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, .75);
+      padding: 1ex;
+
+      h3 {
+        font-weight: 400;
+        color: @ok;
+        margin: 0;
+        padding: 0;
+      }
+
+    }
+
+    #speedWidget, #altitudeWidget {
+      .value {
+        font-size: 48px;
+        font-weight: 600;
+      }
+    }
+
+  } 
+}

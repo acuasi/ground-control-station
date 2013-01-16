@@ -49,8 +49,8 @@ var UsbConnection = function (options) {
     if (err) {
       if(self.listeners('error').length)
         self.emit('error', err);
-      else
-        throw new Error(err);
+      //else
+        //throw new Error(err);
     }else{
       self.serial = serial;
       self.emit('connected');
