@@ -1008,7 +1008,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="gpsWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
 }
 return buf.join("");
 };
