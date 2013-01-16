@@ -5,6 +5,7 @@ define(['backbone'], function(Backbone) {
     defaults: {
       
       speed: undefined, // kph.  Who the hell sets this?? TODO =P
+      // this can likely be removed since we are most likely interested in ground speed
 
       // Set by mavlink.global_position_int packets
       lat: undefined,

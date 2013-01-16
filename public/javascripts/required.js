@@ -702,6 +702,7 @@ define('Models/Platform',['backbone'], function(Backbone) {
     defaults: {
       
       speed: undefined, // kph.  Who the hell sets this?? TODO =P
+      // this can likely be removed since we are most likely interested in ground speed
 
       // Set by mavlink.global_position_int packets
       lat: undefined,
@@ -987,7 +988,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="position"><span class="units">lat &nbsp;</span><span class="value">' + ((interp = lat) == null ? '' : interp) + ' &nbsp;</span><span class="units">lon &nbsp;</span><span class="value">' + ((interp = lon) == null ? '' : interp) + ' &nbsp;</span></div><div id="gps_stats"><span class="units">fix_type &nbsp;</span><span class="value">' + ((interp = fix_type) == null ? '' : interp) + ' &nbsp;</span><span class="units">satellites_visible &nbsp;</span><span class="value">' + ((interp = satellites_visible) == null ? '' : interp) + ' &nbsp;</span></div>');
+buf.push('<h3>GPS</h3><div id="position"><span class="units">lat &nbsp;</span><span class="value">' + ((interp = lat) == null ? '' : interp) + ' &nbsp;</span><span class="units">lon &nbsp;</span><span class="value">' + ((interp = lon) == null ? '' : interp) + ' &nbsp;</span></div><div id="gps_stats"><div id="location"><span class="units">fix_type &nbsp;</span><span class="value">' + ((interp = fix_type) == null ? '' : interp) + ' &nbsp;</span></div><div id="stats"><span class="units">satellites_visible &nbsp;</span><span class="value">' + ((interp = satellites_visible) == null ? '' : interp) + ' &nbsp;</span></div></div>');
 }
 return buf.join("");
 };
@@ -1007,7 +1008,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="gpsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="gpsWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div>');
 }
 return buf.join("");
 };
