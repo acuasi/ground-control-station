@@ -109,6 +109,7 @@ if connecting via the usb, be sure to set the baudrate in config.json:
   "baudrate" : 115200
   ...
 }
+```
 
 Many things are dependent upon the build cycle, so you usually want to have this running:
 
