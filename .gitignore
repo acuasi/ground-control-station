@@ -6,3 +6,4 @@ config.json
 .monitor
 public/stylesheets/*.css
 app/Templates.js
+build/
