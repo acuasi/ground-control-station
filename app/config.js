@@ -1,3 +1,5 @@
+require = require || requirejs;
+
 // Set the require.js configuration for your application.
 require.config({
 
@@ -11,11 +13,22 @@ require.config({
     // vendor is for external, 3rd party libraries used in this project.
     vendor: "../assets/vendor",
 
-    // Libraries.
+    // Build files are generated during the build process
+    build: "../build",
+
+    // Templates.js is created during the build process, move it outside the
+    // app directory so our watch task can work properly.
+    Templates: "../build/Templates",
+
+    // Required Libraries.
     jquery: "../assets/js/vendor/jquery",
     underscore: "../assets/js/vendor/underscore",
     backbone: "../assets/js/vendor/backbone",
-    jade: "../assets/js/vendor/jade"
+    jade: "../assets/js/vendor/jade",
+
+    // Libraries where we modify the source code in one way or another
+    leaflet: "../assets/js/libs/leaflet",
+    now: "../assets/js/libs/now" // we just don't talk about this one.
     
   },
 
@@ -25,7 +38,10 @@ require.config({
     backbone: {
       deps: ["underscore", "jquery"],
       exports: "Backbone"
-      
+    },
+
+    leaflet: {
+      exports: "L"
     }
   }
 

@@ -1,3 +1,31 @@
-h1 {
-  font-weight: bold;
+
+@import "variables.less";
+@import "fonts.less";
+@import "missionWidgets.less";
+
+// We'll refactor this file apart as we go: watch for blocks of related things,
+// then @import(url) them.
+body {
+   color: @text;
+   background-color: @background;
+   font-family: 'Source Sans Pro';
+   margin: 0;
+   padding: 0;
+}
+
+.widget {
+  .units {
+    color: @dim;
+  }
+}
+
+div#mapWidget {
+  min-height: 500px;
+  min-width: 1000px;
+}
+
+fieldset {
+    border: 2px #af3333 solid;
+    border-radius: 10px;
+    max-width: 1000px;
 }

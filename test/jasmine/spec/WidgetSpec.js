@@ -1,21 +1,33 @@
-require(['Views/Widgets/Speed'], function(TryView) {
+require([
+  // Libraries
 
-  describe("SpeedWidget", function() {
+  // Models
+  'Models/Platform',
+
+  // Views
+  'Views/Widgets/Altitude',
+  'Views/Widgets/Battery',
+  'Views/Widgets/Comms',
+  'Views/Widgets/Gps',
+  'Views/Widgets/Health',
+  'Views/Widgets/Map',
+  'Views/Widgets/Speed',
+  'Views/Widgets/State'
+  ], function(
+    // Models
+    Platform,
+
+    // Views
+    Widget,
+    Widget,
+    Widget,
+    Widget,
+    Widget,
+    Widget,
+    Widget,
+    Widget,
+    ) {
+
     
-    beforeEach(function() {
-      setFixtures(sandbox({id:'try'}));
-    });
-
-    it('Includes views correctly', function() {
-      expect(TryView).toBeDefined();
-    });
-
-    it('Can access templates and fixtures', function() {
-      var v = new TryView();
-      v.render();
-      expect($('#try')).not.toBeEmpty();
-    });
-
-  });
-
-});
+    } 
+);
