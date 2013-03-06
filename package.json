@@ -37,15 +37,15 @@
     "should": "",
     "sinon": "",
     "grunt": "~0.3.17",
-    "grunt-contrib": "*",
+    "grunt-contrib": "<0.4",
     "grunt-contrib-requirejs": "~0.3.4",
-    "grunt-contrib-concat": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-jade-plugin": "*",
-    "grunt-jasmine-task": "*",
-    "grunt-linter":"*",
-    "grunt-contrib-less":"*",
-    "grunt-contrib-mincss":"*"
+    "grunt-contrib-concat": "<0.1.2",
+    "grunt-contrib-watch": "<0.2.0",
+    "grunt-jade-plugin": "<0.4",
+    "grunt-jasmine-task": "<0.4",
+    "grunt-linter":"<0.4",
+    "grunt-contrib-less":"<0.4",
+    "grunt-contrib-mincss":"<0.4"
   },
   "keywords": []
 }

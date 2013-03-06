@@ -766,9 +766,9 @@ define('Models/Platform',['backbone'], function(Backbone) {
   return Platform;
   
 });
-define('jade',[], function() {
-var 
-jade = (function(exports){
+define('Templates',[], function() {
+var jade = {};
+
 /*!
  * Jade - runtime
  * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
@@ -813,7 +813,7 @@ if (!Object.keys) {
  * @api private
  */
 
-exports.merge = function merge(a, b) {
+jade.merge = function merge(a, b) {
   var ac = a['class'];
   var bc = b['class'];
 
@@ -857,7 +857,7 @@ function nulls(val) {
  * @api private
  */
 
-exports.attrs = function attrs(obj, escaped){
+jade.attrs = function attrs(obj, escaped){
   var buf = []
     , terse = obj.terse;
 
@@ -880,9 +880,9 @@ exports.attrs = function attrs(obj, escaped){
       } else if (0 == key.indexOf('data') && 'string' != typeof val) {
         buf.push(key + "='" + JSON.stringify(val) + "'");
       } else if ('class' == key && Array.isArray(val)) {
-        buf.push(key + '="' + exports.escape(val.join(' ')) + '"');
+        buf.push(key + '="' + jade.escape(val.join(' ')) + '"');
       } else if (escaped && escaped[key]) {
-        buf.push(key + '="' + exports.escape(val) + '"');
+        buf.push(key + '="' + jade.escape(val) + '"');
       } else {
         buf.push(key + '="' + val + '"');
       }
@@ -900,7 +900,7 @@ exports.attrs = function attrs(obj, escaped){
  * @api private
  */
 
-exports.escape = function escape(html){
+jade.escape = function escape(html){
   return String(html)
     .replace(/&(?!(\w+|\#\d+);)/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -918,7 +918,7 @@ exports.escape = function escape(html){
  * @api private
  */
 
-exports.rethrow = function rethrow(err, filename, lineno){
+jade.rethrow = function rethrow(err, filename, lineno){
   if (!filename) throw err;
 
   var context = 3
@@ -943,17 +943,11 @@ exports.rethrow = function rethrow(err, filename, lineno){
   throw err;
 };
 
-  return exports;
 
-})({});
+var exports = exports || {};
+exports["Templates"] = exports["Templates"] || {};
 
-return jade;
-});
-
-define('Templates',['jade'], function(jade) {
-this["Templates"] = this["Templates"] || {};
-
-this["Templates"]["app/Templates/altitudeWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["altitudeWidget"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -963,7 +957,7 @@ buf.push('<h3>Altitude</h3><div><span class="value">' + ((interp = alt) == null 
 return buf.join("");
 };
 
-this["Templates"]["app/Templates/batteryWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["batteryWidget"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -973,7 +967,7 @@ buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remain
 return buf.join("");
 };
 
-this["Templates"]["app/Templates/commsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["commsWidget"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -983,7 +977,7 @@ buf.push('<div id="comms"><span class="units">drop_rate &nbsp;</span><span class
 return buf.join("");
 };
 
-this["Templates"]["app/Templates/gpsWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["gpsWidget"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -993,7 +987,7 @@ buf.push('<h3>GPS</h3><div id="position"><span class="units">lat &nbsp;</span><s
 return buf.join("");
 };
 
-this["Templates"]["app/Templates/healthWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["healthWidget"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1003,7 +997,7 @@ buf.push('<div id="type"><span class="units">type &nbsp;</span><span class="valu
 return buf.join("");
 };
 
-this["Templates"]["app/Templates/missionLayout.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["missionLayout"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1013,7 +1007,7 @@ buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="
 return buf.join("");
 };
 
-this["Templates"]["app/Templates/speedWidget.jade"] = function anonymous(locals, attrs, escape, rethrow, merge) {
+exports["Templates"]["speedWidget"] = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
 with (locals || {}) {
@@ -1022,7 +1016,7 @@ buf.push('<h3>Ground Speed</h3><span class="value">' + ((interp = groundspeed) =
 }
 return buf.join("");
 };
-return this["Templates"];
+return exports["Templates"];
 });
 define('Views/Widgets/Speed',['backbone', 'Templates'], function(Backbone, template) {
   
