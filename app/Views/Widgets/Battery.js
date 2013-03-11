@@ -14,7 +14,7 @@ define(['backbone', 'Templates'], function(Backbone, template) {
 
     render: function() {
 
-      this.$el.html(template['app/Templates/batteryWidget.jade'](
+      this.$el.html(template['batteryWidget'](
         {
           battery_remaining: this.model.get('battery_remaining')
         }

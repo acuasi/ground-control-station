@@ -2668,7 +2668,7 @@ up (GPS frame).
 */
 mavlink.messages.gps_raw_int = function(time_usec, fix_type, lat, lon, alt, eph, epv, vel, cog, satellites_visible) {
 
-    this.format = '<QiiiHHHHBB';
+    //this.format = '<8xiiiHHHHBB';
     this.id = mavlink.MAVLINK_MSG_ID_GPS_RAW_INT;
     this.order_map = [0, 8, 1, 2, 3, 4, 5, 6, 7, 9];
     this.crc_extra = 24;
@@ -4959,7 +4959,7 @@ mavlink.map = {
         21: { format: '<BB', type: mavlink.messages.param_request_list, order_map: [0, 1], crc_extra: 159 },
         22: { format: '<fHH16sB', type: mavlink.messages.param_value, order_map: [3, 0, 4, 1, 2], crc_extra: 220 },
         23: { format: '<fBB16sB', type: mavlink.messages.param_set, order_map: [1, 2, 3, 0, 4], crc_extra: 168 },
-        24: { format: '<QiiiHHHHBB', type: mavlink.messages.gps_raw_int, order_map: [0, 8, 1, 2, 3, 4, 5, 6, 7, 9], crc_extra: 24 },
+        24: { format: '<diiiHHHHBB', type: mavlink.messages.gps_raw_int, order_map: [0, 8, 1, 2, 3, 4, 5, 6, 7, 9], crc_extra: 24 },
         25: { format: '<B20s20s20s20s20s', type: mavlink.messages.gps_status, order_map: [0, 1, 2, 3, 4, 5], crc_extra: 23 },
         26: { format: '<Ihhhhhhhhh', type: mavlink.messages.scaled_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], crc_extra: 170 },
         27: { format: '<Qhhhhhhhhh', type: mavlink.messages.raw_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], crc_extra: 144 },

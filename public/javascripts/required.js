@@ -1032,7 +1032,7 @@ define('Views/Widgets/Speed',['backbone', 'Templates'], function(Backbone, templ
 
     render: function() {
 
-      this.$el.html(template['app/Templates/speedWidget.jade']({groundspeed: this.model.get('groundspeed')}));
+      this.$el.html(template['speedWidget']({groundspeed: this.model.get('groundspeed')}));
     
     }
     
@@ -1281,7 +1281,7 @@ define('Views/Widgets/Comms',['backbone', 'Templates'], function(Backbone, templ
 
     render: function() {
 
-        this.$el.html(template['app/Templates/commsWidget.jade'](
+        this.$el.html(template['commsWidget'](
             {
                 drop_rate_comm: this.model.get('drop_rate_comm'),
                 errors_comm: this.model.get('errors_comm')
@@ -1306,7 +1306,7 @@ define('Views/Widgets/Altitude',['backbone', 'Templates'], function(Backbone, te
       this.model.on("change:alt", this.render, this);
     },
     render: function() {
-      this.$el.html(template['app/Templates/altitudeWidget.jade']({alt: this.model.get('alt')}));
+      this.$el.html(template['altitudeWidget']({alt: this.model.get('alt')}));
     }
     
   });
@@ -1332,7 +1332,7 @@ define('Views/Widgets/Gps',['backbone', 'Templates'], function(Backbone, templat
 
     render: function() {
 
-        this.$el.html(template['app/Templates/gpsWidget.jade'](
+        this.$el.html(template['gpsWidget'](
         {
             lat: this.model.get('lat'),
             lon: this.model.get('lon'),
@@ -1372,7 +1372,7 @@ define('Views/Widgets/Health',['backbone', 'Templates'], function(Backbone, temp
 
     render: function() {
 
-        this.$el.html(template['app/Templates/healthWidget.jade'](
+        this.$el.html(template['healthWidget'](
             {
                 type: this.model.get('type'),
                 autopilot: this.model.get('autopilot'),
@@ -1399,7 +1399,7 @@ define('Views/Widgets/State',['backbone', 'Templates'], function(Backbone, templ
     
     render: function() {
 
-      this.$el.html(template['app/Templates/stateWidget.jade']());
+      this.$el.html(template['stateWidget']());
     
     }
     
@@ -1423,7 +1423,7 @@ define('Views/Widgets/Battery',['backbone', 'Templates'], function(Backbone, tem
 
     render: function() {
 
-      this.$el.html(template['app/Templates/batteryWidget.jade'](
+      this.$el.html(template['batteryWidget'](
         {
           battery_remaining: this.model.get('battery_remaining')
         }
@@ -1485,7 +1485,7 @@ define('Views/Mission',['backbone', 'Templates',
     renderLayout: function() {
 
       // Render scaffolding
-      this.$el.html(template['app/Templates/missionLayout.jade']());
+      this.$el.html(template['missionLayout']());
       
       // Instantiate subviews, now that their elements are present on the page
       this.speedWidget = new SpeedWidget({model: this.model.get('platform')});

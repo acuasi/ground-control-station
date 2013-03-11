@@ -19,7 +19,7 @@ define(['backbone', 'Templates'], function(Backbone, template) {
 
     render: function() {
 
-        this.$el.html(template['app/Templates/healthWidget.jade'](
+        this.$el.html(template['healthWidget'](
             {
                 type: this.model.get('type'),
                 autopilot: this.model.get('autopilot'),

@@ -48,7 +48,7 @@ define(['backbone', 'Templates',
     renderLayout: function() {
 
       // Render scaffolding
-      this.$el.html(template['app/Templates/missionLayout.jade']());
+      this.$el.html(template['missionLayout']());
       
       // Instantiate subviews, now that their elements are present on the page
       this.speedWidget = new SpeedWidget({model: this.model.get('platform')});

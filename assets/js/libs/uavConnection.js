@@ -2,14 +2,14 @@ var SerialPort = require("serialport").SerialPort,
   util   = require('util'),
   child = require("child_process"),
   net = require('net');
-
+/*
 
 var masterSerial = net.createConnection(5760, '127.0.0.1');
 
 masterSerial.on('data', function(data) {
   mavlinkParser.parseBuffer(data);
 })
-
+*/
 /*
  * The main Arduino constructor
  * Connect to the serial port and bind

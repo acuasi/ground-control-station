@@ -13,7 +13,7 @@ define(['backbone', 'Templates'], function(Backbone, template) {
 
     render: function() {
 
-        this.$el.html(template['app/Templates/commsWidget.jade'](
+        this.$el.html(template['commsWidget'](
             {
                 drop_rate_comm: this.model.get('drop_rate_comm'),
                 errors_comm: this.model.get('errors_comm')

@@ -17,7 +17,7 @@ define(['backbone', 'Templates'], function(Backbone, template) {
 
     render: function() {
 
-        this.$el.html(template['app/Templates/gpsWidget.jade'](
+        this.$el.html(template['gpsWidget'](
         {
             lat: this.model.get('lat'),
             lon: this.model.get('lon'),

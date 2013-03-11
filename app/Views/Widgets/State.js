@@ -7,7 +7,7 @@ define(['backbone', 'Templates'], function(Backbone, template) {
     
     render: function() {
 
-      this.$el.html(template['app/Templates/stateWidget.jade']());
+      this.$el.html(template['stateWidget']());
     
     }
     

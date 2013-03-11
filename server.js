@@ -1,26 +1,27 @@
 var mavlink = require("./assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
-  uavConnection = require("./assets/js/libs/uavConnection.js"),
-  express = require('express'),
-  routes = require('./routes'),
-  app = express(),
-  http = require('http'),
-  nowjs = require("now"),
-  path = require('path'),
-  nconf = require("nconf"),
-  requirejs = require("requirejs"),
-  winston = require("winston"),
+uavConnection = require("./assets/js/libs/uavConnection.js"),
+express = require('express'),
+routes = require('./routes'),
+app = express(),
+http = require('http'),
+nowjs = require("now"),
+path = require('path'),
+nconf = require("nconf"),
+requirejs = require("requirejs"),
+dgram = require("dgram"),
+winston = require("winston");
 
 requirejs.config({
     //Pass the top-level main.js/index.js require
     //function to requirejs so that node modules
     //are loaded relative to the top-level JS file.
     baseUrl: './app'
-});
+  });
 
 // Logger
 var logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.File)({ filename: 'mavlink.dev.log' })
+  new (winston.transports.File)({ filename: 'mavlink.dev.log' })
   ]
 });
 
@@ -57,11 +58,52 @@ var everyone = nowjs.initialize(server);
 // Establish parser
 var mavlinkParser = new MAVLink(logger);
 
+/*
+var net = require('net');
+var masterSerial = net.createConnection(5760, '127.0.0.1');
+
+masterSerial.on('data', function(data) {
+  mavlinkParser.parseBuffer(data);
+})
+*/
+
+
+var dgram = require("dgram");
+
+var server = dgram.createSocket("udp4");
+
+/*
+msg  = new Buffer([0xfe, 0x1e, 0x69, 0x01, 0x01, 0x18, 0xc0, 0x2c, 0x3a, 0x10, 0x00, 0x00, 0x00, 0x00, 0x2c, 0x0b, 0xec, 0xea, 0x22,
+  0xc9, 0xe8, 0x58, 0x9a, 0xe9, 0x08, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x59, 0xf7])
+
+mavlinkParser.parseBuffer(msg);
+*/
+
+server.on("message", function (msg, rinfo) {
+  mavlinkParser.parseBuffer(msg);
+});
+
+server.on("listening", function () {
+  var address = server.address();
+  console.log("server listening " +
+      address.address + ":" + address.port);
+});
+
+server.bind(14550);
+
+/*
+./ArduCopter.elf
+./sim_multicopter.py --home -35.362938,149.165085,584,270
+./mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550
+
+*/
+
 requirejs(["Models/Platform"], function(Platform) {
 
   // Debugging
   mavlinkParser.on('message', function(message) {
-    console.log(message);
+    if(message.name == 'GPS_RAW_INT') {
+    }
     //everyone.now.updatePlatform();
   });
 
@@ -133,7 +175,14 @@ requirejs(["Models/Platform"], function(Platform) {
   mavlinkParser.on('GPS_RAW_INT', function(message) {
     platform = _.extend(platform, {
       fix_type: message.fix_type,
-      satellites_visible: message.satellites_visible
+      satellites_visible: message.satellites_visible,
+      lat: message.lat / 10000000,
+      lon: message.lon / 10000000,
+      alt: message.alt / 1000,
+      eph: message.eph,
+      epv: message.epv,
+      vel: message.vel,
+      cog: message.cog
     });
     everyone.now.updatePlatform(platform);
   });
