@@ -8,3 +8,7 @@ config.json
 public/stylesheets/*.css
 app/Templates.js
 build/
+dataflash.bin
+eeprom.bin
+mav.tlog
+mav.tlog.raw
