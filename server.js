@@ -1,5 +1,5 @@
 var mavlink = require("./assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
-uavConnection = require("./assets/js/libs/uavConnection.js"),
+UavConnection = require("./assets/js/libs/uavConnection.js"),
 express = require('express'),
 routes = require('./routes'),
 app = express(),
@@ -58,54 +58,16 @@ var everyone = nowjs.initialize(server);
 // Establish parser
 var mavlinkParser = new MAVLink(logger);
 
-/*
-var net = require('net');
-var masterSerial = net.createConnection(5760, '127.0.0.1');
-
-masterSerial.on('data', function(data) {
-  mavlinkParser.parseBuffer(data);
+// Establish connection management, start its heartbeat.
+var uavConnectionManager = new UavConnection.UavConnection(nconf, mavlinkParser);
+uavConnectionManager.heartbeat();
+setInterval(uavConnectionManager.heartbeat, 1000);
+uavConnectionManager.on('disconnected', function() {
+  console.log('emergency, disconnected');
 })
-*/
 
-
-var dgram = require("dgram");
-
-var server = dgram.createSocket("udp4");
-
-/*
-msg  = new Buffer([0xfe, 0x1e, 0x69, 0x01, 0x01, 0x18, 0xc0, 0x2c, 0x3a, 0x10, 0x00, 0x00, 0x00, 0x00, 0x2c, 0x0b, 0xec, 0xea, 0x22,
-  0xc9, 0xe8, 0x58, 0x9a, 0xe9, 0x08, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x59, 0xf7])
-
-mavlinkParser.parseBuffer(msg);
-*/
-
-server.on("message", function (msg, rinfo) {
-  mavlinkParser.parseBuffer(msg);
-});
-
-server.on("listening", function () {
-  var address = server.address();
-  console.log("server listening " +
-      address.address + ":" + address.port);
-});
-
-server.bind(14550);
-
-/*
-./ArduCopter.elf
-./sim_multicopter.py --home -35.362938,149.165085,584,270
-./mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550
-
-*/
-
+// Client integration code, TODO refactor away to elsewhere
 requirejs(["Models/Platform"], function(Platform) {
-
-  // Debugging
-  mavlinkParser.on('message', function(message) {
-    if(message.name == 'GPS_RAW_INT') {
-    }
-    //everyone.now.updatePlatform();
-  });
 
   var platform = {};
   
