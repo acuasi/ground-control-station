@@ -18,14 +18,52 @@ var config = undefined;
 // connection represents the socket-level connection through which MAVLink arrives
 var connection = undefined;
 
+// name of the message the connection uses to signal that new data is ready to consume
+var dataEventName = undefined;
+
 // state points to one of the objects defined below, determining what action to take on heartbeat
 var state = undefined;
 
 // protocol is the parser for the incoming binary stream (MAVLink)
 var protocol = undefined;
 
+// this flag is set to true if the event listener must be reattached to the connection, in case
+// the connection itself was lost
+var attachDataEventListener = true;
+
 // Variables related to the timeout/health of the heartbeat
 var lastHeartbeat = undefined;
+
+// This function is defined once in the larger scope so that it can be invoked directly a single time
+var fetch_params = _.once(_.bind(function(done) {
+  
+  console.log('Starting to fetch params...');
+  
+  // Fetch the params from the APM, wait to exit this state until finished.
+  param_request = new mavlink.messages.param_request_list(1, 1); // target system/component IDs
+  _.extend(param_request, {
+    srcSystem: 255,
+    srcComponent: 0
+  });
+
+  p = new Buffer(param_request.pack());
+  connection.write(p);
+
+  // Listen for parameters
+  protocol.on('PARAM_VALUE', _.bind(function(message) {
+    apmConfig[message.param_id] = message.param_value;
+    if( _.keys(apmConfig).length == 270 ) {
+      console.log('...finished fetching parameters.');
+      console.log(apmConfig);
+      done();
+    }
+
+  }, this));
+
+}, this));
+
+// Stores the configuration values for the APM.
+var apmConfig = {};
 
 var states = {
     // The disconnected state represents when there is no socket connection
@@ -35,16 +73,35 @@ var states = {
         console.log('trying to connect from disconnected state...');
 
         try {
-          connection = dgram.createSocket("udp4");
 
-          // When the socket confirms its listening, change state to try and collect MAVLink configuration
-          connection.on("listening", _.bind(function () {
-            var address = connection.address();
-            console.log("server listening " + address.address + ":" + address.port);
-            changeState(states.connecting)
-          }, this));
+          switch(config.get('connection')) {
+            case 'udp':
 
-          connection.bind(14550);
+              connection = dgram.createSocket("udp4");
+              dataEventName = 'message';
+
+              // When the socket confirms its listening, change state to try and collect MAVLink configuration
+              connection.on("listening", _.bind(function () {
+                console.log("UDP connection established on " + address.address + ":" + address.port);
+                var address = connection.address();
+                changeState(states.connecting)
+              }, this));
+
+              connection.bind(14550);
+              break;
+
+              case 'tcp':
+                dataEventName = 'data';
+                connection = net.createConnection({port: 5760}, _.bind(function() {
+                  // 'connect' event listener
+                  console.log('TCP connection established on 127.0.0.1:5760');
+                  changeState(states.connecting);
+                }, this));
+                break;
+
+            default:
+              console.log('Connection type not understood (' + config.get('connection')+')');
+          }
         } catch(e) {
           console.log(e);
         }
@@ -53,18 +110,30 @@ var states = {
     },
   
     // The connecting state attaches event handlers to the connection to establish the
-    // flow of protocol data.
+    // flow of protocol data, and fetches the params from the APM.
     connecting: {
         heartbeat: function() {
 
-        console.log('establishing MAVLink connection...');
+          try {
+            console.log('establishing MAVLink connection...');
 
-          // Attach the message parser here          
-          connection.on("message", _.bind(function (msg, rinfo) {
-            protocol.parseBuffer(msg);
-          }, this));
+            // If necessary, attach the message parser to the connection
+            if(attachDataEventListener === true) {
+                connection.on(dataEventName, _.bind(function (msg) {
+                  protocol.parseBuffer(msg);
+              }, this));
+            }
 
-          changeState(states.connected)
+            // When the parameters have been read, move to the connected state.
+            fetch_params(function() {
+              changeState(states.connected);
+            });
+
+            attachDataEventListener = false;
+            
+          } catch(e) {
+            console.log(e);
+          } 
       }
     },
   
@@ -74,7 +143,11 @@ var states = {
 
         console.log('connected, ensuring a timeout has not happened...');
         console.log('time since last heartbeat = ' + timeSinceLastHeartbeat);
-        if(timeSinceLastHeartbeat > 5000) throw 'disconnected';
+
+        if(timeSinceLastHeartbeat > 5000 || true === _.isNaN(timeSinceLastHeartbeat)) {
+          changeState(states.disconnected);
+          throw 'disconnected';
+        }
       }
     }
  };
@@ -114,41 +187,6 @@ changeState = function(newState) {
 exports.UavConnection = UavConnection;
 
 
-/*
-var net = require('net');
-var masterSerial = net.createConnection(5760, '127.0.0.1');
-
-masterSerial.on('data', function(data) {
-  mavlinkParser.parseBuffer(data);
-})
-*/
-/*
-
-*/
-/*
-msg  = new Buffer([0xfe, 0x1e, 0x69, 0x01, 0x01, 0x18, 0xc0, 0x2c, 0x3a, 0x10, 0x00, 0x00, 0x00, 0x00, 0x2c, 0x0b, 0xec, 0xea, 0x22,
-  0xc9, 0xe8, 0x58, 0x9a, 0xe9, 0x08, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x59, 0xf7])
-
-mavlinkParser.parseBuffer(msg);
-*/
-/*
-
-
-/*
-./ArduCopter.elf
-./sim_multicopter.py --home -35.362938,149.165085,584,270
-./mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550
-
-*/
-
-/*
-
-var masterSerial = net.createConnection(5760, '127.0.0.1');
-
-masterSerial.on('data', function(data) {
-  mavlinkParser.parseBuffer(data);
-})
-*/
 /*
  * The main Arduino constructor
  * Connect to the serial port and bind

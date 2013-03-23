@@ -13,4 +13,4 @@ ps aux | grep 'mavproxy.py' | grep -v 'grep' | awk '{print $2}' | xargs kill
 # Run them all!
 $ARDUCOPTER_PATH &
 $SIM_MULTICOPTER_PATH --home -35.362938,149.165085,584,270 &
-$MAVPROXY_PATH --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550
+#$MAVPROXY_PATH --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550

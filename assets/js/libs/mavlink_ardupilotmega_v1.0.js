@@ -14,25 +14,24 @@ jspack = require("./node-jspack-master/jspack.js").jspack,
 
 // Add a convenience method to Buffer
 Buffer.prototype.toByteArray = function () {
-  return Array.prototype.slice.call(this, 0);
+  return Array.prototype.slice.call(this, 0)
 }
 
-mavlink = function() {};
-mavlink.enums = {};
+mavlink = function(){};
 
 mavlink.WIRE_PROTOCOL_VERSION = "1.0";
 
-mavlink.MAVLINK_TYPE_CHAR     = 0;
-mavlink.MAVLINK_TYPE_UINT8_T  = 1;
-mavlink.MAVLINK_TYPE_INT8_T   = 2;
-mavlink.MAVLINK_TYPE_UINT16_T = 3;
-mavlink.MAVLINK_TYPE_INT16_T  = 4;
-mavlink.MAVLINK_TYPE_UINT32_T = 5;
-mavlink.MAVLINK_TYPE_INT32_T  = 6;
-mavlink.MAVLINK_TYPE_UINT64_T = 7;
-mavlink.MAVLINK_TYPE_INT64_T  = 8;
-mavlink.MAVLINK_TYPE_FLOAT    = 9;
-mavlink.MAVLINK_TYPE_DOUBLE   = 10;
+mavlink.MAVLINK_TYPE_CHAR     = 0
+mavlink.MAVLINK_TYPE_UINT8_T  = 1
+mavlink.MAVLINK_TYPE_INT8_T   = 2
+mavlink.MAVLINK_TYPE_UINT16_T = 3
+mavlink.MAVLINK_TYPE_INT16_T  = 4
+mavlink.MAVLINK_TYPE_UINT32_T = 5
+mavlink.MAVLINK_TYPE_INT32_T  = 6
+mavlink.MAVLINK_TYPE_UINT64_T = 7
+mavlink.MAVLINK_TYPE_INT64_T  = 8
+mavlink.MAVLINK_TYPE_FLOAT    = 9
+mavlink.MAVLINK_TYPE_DOUBLE   = 10
 
 // Mavlink headers incorporate sequence, source system (platform) and source component. 
 mavlink.header = function(msgId, mlen, seq, srcSystem, srcComponent) {
@@ -41,7 +40,7 @@ mavlink.header = function(msgId, mlen, seq, srcSystem, srcComponent) {
     this.seq = ( typeof seq === 'undefined' ) ? 0 : seq;
     this.srcSystem = ( typeof srcSystem === 'undefined' ) ? 0 : srcSystem;
     this.srcComponent = ( typeof srcComponent === 'undefined' ) ? 0 : srcComponent;
-    this.msgId = msgId;
+    this.msgId = msgId
 
 }
 
@@ -65,9 +64,13 @@ mavlink.message.prototype.set = function(args) {
 mavlink.message.prototype.pack = function(crc_extra, payload) {
 
     this.payload = payload;
-    this.header = new mavlink.header(this.id, payload.length, this.seq, this.srcSystem, this.srcComponent);
+    this.header = new mavlink.header(this.id, payload.length, this.seq, this.srcSystem, this.srcComponent);    
     this.msgbuf = this.header.pack().concat(payload);
-    this.msgbuf = this.msgbuf.concat(jspack.Pack('<H', [ mavutil.x25Crc(this.msgbuf.slice(1)) ] ) );
+    var crc = mavutil.x25Crc(this.msgbuf.slice(1));
+
+    // For now, assume always using crc_extra = True.  TODO: check/fix this.
+    crc = mavutil.x25Crc([crc_extra], crc);
+    this.msgbuf = this.msgbuf.concat(jspack.Pack('<H', [crc] ) );
     return this.msgbuf;
 
 }
@@ -78,1360 +81,364 @@ mavlink.message.prototype.pack = function(crc_extra, payload) {
 // MAV_MOUNT_MODE
 mavlink.MAV_MOUNT_MODE_RETRACT = 0 // Load and keep safe position (Roll,Pitch,Yaw) from EEPROM and stop
                         // stabilization
-mavlink.enums.MAV_MOUNT_MODE_RETRACT = {
-	 name: "MAV_MOUNT_MODE_RETRACT",
-	description:"Load and keep safe position (Roll,Pitch,Yaw) from EEPROM and stop stabilization"
-}
 mavlink.MAV_MOUNT_MODE_NEUTRAL = 1 // Load and keep neutral position (Roll,Pitch,Yaw) from EEPROM.
-mavlink.enums.MAV_MOUNT_MODE_NEUTRAL = {
-	 name: "MAV_MOUNT_MODE_NEUTRAL",
-	description:"Load and keep neutral position (Roll,Pitch,Yaw) from EEPROM."
-}
 mavlink.MAV_MOUNT_MODE_MAVLINK_TARGETING = 2 // Load neutral position and start MAVLink Roll,Pitch,Yaw control with
                         // stabilization
-mavlink.enums.MAV_MOUNT_MODE_MAVLINK_TARGETING = {
-	 name: "MAV_MOUNT_MODE_MAVLINK_TARGETING",
-	description:"Load neutral position and start MAVLink Roll,Pitch,Yaw control with stabilization"
-}
 mavlink.MAV_MOUNT_MODE_RC_TARGETING = 3 // Load neutral position and start RC Roll,Pitch,Yaw control with
                         // stabilization
-mavlink.enums.MAV_MOUNT_MODE_RC_TARGETING = {
-	 name: "MAV_MOUNT_MODE_RC_TARGETING",
-	description:"Load neutral position and start RC Roll,Pitch,Yaw control with stabilization"
-}
 mavlink.MAV_MOUNT_MODE_GPS_POINT = 4 // Load neutral position and start to point to Lat,Lon,Alt
-mavlink.enums.MAV_MOUNT_MODE_GPS_POINT = {
-	 name: "MAV_MOUNT_MODE_GPS_POINT",
-	description:"Load neutral position and start to point to Lat,Lon,Alt"
-}
 mavlink.MAV_MOUNT_MODE_ENUM_END = 5 // 
-mavlink.enums.MAV_MOUNT_MODE_ENUM_END = {
-	 name: "MAV_MOUNT_MODE_ENUM_END",
-	description:""
-}
 
 // MAV_CMD
 mavlink.MAV_CMD_NAV_WAYPOINT = 16 // Navigate to MISSION.
-mavlink.enums.MAV_CMD_NAV_WAYPOINT = {
-	 name: "MAV_CMD_NAV_WAYPOINT",
-	description:"Navigate to MISSION."
-}
 mavlink.MAV_CMD_NAV_LOITER_UNLIM = 17 // Loiter around this MISSION an unlimited amount of time
-mavlink.enums.MAV_CMD_NAV_LOITER_UNLIM = {
-	 name: "MAV_CMD_NAV_LOITER_UNLIM",
-	description:"Loiter around this MISSION an unlimited amount of time"
-}
 mavlink.MAV_CMD_NAV_LOITER_TURNS = 18 // Loiter around this MISSION for X turns
-mavlink.enums.MAV_CMD_NAV_LOITER_TURNS = {
-	 name: "MAV_CMD_NAV_LOITER_TURNS",
-	description:"Loiter around this MISSION for X turns"
-}
 mavlink.MAV_CMD_NAV_LOITER_TIME = 19 // Loiter around this MISSION for X seconds
-mavlink.enums.MAV_CMD_NAV_LOITER_TIME = {
-	 name: "MAV_CMD_NAV_LOITER_TIME",
-	description:"Loiter around this MISSION for X seconds"
-}
 mavlink.MAV_CMD_NAV_RETURN_TO_LAUNCH = 20 // Return to launch location
-mavlink.enums.MAV_CMD_NAV_RETURN_TO_LAUNCH = {
-	 name: "MAV_CMD_NAV_RETURN_TO_LAUNCH",
-	description:"Return to launch location"
-}
 mavlink.MAV_CMD_NAV_LAND = 21 // Land at location
-mavlink.enums.MAV_CMD_NAV_LAND = {
-	 name: "MAV_CMD_NAV_LAND",
-	description:"Land at location"
-}
 mavlink.MAV_CMD_NAV_TAKEOFF = 22 // Takeoff from ground / hand
-mavlink.enums.MAV_CMD_NAV_TAKEOFF = {
-	 name: "MAV_CMD_NAV_TAKEOFF",
-	description:"Takeoff from ground / hand"
-}
 mavlink.MAV_CMD_NAV_ROI = 80 // Sets the region of interest (ROI) for a sensor set or the vehicle
                         // itself. This can then be used by the
                         // vehicles control system to control the
                         // vehicle attitude and the attitude of
                         // various sensors such as cameras.
-mavlink.enums.MAV_CMD_NAV_ROI = {
-	 name: "MAV_CMD_NAV_ROI",
-	description:"Sets the region of interest (ROI) for a sensor set or the vehicle itself. This can then be used by the vehicles control system to control the vehicle attitude and the attitude of various sensors such as cameras."
-}
 mavlink.MAV_CMD_NAV_PATHPLANNING = 81 // Control autonomous path planning on the MAV.
-mavlink.enums.MAV_CMD_NAV_PATHPLANNING = {
-	 name: "MAV_CMD_NAV_PATHPLANNING",
-	description:"Control autonomous path planning on the MAV."
-}
 mavlink.MAV_CMD_NAV_LAST = 95 // NOP - This command is only used to mark the upper limit of the
                         // NAV/ACTION commands in the enumeration
-mavlink.enums.MAV_CMD_NAV_LAST = {
-	 name: "MAV_CMD_NAV_LAST",
-	description:"NOP - This command is only used to mark the upper limit of the NAV/ACTION commands in the enumeration"
-}
 mavlink.MAV_CMD_CONDITION_DELAY = 112 // Delay mission state machine.
-mavlink.enums.MAV_CMD_CONDITION_DELAY = {
-	 name: "MAV_CMD_CONDITION_DELAY",
-	description:"Delay mission state machine."
-}
 mavlink.MAV_CMD_CONDITION_CHANGE_ALT = 113 // Ascend/descend at rate.  Delay mission state machine until desired
                         // altitude reached.
-mavlink.enums.MAV_CMD_CONDITION_CHANGE_ALT = {
-	 name: "MAV_CMD_CONDITION_CHANGE_ALT",
-	description:"Ascend/descend at rate.  Delay mission state machine until desired altitude reached."
-}
 mavlink.MAV_CMD_CONDITION_DISTANCE = 114 // Delay mission state machine until within desired distance of next NAV
                         // point.
-mavlink.enums.MAV_CMD_CONDITION_DISTANCE = {
-	 name: "MAV_CMD_CONDITION_DISTANCE",
-	description:"Delay mission state machine until within desired distance of next NAV point."
-}
 mavlink.MAV_CMD_CONDITION_YAW = 115 // Reach a certain target angle.
-mavlink.enums.MAV_CMD_CONDITION_YAW = {
-	 name: "MAV_CMD_CONDITION_YAW",
-	description:"Reach a certain target angle."
-}
 mavlink.MAV_CMD_CONDITION_LAST = 159 // NOP - This command is only used to mark the upper limit of the
                         // CONDITION commands in the enumeration
-mavlink.enums.MAV_CMD_CONDITION_LAST = {
-	 name: "MAV_CMD_CONDITION_LAST",
-	description:"NOP - This command is only used to mark the upper limit of the CONDITION commands in the enumeration"
-}
 mavlink.MAV_CMD_DO_SET_MODE = 176 // Set system mode.
-mavlink.enums.MAV_CMD_DO_SET_MODE = {
-	 name: "MAV_CMD_DO_SET_MODE",
-	description:"Set system mode."
-}
 mavlink.MAV_CMD_DO_JUMP = 177 // Jump to the desired command in the mission list.  Repeat this action
                         // only the specified number of times
-mavlink.enums.MAV_CMD_DO_JUMP = {
-	 name: "MAV_CMD_DO_JUMP",
-	description:"Jump to the desired command in the mission list.  Repeat this action only the specified number of times"
-}
 mavlink.MAV_CMD_DO_CHANGE_SPEED = 178 // Change speed and/or throttle set points.
-mavlink.enums.MAV_CMD_DO_CHANGE_SPEED = {
-	 name: "MAV_CMD_DO_CHANGE_SPEED",
-	description:"Change speed and/or throttle set points."
-}
 mavlink.MAV_CMD_DO_SET_HOME = 179 // Changes the home location either to the current location or a
                         // specified location.
-mavlink.enums.MAV_CMD_DO_SET_HOME = {
-	 name: "MAV_CMD_DO_SET_HOME",
-	description:"Changes the home location either to the current location or a specified location."
-}
 mavlink.MAV_CMD_DO_SET_PARAMETER = 180 // Set a system parameter.  Caution!  Use of this command requires
                         // knowledge of the numeric enumeration value
                         // of the parameter.
-mavlink.enums.MAV_CMD_DO_SET_PARAMETER = {
-	 name: "MAV_CMD_DO_SET_PARAMETER",
-	description:"Set a system parameter.  Caution!  Use of this command requires knowledge of the numeric enumeration value of the parameter."
-}
 mavlink.MAV_CMD_DO_SET_RELAY = 181 // Set a relay to a condition.
-mavlink.enums.MAV_CMD_DO_SET_RELAY = {
-	 name: "MAV_CMD_DO_SET_RELAY",
-	description:"Set a relay to a condition."
-}
 mavlink.MAV_CMD_DO_REPEAT_RELAY = 182 // Cycle a relay on and off for a desired number of cyles with a desired
                         // period.
-mavlink.enums.MAV_CMD_DO_REPEAT_RELAY = {
-	 name: "MAV_CMD_DO_REPEAT_RELAY",
-	description:"Cycle a relay on and off for a desired number of cyles with a desired period."
-}
 mavlink.MAV_CMD_DO_SET_SERVO = 183 // Set a servo to a desired PWM value.
-mavlink.enums.MAV_CMD_DO_SET_SERVO = {
-	 name: "MAV_CMD_DO_SET_SERVO",
-	description:"Set a servo to a desired PWM value."
-}
 mavlink.MAV_CMD_DO_REPEAT_SERVO = 184 // Cycle a between its nominal setting and a desired PWM for a desired
                         // number of cycles with a desired period.
-mavlink.enums.MAV_CMD_DO_REPEAT_SERVO = {
-	 name: "MAV_CMD_DO_REPEAT_SERVO",
-	description:"Cycle a between its nominal setting and a desired PWM for a desired number of cycles with a desired period."
-}
 mavlink.MAV_CMD_DO_CONTROL_VIDEO = 200 // Control onboard camera system.
-mavlink.enums.MAV_CMD_DO_CONTROL_VIDEO = {
-	 name: "MAV_CMD_DO_CONTROL_VIDEO",
-	description:"Control onboard camera system."
-}
 mavlink.MAV_CMD_DO_DIGICAM_CONFIGURE = 202 // Mission command to configure an on-board camera controller system.
-mavlink.enums.MAV_CMD_DO_DIGICAM_CONFIGURE = {
-	 name: "MAV_CMD_DO_DIGICAM_CONFIGURE",
-	description:"Mission command to configure an on-board camera controller system."
-}
 mavlink.MAV_CMD_DO_DIGICAM_CONTROL = 203 // Mission command to control an on-board camera controller system.
-mavlink.enums.MAV_CMD_DO_DIGICAM_CONTROL = {
-	 name: "MAV_CMD_DO_DIGICAM_CONTROL",
-	description:"Mission command to control an on-board camera controller system."
-}
 mavlink.MAV_CMD_DO_MOUNT_CONFIGURE = 204 // Mission command to configure a camera or antenna mount
-mavlink.enums.MAV_CMD_DO_MOUNT_CONFIGURE = {
-	 name: "MAV_CMD_DO_MOUNT_CONFIGURE",
-	description:"Mission command to configure a camera or antenna mount"
-}
 mavlink.MAV_CMD_DO_MOUNT_CONTROL = 205 // Mission command to control a camera or antenna mount
-mavlink.enums.MAV_CMD_DO_MOUNT_CONTROL = {
-	 name: "MAV_CMD_DO_MOUNT_CONTROL",
-	description:"Mission command to control a camera or antenna mount"
-}
 mavlink.MAV_CMD_DO_LAST = 240 // NOP - This command is only used to mark the upper limit of the DO
                         // commands in the enumeration
-mavlink.enums.MAV_CMD_DO_LAST = {
-	 name: "MAV_CMD_DO_LAST",
-	description:"NOP - This command is only used to mark the upper limit of the DO commands in the enumeration"
-}
 mavlink.MAV_CMD_PREFLIGHT_CALIBRATION = 241 // Trigger calibration. This command will be only accepted if in pre-
                         // flight mode.
-mavlink.enums.MAV_CMD_PREFLIGHT_CALIBRATION = {
-	 name: "MAV_CMD_PREFLIGHT_CALIBRATION",
-	description:"Trigger calibration. This command will be only accepted if in pre-flight mode."
-}
 mavlink.MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS = 242 // Set sensor offsets. This command will be only accepted if in pre-
                         // flight mode.
-mavlink.enums.MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS = {
-	 name: "MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS",
-	description:"Set sensor offsets. This command will be only accepted if in pre-flight mode."
-}
 mavlink.MAV_CMD_PREFLIGHT_STORAGE = 245 // Request storage of different parameter values and logs. This command
                         // will be only accepted if in pre-flight
                         // mode.
-mavlink.enums.MAV_CMD_PREFLIGHT_STORAGE = {
-	 name: "MAV_CMD_PREFLIGHT_STORAGE",
-	description:"Request storage of different parameter values and logs. This command will be only accepted if in pre-flight mode."
-}
 mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN = 246 // Request the reboot or shutdown of system components.
-mavlink.enums.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN = {
-	 name: "MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN",
-	description:"Request the reboot or shutdown of system components."
-}
 mavlink.MAV_CMD_OVERRIDE_GOTO = 252 // Hold / continue the current action
-mavlink.enums.MAV_CMD_OVERRIDE_GOTO = {
-	 name: "MAV_CMD_OVERRIDE_GOTO",
-	description:"Hold / continue the current action"
-}
 mavlink.MAV_CMD_MISSION_START = 300 // start running a mission
-mavlink.enums.MAV_CMD_MISSION_START = {
-	 name: "MAV_CMD_MISSION_START",
-	description:"start running a mission"
-}
 mavlink.MAV_CMD_COMPONENT_ARM_DISARM = 400 // Arms / Disarms a component
-mavlink.enums.MAV_CMD_COMPONENT_ARM_DISARM = {
-	 name: "MAV_CMD_COMPONENT_ARM_DISARM",
-	description:"Arms / Disarms a component"
-}
 mavlink.MAV_CMD_ENUM_END = 401 // 
-mavlink.enums.MAV_CMD_ENUM_END = {
-	 name: "MAV_CMD_ENUM_END",
-	description:""
-}
 
 // FENCE_ACTION
 mavlink.FENCE_ACTION_NONE = 0 // Disable fenced mode
-mavlink.enums.FENCE_ACTION_NONE = {
-	 name: "FENCE_ACTION_NONE",
-	description:"Disable fenced mode"
-}
 mavlink.FENCE_ACTION_GUIDED = 1 // Switched to guided mode to return point (fence point 0)
-mavlink.enums.FENCE_ACTION_GUIDED = {
-	 name: "FENCE_ACTION_GUIDED",
-	description:"Switched to guided mode to return point (fence point 0)"
-}
 mavlink.FENCE_ACTION_REPORT = 2 // Report fence breach, but don't take action
-mavlink.enums.FENCE_ACTION_REPORT = {
-	 name: "FENCE_ACTION_REPORT",
-	description:"Report fence breach, but don't take action"
-}
 mavlink.FENCE_ACTION_ENUM_END = 3 // 
-mavlink.enums.FENCE_ACTION_ENUM_END = {
-	 name: "FENCE_ACTION_ENUM_END",
-	description:""
-}
 
 // FENCE_BREACH
 mavlink.FENCE_BREACH_NONE = 0 // No last fence breach
-mavlink.enums.FENCE_BREACH_NONE = {
-	 name: "FENCE_BREACH_NONE",
-	description:"No last fence breach"
-}
 mavlink.FENCE_BREACH_MINALT = 1 // Breached minimum altitude
-mavlink.enums.FENCE_BREACH_MINALT = {
-	 name: "FENCE_BREACH_MINALT",
-	description:"Breached minimum altitude"
-}
 mavlink.FENCE_BREACH_MAXALT = 2 // Breached minimum altitude
-mavlink.enums.FENCE_BREACH_MAXALT = {
-	 name: "FENCE_BREACH_MAXALT",
-	description:"Breached minimum altitude"
-}
 mavlink.FENCE_BREACH_BOUNDARY = 3 // Breached fence boundary
-mavlink.enums.FENCE_BREACH_BOUNDARY = {
-	 name: "FENCE_BREACH_BOUNDARY",
-	description:"Breached fence boundary"
-}
 mavlink.FENCE_BREACH_ENUM_END = 4 // 
-mavlink.enums.FENCE_BREACH_ENUM_END = {
-	 name: "FENCE_BREACH_ENUM_END",
-	description:""
-}
 
 // LIMITS_STATE
 mavlink.LIMITS_INIT = 0 //  pre-initialization
-mavlink.enums.LIMITS_INIT = {
-	 name: "LIMITS_INIT",
-	description:" pre-initialization"
-}
 mavlink.LIMITS_DISABLED = 1 //  disabled
-mavlink.enums.LIMITS_DISABLED = {
-	 name: "LIMITS_DISABLED",
-	description:" disabled"
-}
 mavlink.LIMITS_ENABLED = 2 //  checking limits
-mavlink.enums.LIMITS_ENABLED = {
-	 name: "LIMITS_ENABLED",
-	description:" checking limits"
-}
 mavlink.LIMITS_TRIGGERED = 3 //  a limit has been breached
-mavlink.enums.LIMITS_TRIGGERED = {
-	 name: "LIMITS_TRIGGERED",
-	description:" a limit has been breached"
-}
 mavlink.LIMITS_RECOVERING = 4 //  taking action eg. RTL
-mavlink.enums.LIMITS_RECOVERING = {
-	 name: "LIMITS_RECOVERING",
-	description:" taking action eg. RTL"
-}
 mavlink.LIMITS_RECOVERED = 5 //  we're no longer in breach of a limit
-mavlink.enums.LIMITS_RECOVERED = {
-	 name: "LIMITS_RECOVERED",
-	description:" we're no longer in breach of a limit"
-}
 mavlink.LIMITS_STATE_ENUM_END = 6 // 
-mavlink.enums.LIMITS_STATE_ENUM_END = {
-	 name: "LIMITS_STATE_ENUM_END",
-	description:""
-}
 
 // LIMIT_MODULE
 mavlink.LIMIT_GPSLOCK = 1 //  pre-initialization
-mavlink.enums.LIMIT_GPSLOCK = {
-	 name: "LIMIT_GPSLOCK",
-	description:" pre-initialization"
-}
 mavlink.LIMIT_GEOFENCE = 2 //  disabled
-mavlink.enums.LIMIT_GEOFENCE = {
-	 name: "LIMIT_GEOFENCE",
-	description:" disabled"
-}
 mavlink.LIMIT_ALTITUDE = 4 //  checking limits
-mavlink.enums.LIMIT_ALTITUDE = {
-	 name: "LIMIT_ALTITUDE",
-	description:" checking limits"
-}
 mavlink.LIMIT_MODULE_ENUM_END = 5 // 
-mavlink.enums.LIMIT_MODULE_ENUM_END = {
-	 name: "LIMIT_MODULE_ENUM_END",
-	description:""
-}
 
 // MAV_AUTOPILOT
 mavlink.MAV_AUTOPILOT_GENERIC = 0 // Generic autopilot, full support for everything
-mavlink.enums.MAV_AUTOPILOT_GENERIC = {
-	 name: "MAV_AUTOPILOT_GENERIC",
-	description:"Generic autopilot, full support for everything"
-}
 mavlink.MAV_AUTOPILOT_PIXHAWK = 1 // PIXHAWK autopilot, http://pixhawk.ethz.ch
-mavlink.enums.MAV_AUTOPILOT_PIXHAWK = {
-	 name: "MAV_AUTOPILOT_PIXHAWK",
-	description:"PIXHAWK autopilot, http://pixhawk.ethz.ch"
-}
 mavlink.MAV_AUTOPILOT_SLUGS = 2 // SLUGS autopilot, http://slugsuav.soe.ucsc.edu
-mavlink.enums.MAV_AUTOPILOT_SLUGS = {
-	 name: "MAV_AUTOPILOT_SLUGS",
-	description:"SLUGS autopilot, http://slugsuav.soe.ucsc.edu"
-}
 mavlink.MAV_AUTOPILOT_ARDUPILOTMEGA = 3 // ArduPilotMega / ArduCopter, http://diydrones.com
-mavlink.enums.MAV_AUTOPILOT_ARDUPILOTMEGA = {
-	 name: "MAV_AUTOPILOT_ARDUPILOTMEGA",
-	description:"ArduPilotMega / ArduCopter, http://diydrones.com"
-}
 mavlink.MAV_AUTOPILOT_OPENPILOT = 4 // OpenPilot, http://openpilot.org
-mavlink.enums.MAV_AUTOPILOT_OPENPILOT = {
-	 name: "MAV_AUTOPILOT_OPENPILOT",
-	description:"OpenPilot, http://openpilot.org"
-}
 mavlink.MAV_AUTOPILOT_GENERIC_WAYPOINTS_ONLY = 5 // Generic autopilot only supporting simple waypoints
-mavlink.enums.MAV_AUTOPILOT_GENERIC_WAYPOINTS_ONLY = {
-	 name: "MAV_AUTOPILOT_GENERIC_WAYPOINTS_ONLY",
-	description:"Generic autopilot only supporting simple waypoints"
-}
 mavlink.MAV_AUTOPILOT_GENERIC_WAYPOINTS_AND_SIMPLE_NAVIGATION_ONLY = 6 // Generic autopilot supporting waypoints and other simple navigation
                         // commands
-mavlink.enums.MAV_AUTOPILOT_GENERIC_WAYPOINTS_AND_SIMPLE_NAVIGATION_ONLY = {
-	 name: "MAV_AUTOPILOT_GENERIC_WAYPOINTS_AND_SIMPLE_NAVIGATION_ONLY",
-	description:"Generic autopilot supporting waypoints and other simple navigation commands"
-}
 mavlink.MAV_AUTOPILOT_GENERIC_MISSION_FULL = 7 // Generic autopilot supporting the full mission command set
-mavlink.enums.MAV_AUTOPILOT_GENERIC_MISSION_FULL = {
-	 name: "MAV_AUTOPILOT_GENERIC_MISSION_FULL",
-	description:"Generic autopilot supporting the full mission command set"
-}
 mavlink.MAV_AUTOPILOT_INVALID = 8 // No valid autopilot, e.g. a GCS or other MAVLink component
-mavlink.enums.MAV_AUTOPILOT_INVALID = {
-	 name: "MAV_AUTOPILOT_INVALID",
-	description:"No valid autopilot, e.g. a GCS or other MAVLink component"
-}
 mavlink.MAV_AUTOPILOT_PPZ = 9 // PPZ UAV - http://nongnu.org/paparazzi
-mavlink.enums.MAV_AUTOPILOT_PPZ = {
-	 name: "MAV_AUTOPILOT_PPZ",
-	description:"PPZ UAV - http://nongnu.org/paparazzi"
-}
 mavlink.MAV_AUTOPILOT_UDB = 10 // UAV Dev Board
-mavlink.enums.MAV_AUTOPILOT_UDB = {
-	 name: "MAV_AUTOPILOT_UDB",
-	description:"UAV Dev Board"
-}
 mavlink.MAV_AUTOPILOT_FP = 11 // FlexiPilot
-mavlink.enums.MAV_AUTOPILOT_FP = {
-	 name: "MAV_AUTOPILOT_FP",
-	description:"FlexiPilot"
-}
 mavlink.MAV_AUTOPILOT_PX4 = 12 // PX4 Autopilot - http://pixhawk.ethz.ch/px4/
-mavlink.enums.MAV_AUTOPILOT_PX4 = {
-	 name: "MAV_AUTOPILOT_PX4",
-	description:"PX4 Autopilot - http://pixhawk.ethz.ch/px4/"
-}
 mavlink.MAV_AUTOPILOT_ENUM_END = 13 // 
-mavlink.enums.MAV_AUTOPILOT_ENUM_END = {
-	 name: "MAV_AUTOPILOT_ENUM_END",
-	description:""
-}
 
 // MAV_TYPE
 mavlink.MAV_TYPE_GENERIC = 0 // Generic micro air vehicle.
-mavlink.enums.MAV_TYPE_GENERIC = {
-	 name: "MAV_TYPE_GENERIC",
-	description:"Generic micro air vehicle."
-}
 mavlink.MAV_TYPE_FIXED_WING = 1 // Fixed wing aircraft.
-mavlink.enums.MAV_TYPE_FIXED_WING = {
-	 name: "MAV_TYPE_FIXED_WING",
-	description:"Fixed wing aircraft."
-}
 mavlink.MAV_TYPE_QUADROTOR = 2 // Quadrotor
-mavlink.enums.MAV_TYPE_QUADROTOR = {
-	 name: "MAV_TYPE_QUADROTOR",
-	description:"Quadrotor"
-}
 mavlink.MAV_TYPE_COAXIAL = 3 // Coaxial helicopter
-mavlink.enums.MAV_TYPE_COAXIAL = {
-	 name: "MAV_TYPE_COAXIAL",
-	description:"Coaxial helicopter"
-}
 mavlink.MAV_TYPE_HELICOPTER = 4 // Normal helicopter with tail rotor.
-mavlink.enums.MAV_TYPE_HELICOPTER = {
-	 name: "MAV_TYPE_HELICOPTER",
-	description:"Normal helicopter with tail rotor."
-}
 mavlink.MAV_TYPE_ANTENNA_TRACKER = 5 // Ground installation
-mavlink.enums.MAV_TYPE_ANTENNA_TRACKER = {
-	 name: "MAV_TYPE_ANTENNA_TRACKER",
-	description:"Ground installation"
-}
 mavlink.MAV_TYPE_GCS = 6 // Operator control unit / ground control station
-mavlink.enums.MAV_TYPE_GCS = {
-	 name: "MAV_TYPE_GCS",
-	description:"Operator control unit / ground control station"
-}
 mavlink.MAV_TYPE_AIRSHIP = 7 // Airship, controlled
-mavlink.enums.MAV_TYPE_AIRSHIP = {
-	 name: "MAV_TYPE_AIRSHIP",
-	description:"Airship, controlled"
-}
 mavlink.MAV_TYPE_FREE_BALLOON = 8 // Free balloon, uncontrolled
-mavlink.enums.MAV_TYPE_FREE_BALLOON = {
-	 name: "MAV_TYPE_FREE_BALLOON",
-	description:"Free balloon, uncontrolled"
-}
 mavlink.MAV_TYPE_ROCKET = 9 // Rocket
-mavlink.enums.MAV_TYPE_ROCKET = {
-	 name: "MAV_TYPE_ROCKET",
-	description:"Rocket"
-}
 mavlink.MAV_TYPE_GROUND_ROVER = 10 // Ground rover
-mavlink.enums.MAV_TYPE_GROUND_ROVER = {
-	 name: "MAV_TYPE_GROUND_ROVER",
-	description:"Ground rover"
-}
 mavlink.MAV_TYPE_SURFACE_BOAT = 11 // Surface vessel, boat, ship
-mavlink.enums.MAV_TYPE_SURFACE_BOAT = {
-	 name: "MAV_TYPE_SURFACE_BOAT",
-	description:"Surface vessel, boat, ship"
-}
 mavlink.MAV_TYPE_SUBMARINE = 12 // Submarine
-mavlink.enums.MAV_TYPE_SUBMARINE = {
-	 name: "MAV_TYPE_SUBMARINE",
-	description:"Submarine"
-}
 mavlink.MAV_TYPE_HEXAROTOR = 13 // Hexarotor
-mavlink.enums.MAV_TYPE_HEXAROTOR = {
-	 name: "MAV_TYPE_HEXAROTOR",
-	description:"Hexarotor"
-}
 mavlink.MAV_TYPE_OCTOROTOR = 14 // Octorotor
-mavlink.enums.MAV_TYPE_OCTOROTOR = {
-	 name: "MAV_TYPE_OCTOROTOR",
-	description:"Octorotor"
-}
 mavlink.MAV_TYPE_TRICOPTER = 15 // Octorotor
-mavlink.enums.MAV_TYPE_TRICOPTER = {
-	 name: "MAV_TYPE_TRICOPTER",
-	description:"Octorotor"
-}
 mavlink.MAV_TYPE_FLAPPING_WING = 16 // Flapping wing
-mavlink.enums.MAV_TYPE_FLAPPING_WING = {
-	 name: "MAV_TYPE_FLAPPING_WING",
-	description:"Flapping wing"
-}
 mavlink.MAV_TYPE_KITE = 17 // Flapping wing
-mavlink.enums.MAV_TYPE_KITE = {
-	 name: "MAV_TYPE_KITE",
-	description:"Flapping wing"
-}
 mavlink.MAV_TYPE_ENUM_END = 18 // 
-mavlink.enums.MAV_TYPE_ENUM_END = {
-	 name: "MAV_TYPE_ENUM_END",
-	description:""
-}
 
 // MAV_MODE_FLAG
 mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1 // 0b00000001 Reserved for future use.
-mavlink.enums.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = {
-	 name: "MAV_MODE_FLAG_CUSTOM_MODE_ENABLED",
-	description:"0b00000001 Reserved for future use."
-}
 mavlink.MAV_MODE_FLAG_TEST_ENABLED = 2 // 0b00000010 system has a test mode enabled. This flag is intended for
                         // temporary system tests and should not be
                         // used for stable implementations.
-mavlink.enums.MAV_MODE_FLAG_TEST_ENABLED = {
-	 name: "MAV_MODE_FLAG_TEST_ENABLED",
-	description:"0b00000010 system has a test mode enabled. This flag is intended for temporary system tests and should not be used for stable implementations."
-}
 mavlink.MAV_MODE_FLAG_AUTO_ENABLED = 4 // 0b00000100 autonomous mode enabled, system finds its own goal
                         // positions. Guided flag can be set or not,
                         // depends on the actual implementation.
-mavlink.enums.MAV_MODE_FLAG_AUTO_ENABLED = {
-	 name: "MAV_MODE_FLAG_AUTO_ENABLED",
-	description:"0b00000100 autonomous mode enabled, system finds its own goal positions. Guided flag can be set or not, depends on the actual implementation."
-}
 mavlink.MAV_MODE_FLAG_GUIDED_ENABLED = 8 // 0b00001000 guided mode enabled, system flies MISSIONs / mission items.
-mavlink.enums.MAV_MODE_FLAG_GUIDED_ENABLED = {
-	 name: "MAV_MODE_FLAG_GUIDED_ENABLED",
-	description:"0b00001000 guided mode enabled, system flies MISSIONs / mission items."
-}
 mavlink.MAV_MODE_FLAG_STABILIZE_ENABLED = 16 // 0b00010000 system stabilizes electronically its attitude (and
                         // optionally position). It needs however
                         // further control inputs to move around.
-mavlink.enums.MAV_MODE_FLAG_STABILIZE_ENABLED = {
-	 name: "MAV_MODE_FLAG_STABILIZE_ENABLED",
-	description:"0b00010000 system stabilizes electronically its attitude (and optionally position). It needs however further control inputs to move around."
-}
 mavlink.MAV_MODE_FLAG_HIL_ENABLED = 32 // 0b00100000 hardware in the loop simulation. All motors / actuators are
                         // blocked, but internal software is full
                         // operational.
-mavlink.enums.MAV_MODE_FLAG_HIL_ENABLED = {
-	 name: "MAV_MODE_FLAG_HIL_ENABLED",
-	description:"0b00100000 hardware in the loop simulation. All motors / actuators are blocked, but internal software is full operational."
-}
 mavlink.MAV_MODE_FLAG_MANUAL_INPUT_ENABLED = 64 // 0b01000000 remote control input is enabled.
-mavlink.enums.MAV_MODE_FLAG_MANUAL_INPUT_ENABLED = {
-	 name: "MAV_MODE_FLAG_MANUAL_INPUT_ENABLED",
-	description:"0b01000000 remote control input is enabled."
-}
 mavlink.MAV_MODE_FLAG_SAFETY_ARMED = 128 // 0b10000000 MAV safety set to armed. Motors are enabled / running / can
                         // start. Ready to fly.
-mavlink.enums.MAV_MODE_FLAG_SAFETY_ARMED = {
-	 name: "MAV_MODE_FLAG_SAFETY_ARMED",
-	description:"0b10000000 MAV safety set to armed. Motors are enabled / running / can start. Ready to fly."
-}
 mavlink.MAV_MODE_FLAG_ENUM_END = 129 // 
-mavlink.enums.MAV_MODE_FLAG_ENUM_END = {
-	 name: "MAV_MODE_FLAG_ENUM_END",
-	description:""
-}
 
 // MAV_MODE_FLAG_DECODE_POSITION
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = 1 // Eighth bit: 00000001
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_CUSTOM_MODE",
-	description:"Eighth bit: 00000001"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_TEST = 2 // Seventh bit: 00000010
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_TEST = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_TEST",
-	description:"Seventh bit: 00000010"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_AUTO = 4 // Sixt bit:   00000100
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_AUTO = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_AUTO",
-	description:"Sixt bit:   00000100"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_GUIDED = 8 // Fifth bit:  00001000
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_GUIDED = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_GUIDED",
-	description:"Fifth bit:  00001000"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = 16 // Fourth bit: 00010000
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_STABILIZE = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_STABILIZE",
-	description:"Fourth bit: 00010000"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_HIL = 32 // Third bit:  00100000
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_HIL = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_HIL",
-	description:"Third bit:  00100000"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_MANUAL = 64 // Second bit: 01000000
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_MANUAL = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_MANUAL",
-	description:"Second bit: 01000000"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_SAFETY = 128 // First bit:  10000000
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_SAFETY = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_SAFETY",
-	description:"First bit:  10000000"
-}
 mavlink.MAV_MODE_FLAG_DECODE_POSITION_ENUM_END = 129 // 
-mavlink.enums.MAV_MODE_FLAG_DECODE_POSITION_ENUM_END = {
-	 name: "MAV_MODE_FLAG_DECODE_POSITION_ENUM_END",
-	description:""
-}
 
 // MAV_GOTO
 mavlink.MAV_GOTO_DO_HOLD = 0 // Hold at the current position.
-mavlink.enums.MAV_GOTO_DO_HOLD = {
-	 name: "MAV_GOTO_DO_HOLD",
-	description:"Hold at the current position."
-}
 mavlink.MAV_GOTO_DO_CONTINUE = 1 // Continue with the next item in mission execution.
-mavlink.enums.MAV_GOTO_DO_CONTINUE = {
-	 name: "MAV_GOTO_DO_CONTINUE",
-	description:"Continue with the next item in mission execution."
-}
 mavlink.MAV_GOTO_HOLD_AT_CURRENT_POSITION = 2 // Hold at the current position of the system
-mavlink.enums.MAV_GOTO_HOLD_AT_CURRENT_POSITION = {
-	 name: "MAV_GOTO_HOLD_AT_CURRENT_POSITION",
-	description:"Hold at the current position of the system"
-}
 mavlink.MAV_GOTO_HOLD_AT_SPECIFIED_POSITION = 3 // Hold at the position specified in the parameters of the DO_HOLD action
-mavlink.enums.MAV_GOTO_HOLD_AT_SPECIFIED_POSITION = {
-	 name: "MAV_GOTO_HOLD_AT_SPECIFIED_POSITION",
-	description:"Hold at the position specified in the parameters of the DO_HOLD action"
-}
 mavlink.MAV_GOTO_ENUM_END = 4 // 
-mavlink.enums.MAV_GOTO_ENUM_END = {
-	 name: "MAV_GOTO_ENUM_END",
-	description:""
-}
 
 // MAV_MODE
 mavlink.MAV_MODE_PREFLIGHT = 0 // System is not ready to fly, booting, calibrating, etc. No flag is set.
-mavlink.enums.MAV_MODE_PREFLIGHT = {
-	 name: "MAV_MODE_PREFLIGHT",
-	description:"System is not ready to fly, booting, calibrating, etc. No flag is set."
-}
 mavlink.MAV_MODE_MANUAL_DISARMED = 64 // System is allowed to be active, under manual (RC) control, no
                         // stabilization
-mavlink.enums.MAV_MODE_MANUAL_DISARMED = {
-	 name: "MAV_MODE_MANUAL_DISARMED",
-	description:"System is allowed to be active, under manual (RC) control, no stabilization"
-}
 mavlink.MAV_MODE_TEST_DISARMED = 66 // UNDEFINED mode. This solely depends on the autopilot - use with
                         // caution, intended for developers only.
-mavlink.enums.MAV_MODE_TEST_DISARMED = {
-	 name: "MAV_MODE_TEST_DISARMED",
-	description:"UNDEFINED mode. This solely depends on the autopilot - use with caution, intended for developers only."
-}
 mavlink.MAV_MODE_STABILIZE_DISARMED = 80 // System is allowed to be active, under assisted RC control.
-mavlink.enums.MAV_MODE_STABILIZE_DISARMED = {
-	 name: "MAV_MODE_STABILIZE_DISARMED",
-	description:"System is allowed to be active, under assisted RC control."
-}
 mavlink.MAV_MODE_GUIDED_DISARMED = 88 // System is allowed to be active, under autonomous control, manual
                         // setpoint
-mavlink.enums.MAV_MODE_GUIDED_DISARMED = {
-	 name: "MAV_MODE_GUIDED_DISARMED",
-	description:"System is allowed to be active, under autonomous control, manual setpoint"
-}
 mavlink.MAV_MODE_AUTO_DISARMED = 92 // System is allowed to be active, under autonomous control and
                         // navigation (the trajectory is decided
                         // onboard and not pre-programmed by MISSIONs)
-mavlink.enums.MAV_MODE_AUTO_DISARMED = {
-	 name: "MAV_MODE_AUTO_DISARMED",
-	description:"System is allowed to be active, under autonomous control and navigation (the trajectory is decided onboard and not pre-programmed by MISSIONs)"
-}
 mavlink.MAV_MODE_MANUAL_ARMED = 192 // System is allowed to be active, under manual (RC) control, no
                         // stabilization
-mavlink.enums.MAV_MODE_MANUAL_ARMED = {
-	 name: "MAV_MODE_MANUAL_ARMED",
-	description:"System is allowed to be active, under manual (RC) control, no stabilization"
-}
 mavlink.MAV_MODE_TEST_ARMED = 194 // UNDEFINED mode. This solely depends on the autopilot - use with
                         // caution, intended for developers only.
-mavlink.enums.MAV_MODE_TEST_ARMED = {
-	 name: "MAV_MODE_TEST_ARMED",
-	description:"UNDEFINED mode. This solely depends on the autopilot - use with caution, intended for developers only."
-}
 mavlink.MAV_MODE_STABILIZE_ARMED = 208 // System is allowed to be active, under assisted RC control.
-mavlink.enums.MAV_MODE_STABILIZE_ARMED = {
-	 name: "MAV_MODE_STABILIZE_ARMED",
-	description:"System is allowed to be active, under assisted RC control."
-}
 mavlink.MAV_MODE_GUIDED_ARMED = 216 // System is allowed to be active, under autonomous control, manual
                         // setpoint
-mavlink.enums.MAV_MODE_GUIDED_ARMED = {
-	 name: "MAV_MODE_GUIDED_ARMED",
-	description:"System is allowed to be active, under autonomous control, manual setpoint"
-}
 mavlink.MAV_MODE_AUTO_ARMED = 220 // System is allowed to be active, under autonomous control and
                         // navigation (the trajectory is decided
                         // onboard and not pre-programmed by MISSIONs)
-mavlink.enums.MAV_MODE_AUTO_ARMED = {
-	 name: "MAV_MODE_AUTO_ARMED",
-	description:"System is allowed to be active, under autonomous control and navigation (the trajectory is decided onboard and not pre-programmed by MISSIONs)"
-}
 mavlink.MAV_MODE_ENUM_END = 221 // 
-mavlink.enums.MAV_MODE_ENUM_END = {
-	 name: "MAV_MODE_ENUM_END",
-	description:""
-}
 
 // MAV_STATE
 mavlink.MAV_STATE_UNINIT = 0 // Uninitialized system, state is unknown.
-mavlink.enums.MAV_STATE_UNINIT = {
-	 name: "MAV_STATE_UNINIT",
-	description:"Uninitialized system, state is unknown."
-}
 mavlink.MAV_STATE_BOOT = 1 // System is booting up.
-mavlink.enums.MAV_STATE_BOOT = {
-	 name: "MAV_STATE_BOOT",
-	description:"System is booting up."
-}
 mavlink.MAV_STATE_CALIBRATING = 2 // System is calibrating and not flight-ready.
-mavlink.enums.MAV_STATE_CALIBRATING = {
-	 name: "MAV_STATE_CALIBRATING",
-	description:"System is calibrating and not flight-ready."
-}
 mavlink.MAV_STATE_STANDBY = 3 // System is grounded and on standby. It can be launched any time.
-mavlink.enums.MAV_STATE_STANDBY = {
-	 name: "MAV_STATE_STANDBY",
-	description:"System is grounded and on standby. It can be launched any time."
-}
 mavlink.MAV_STATE_ACTIVE = 4 // System is active and might be already airborne. Motors are engaged.
-mavlink.enums.MAV_STATE_ACTIVE = {
-	 name: "MAV_STATE_ACTIVE",
-	description:"System is active and might be already airborne. Motors are engaged."
-}
 mavlink.MAV_STATE_CRITICAL = 5 // System is in a non-normal flight mode. It can however still navigate.
-mavlink.enums.MAV_STATE_CRITICAL = {
-	 name: "MAV_STATE_CRITICAL",
-	description:"System is in a non-normal flight mode. It can however still navigate."
-}
 mavlink.MAV_STATE_EMERGENCY = 6 // System is in a non-normal flight mode. It lost control over parts or
                         // over the whole airframe. It is in mayday
                         // and going down.
-mavlink.enums.MAV_STATE_EMERGENCY = {
-	 name: "MAV_STATE_EMERGENCY",
-	description:"System is in a non-normal flight mode. It lost control over parts or over the whole airframe. It is in mayday and going down."
-}
 mavlink.MAV_STATE_POWEROFF = 7 // System just initialized its power-down sequence, will shut down now.
-mavlink.enums.MAV_STATE_POWEROFF = {
-	 name: "MAV_STATE_POWEROFF",
-	description:"System just initialized its power-down sequence, will shut down now."
-}
 mavlink.MAV_STATE_ENUM_END = 8 // 
-mavlink.enums.MAV_STATE_ENUM_END = {
-	 name: "MAV_STATE_ENUM_END",
-	description:""
-}
 
 // MAV_COMPONENT
 mavlink.MAV_COMP_ID_ALL = 0 // 
-mavlink.enums.MAV_COMP_ID_ALL = {
-	 name: "MAV_COMP_ID_ALL",
-	description:""
-}
 mavlink.MAV_COMP_ID_CAMERA = 100 // 
-mavlink.enums.MAV_COMP_ID_CAMERA = {
-	 name: "MAV_COMP_ID_CAMERA",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO1 = 140 // 
-mavlink.enums.MAV_COMP_ID_SERVO1 = {
-	 name: "MAV_COMP_ID_SERVO1",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO2 = 141 // 
-mavlink.enums.MAV_COMP_ID_SERVO2 = {
-	 name: "MAV_COMP_ID_SERVO2",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO3 = 142 // 
-mavlink.enums.MAV_COMP_ID_SERVO3 = {
-	 name: "MAV_COMP_ID_SERVO3",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO4 = 143 // 
-mavlink.enums.MAV_COMP_ID_SERVO4 = {
-	 name: "MAV_COMP_ID_SERVO4",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO5 = 144 // 
-mavlink.enums.MAV_COMP_ID_SERVO5 = {
-	 name: "MAV_COMP_ID_SERVO5",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO6 = 145 // 
-mavlink.enums.MAV_COMP_ID_SERVO6 = {
-	 name: "MAV_COMP_ID_SERVO6",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO7 = 146 // 
-mavlink.enums.MAV_COMP_ID_SERVO7 = {
-	 name: "MAV_COMP_ID_SERVO7",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO8 = 147 // 
-mavlink.enums.MAV_COMP_ID_SERVO8 = {
-	 name: "MAV_COMP_ID_SERVO8",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO9 = 148 // 
-mavlink.enums.MAV_COMP_ID_SERVO9 = {
-	 name: "MAV_COMP_ID_SERVO9",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO10 = 149 // 
-mavlink.enums.MAV_COMP_ID_SERVO10 = {
-	 name: "MAV_COMP_ID_SERVO10",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO11 = 150 // 
-mavlink.enums.MAV_COMP_ID_SERVO11 = {
-	 name: "MAV_COMP_ID_SERVO11",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO12 = 151 // 
-mavlink.enums.MAV_COMP_ID_SERVO12 = {
-	 name: "MAV_COMP_ID_SERVO12",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO13 = 152 // 
-mavlink.enums.MAV_COMP_ID_SERVO13 = {
-	 name: "MAV_COMP_ID_SERVO13",
-	description:""
-}
 mavlink.MAV_COMP_ID_SERVO14 = 153 // 
-mavlink.enums.MAV_COMP_ID_SERVO14 = {
-	 name: "MAV_COMP_ID_SERVO14",
-	description:""
-}
 mavlink.MAV_COMP_ID_MAPPER = 180 // 
-mavlink.enums.MAV_COMP_ID_MAPPER = {
-	 name: "MAV_COMP_ID_MAPPER",
-	description:""
-}
 mavlink.MAV_COMP_ID_MISSIONPLANNER = 190 // 
-mavlink.enums.MAV_COMP_ID_MISSIONPLANNER = {
-	 name: "MAV_COMP_ID_MISSIONPLANNER",
-	description:""
-}
 mavlink.MAV_COMP_ID_PATHPLANNER = 195 // 
-mavlink.enums.MAV_COMP_ID_PATHPLANNER = {
-	 name: "MAV_COMP_ID_PATHPLANNER",
-	description:""
-}
 mavlink.MAV_COMP_ID_IMU = 200 // 
-mavlink.enums.MAV_COMP_ID_IMU = {
-	 name: "MAV_COMP_ID_IMU",
-	description:""
-}
 mavlink.MAV_COMP_ID_IMU_2 = 201 // 
-mavlink.enums.MAV_COMP_ID_IMU_2 = {
-	 name: "MAV_COMP_ID_IMU_2",
-	description:""
-}
 mavlink.MAV_COMP_ID_IMU_3 = 202 // 
-mavlink.enums.MAV_COMP_ID_IMU_3 = {
-	 name: "MAV_COMP_ID_IMU_3",
-	description:""
-}
 mavlink.MAV_COMP_ID_GPS = 220 // 
-mavlink.enums.MAV_COMP_ID_GPS = {
-	 name: "MAV_COMP_ID_GPS",
-	description:""
-}
 mavlink.MAV_COMP_ID_UDP_BRIDGE = 240 // 
-mavlink.enums.MAV_COMP_ID_UDP_BRIDGE = {
-	 name: "MAV_COMP_ID_UDP_BRIDGE",
-	description:""
-}
 mavlink.MAV_COMP_ID_UART_BRIDGE = 241 // 
-mavlink.enums.MAV_COMP_ID_UART_BRIDGE = {
-	 name: "MAV_COMP_ID_UART_BRIDGE",
-	description:""
-}
 mavlink.MAV_COMP_ID_SYSTEM_CONTROL = 250 // 
-mavlink.enums.MAV_COMP_ID_SYSTEM_CONTROL = {
-	 name: "MAV_COMP_ID_SYSTEM_CONTROL",
-	description:""
-}
 mavlink.MAV_COMPONENT_ENUM_END = 251 // 
-mavlink.enums.MAV_COMPONENT_ENUM_END = {
-	 name: "MAV_COMPONENT_ENUM_END",
-	description:""
-}
 
 // MAV_FRAME
 mavlink.MAV_FRAME_GLOBAL = 0 // Global coordinate frame, WGS84 coordinate system. First value / x:
                         // latitude, second value / y: longitude,
                         // third value / z: positive altitude over
                         // mean sea level (MSL)
-mavlink.enums.MAV_FRAME_GLOBAL = {
-	 name: "MAV_FRAME_GLOBAL",
-	description:"Global coordinate frame, WGS84 coordinate system. First value / x: latitude, second value / y: longitude, third value / z: positive altitude over mean sea level (MSL)"
-}
 mavlink.MAV_FRAME_LOCAL_NED = 1 // Local coordinate frame, Z-up (x: north, y: east, z: down).
-mavlink.enums.MAV_FRAME_LOCAL_NED = {
-	 name: "MAV_FRAME_LOCAL_NED",
-	description:"Local coordinate frame, Z-up (x: north, y: east, z: down)."
-}
 mavlink.MAV_FRAME_MISSION = 2 // NOT a coordinate frame, indicates a mission command.
-mavlink.enums.MAV_FRAME_MISSION = {
-	 name: "MAV_FRAME_MISSION",
-	description:"NOT a coordinate frame, indicates a mission command."
-}
 mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT = 3 // Global coordinate frame, WGS84 coordinate system, relative altitude
                         // over ground with respect to the home
                         // position. First value / x: latitude, second
                         // value / y: longitude, third value / z:
                         // positive altitude with 0 being at the
                         // altitude of the home location.
-mavlink.enums.MAV_FRAME_GLOBAL_RELATIVE_ALT = {
-	 name: "MAV_FRAME_GLOBAL_RELATIVE_ALT",
-	description:"Global coordinate frame, WGS84 coordinate system, relative altitude over ground with respect to the home position. First value / x: latitude, second value / y: longitude, third value / z: positive altitude with 0 being at the altitude of the home location."
-}
 mavlink.MAV_FRAME_LOCAL_ENU = 4 // Local coordinate frame, Z-down (x: east, y: north, z: up)
-mavlink.enums.MAV_FRAME_LOCAL_ENU = {
-	 name: "MAV_FRAME_LOCAL_ENU",
-	description:"Local coordinate frame, Z-down (x: east, y: north, z: up)"
-}
 mavlink.MAV_FRAME_ENUM_END = 5 // 
-mavlink.enums.MAV_FRAME_ENUM_END = {
-	 name: "MAV_FRAME_ENUM_END",
-	description:""
-}
 
 // MAVLINK_DATA_STREAM_TYPE
 mavlink.MAVLINK_DATA_STREAM_IMG_JPEG = 1 // 
-mavlink.enums.MAVLINK_DATA_STREAM_IMG_JPEG = {
-	 name: "MAVLINK_DATA_STREAM_IMG_JPEG",
-	description:""
-}
 mavlink.MAVLINK_DATA_STREAM_IMG_BMP = 2 // 
-mavlink.enums.MAVLINK_DATA_STREAM_IMG_BMP = {
-	 name: "MAVLINK_DATA_STREAM_IMG_BMP",
-	description:""
-}
 mavlink.MAVLINK_DATA_STREAM_IMG_RAW8U = 3 // 
-mavlink.enums.MAVLINK_DATA_STREAM_IMG_RAW8U = {
-	 name: "MAVLINK_DATA_STREAM_IMG_RAW8U",
-	description:""
-}
 mavlink.MAVLINK_DATA_STREAM_IMG_RAW32U = 4 // 
-mavlink.enums.MAVLINK_DATA_STREAM_IMG_RAW32U = {
-	 name: "MAVLINK_DATA_STREAM_IMG_RAW32U",
-	description:""
-}
 mavlink.MAVLINK_DATA_STREAM_IMG_PGM = 5 // 
-mavlink.enums.MAVLINK_DATA_STREAM_IMG_PGM = {
-	 name: "MAVLINK_DATA_STREAM_IMG_PGM",
-	description:""
-}
 mavlink.MAVLINK_DATA_STREAM_IMG_PNG = 6 // 
-mavlink.enums.MAVLINK_DATA_STREAM_IMG_PNG = {
-	 name: "MAVLINK_DATA_STREAM_IMG_PNG",
-	description:""
-}
 mavlink.MAVLINK_DATA_STREAM_TYPE_ENUM_END = 7 // 
-mavlink.enums.MAVLINK_DATA_STREAM_TYPE_ENUM_END = {
-	 name: "MAVLINK_DATA_STREAM_TYPE_ENUM_END",
-	description:""
-}
 
 // MAV_DATA_STREAM
 mavlink.MAV_DATA_STREAM_ALL = 0 // Enable all data streams
-mavlink.enums.MAV_DATA_STREAM_ALL = {
-	 name: "MAV_DATA_STREAM_ALL",
-	description:"Enable all data streams"
-}
 mavlink.MAV_DATA_STREAM_RAW_SENSORS = 1 // Enable IMU_RAW, GPS_RAW, GPS_STATUS packets.
-mavlink.enums.MAV_DATA_STREAM_RAW_SENSORS = {
-	 name: "MAV_DATA_STREAM_RAW_SENSORS",
-	description:"Enable IMU_RAW, GPS_RAW, GPS_STATUS packets."
-}
 mavlink.MAV_DATA_STREAM_EXTENDED_STATUS = 2 // Enable GPS_STATUS, CONTROL_STATUS, AUX_STATUS
-mavlink.enums.MAV_DATA_STREAM_EXTENDED_STATUS = {
-	 name: "MAV_DATA_STREAM_EXTENDED_STATUS",
-	description:"Enable GPS_STATUS, CONTROL_STATUS, AUX_STATUS"
-}
 mavlink.MAV_DATA_STREAM_RC_CHANNELS = 3 // Enable RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW
-mavlink.enums.MAV_DATA_STREAM_RC_CHANNELS = {
-	 name: "MAV_DATA_STREAM_RC_CHANNELS",
-	description:"Enable RC_CHANNELS_SCALED, RC_CHANNELS_RAW, SERVO_OUTPUT_RAW"
-}
 mavlink.MAV_DATA_STREAM_RAW_CONTROLLER = 4 // Enable ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT,
                         // NAV_CONTROLLER_OUTPUT.
-mavlink.enums.MAV_DATA_STREAM_RAW_CONTROLLER = {
-	 name: "MAV_DATA_STREAM_RAW_CONTROLLER",
-	description:"Enable ATTITUDE_CONTROLLER_OUTPUT, POSITION_CONTROLLER_OUTPUT, NAV_CONTROLLER_OUTPUT."
-}
 mavlink.MAV_DATA_STREAM_POSITION = 6 // Enable LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages.
-mavlink.enums.MAV_DATA_STREAM_POSITION = {
-	 name: "MAV_DATA_STREAM_POSITION",
-	description:"Enable LOCAL_POSITION, GLOBAL_POSITION/GLOBAL_POSITION_INT messages."
-}
 mavlink.MAV_DATA_STREAM_EXTRA1 = 10 // Dependent on the autopilot
-mavlink.enums.MAV_DATA_STREAM_EXTRA1 = {
-	 name: "MAV_DATA_STREAM_EXTRA1",
-	description:"Dependent on the autopilot"
-}
 mavlink.MAV_DATA_STREAM_EXTRA2 = 11 // Dependent on the autopilot
-mavlink.enums.MAV_DATA_STREAM_EXTRA2 = {
-	 name: "MAV_DATA_STREAM_EXTRA2",
-	description:"Dependent on the autopilot"
-}
 mavlink.MAV_DATA_STREAM_EXTRA3 = 12 // Dependent on the autopilot
-mavlink.enums.MAV_DATA_STREAM_EXTRA3 = {
-	 name: "MAV_DATA_STREAM_EXTRA3",
-	description:"Dependent on the autopilot"
-}
 mavlink.MAV_DATA_STREAM_ENUM_END = 13 // 
-mavlink.enums.MAV_DATA_STREAM_ENUM_END = {
-	 name: "MAV_DATA_STREAM_ENUM_END",
-	description:""
-}
 
 // MAV_ROI
 mavlink.MAV_ROI_NONE = 0 // No region of interest.
-mavlink.enums.MAV_ROI_NONE = {
-	 name: "MAV_ROI_NONE",
-	description:"No region of interest."
-}
 mavlink.MAV_ROI_WPNEXT = 1 // Point toward next MISSION.
-mavlink.enums.MAV_ROI_WPNEXT = {
-	 name: "MAV_ROI_WPNEXT",
-	description:"Point toward next MISSION."
-}
 mavlink.MAV_ROI_WPINDEX = 2 // Point toward given MISSION.
-mavlink.enums.MAV_ROI_WPINDEX = {
-	 name: "MAV_ROI_WPINDEX",
-	description:"Point toward given MISSION."
-}
 mavlink.MAV_ROI_LOCATION = 3 // Point toward fixed location.
-mavlink.enums.MAV_ROI_LOCATION = {
-	 name: "MAV_ROI_LOCATION",
-	description:"Point toward fixed location."
-}
 mavlink.MAV_ROI_TARGET = 4 // Point toward of given id.
-mavlink.enums.MAV_ROI_TARGET = {
-	 name: "MAV_ROI_TARGET",
-	description:"Point toward of given id."
-}
 mavlink.MAV_ROI_ENUM_END = 5 // 
-mavlink.enums.MAV_ROI_ENUM_END = {
-	 name: "MAV_ROI_ENUM_END",
-	description:""
-}
 
 // MAV_CMD_ACK
 mavlink.MAV_CMD_ACK_OK = 1 // Command / mission item is ok.
-mavlink.enums.MAV_CMD_ACK_OK = {
-	 name: "MAV_CMD_ACK_OK",
-	description:"Command / mission item is ok."
-}
 mavlink.MAV_CMD_ACK_ERR_FAIL = 2 // Generic error message if none of the other reasons fails or if no
                         // detailed error reporting is implemented.
-mavlink.enums.MAV_CMD_ACK_ERR_FAIL = {
-	 name: "MAV_CMD_ACK_ERR_FAIL",
-	description:"Generic error message if none of the other reasons fails or if no detailed error reporting is implemented."
-}
 mavlink.MAV_CMD_ACK_ERR_ACCESS_DENIED = 3 // The system is refusing to accept this command from this source /
                         // communication partner.
-mavlink.enums.MAV_CMD_ACK_ERR_ACCESS_DENIED = {
-	 name: "MAV_CMD_ACK_ERR_ACCESS_DENIED",
-	description:"The system is refusing to accept this command from this source / communication partner."
-}
 mavlink.MAV_CMD_ACK_ERR_NOT_SUPPORTED = 4 // Command or mission item is not supported, other commands would be
                         // accepted.
-mavlink.enums.MAV_CMD_ACK_ERR_NOT_SUPPORTED = {
-	 name: "MAV_CMD_ACK_ERR_NOT_SUPPORTED",
-	description:"Command or mission item is not supported, other commands would be accepted."
-}
 mavlink.MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED = 5 // The coordinate frame of this command / mission item is not supported.
-mavlink.enums.MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED = {
-	 name: "MAV_CMD_ACK_ERR_COORDINATE_FRAME_NOT_SUPPORTED",
-	description:"The coordinate frame of this command / mission item is not supported."
-}
 mavlink.MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE = 6 // The coordinate frame of this command is ok, but he coordinate values
                         // exceed the safety limits of this system.
                         // This is a generic error, please use the
                         // more specific error messages below if
                         // possible.
-mavlink.enums.MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE = {
-	 name: "MAV_CMD_ACK_ERR_COORDINATES_OUT_OF_RANGE",
-	description:"The coordinate frame of this command is ok, but he coordinate values exceed the safety limits of this system. This is a generic error, please use the more specific error messages below if possible."
-}
 mavlink.MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE = 7 // The X or latitude value is out of range.
-mavlink.enums.MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE = {
-	 name: "MAV_CMD_ACK_ERR_X_LAT_OUT_OF_RANGE",
-	description:"The X or latitude value is out of range."
-}
 mavlink.MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE = 8 // The Y or longitude value is out of range.
-mavlink.enums.MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE = {
-	 name: "MAV_CMD_ACK_ERR_Y_LON_OUT_OF_RANGE",
-	description:"The Y or longitude value is out of range."
-}
 mavlink.MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE = 9 // The Z or altitude value is out of range.
-mavlink.enums.MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE = {
-	 name: "MAV_CMD_ACK_ERR_Z_ALT_OUT_OF_RANGE",
-	description:"The Z or altitude value is out of range."
-}
 mavlink.MAV_CMD_ACK_ENUM_END = 10 // 
-mavlink.enums.MAV_CMD_ACK_ENUM_END = {
-	 name: "MAV_CMD_ACK_ENUM_END",
-	description:""
-}
 
 // MAV_PARAM_TYPE
 mavlink.MAV_PARAM_TYPE_UINT8 = 1 // 8-bit unsigned integer
-mavlink.enums.MAV_PARAM_TYPE_UINT8 = {
-	 name: "MAV_PARAM_TYPE_UINT8",
-	description:"8-bit unsigned integer"
-}
 mavlink.MAV_PARAM_TYPE_INT8 = 2 // 8-bit signed integer
-mavlink.enums.MAV_PARAM_TYPE_INT8 = {
-	 name: "MAV_PARAM_TYPE_INT8",
-	description:"8-bit signed integer"
-}
 mavlink.MAV_PARAM_TYPE_UINT16 = 3 // 16-bit unsigned integer
-mavlink.enums.MAV_PARAM_TYPE_UINT16 = {
-	 name: "MAV_PARAM_TYPE_UINT16",
-	description:"16-bit unsigned integer"
-}
 mavlink.MAV_PARAM_TYPE_INT16 = 4 // 16-bit signed integer
-mavlink.enums.MAV_PARAM_TYPE_INT16 = {
-	 name: "MAV_PARAM_TYPE_INT16",
-	description:"16-bit signed integer"
-}
 mavlink.MAV_PARAM_TYPE_UINT32 = 5 // 32-bit unsigned integer
-mavlink.enums.MAV_PARAM_TYPE_UINT32 = {
-	 name: "MAV_PARAM_TYPE_UINT32",
-	description:"32-bit unsigned integer"
-}
 mavlink.MAV_PARAM_TYPE_INT32 = 6 // 32-bit signed integer
-mavlink.enums.MAV_PARAM_TYPE_INT32 = {
-	 name: "MAV_PARAM_TYPE_INT32",
-	description:"32-bit signed integer"
-}
 mavlink.MAV_PARAM_TYPE_UINT64 = 7 // 64-bit unsigned integer
-mavlink.enums.MAV_PARAM_TYPE_UINT64 = {
-	 name: "MAV_PARAM_TYPE_UINT64",
-	description:"64-bit unsigned integer"
-}
 mavlink.MAV_PARAM_TYPE_INT64 = 8 // 64-bit signed integer
-mavlink.enums.MAV_PARAM_TYPE_INT64 = {
-	 name: "MAV_PARAM_TYPE_INT64",
-	description:"64-bit signed integer"
-}
 mavlink.MAV_PARAM_TYPE_REAL32 = 9 // 32-bit floating-point
-mavlink.enums.MAV_PARAM_TYPE_REAL32 = {
-	 name: "MAV_PARAM_TYPE_REAL32",
-	description:"32-bit floating-point"
-}
 mavlink.MAV_PARAM_TYPE_REAL64 = 10 // 64-bit floating-point
-mavlink.enums.MAV_PARAM_TYPE_REAL64 = {
-	 name: "MAV_PARAM_TYPE_REAL64",
-	description:"64-bit floating-point"
-}
 mavlink.MAV_PARAM_TYPE_ENUM_END = 11 // 
-mavlink.enums.MAV_PARAM_TYPE_ENUM_END = {
-	 name: "MAV_PARAM_TYPE_ENUM_END",
-	description:""
-}
 
 // MAV_RESULT
 mavlink.MAV_RESULT_ACCEPTED = 0 // Command ACCEPTED and EXECUTED
-mavlink.enums.MAV_RESULT_ACCEPTED = {
-	 name: "MAV_RESULT_ACCEPTED",
-	description:"Command ACCEPTED and EXECUTED"
-}
 mavlink.MAV_RESULT_TEMPORARILY_REJECTED = 1 // Command TEMPORARY REJECTED/DENIED
-mavlink.enums.MAV_RESULT_TEMPORARILY_REJECTED = {
-	 name: "MAV_RESULT_TEMPORARILY_REJECTED",
-	description:"Command TEMPORARY REJECTED/DENIED"
-}
 mavlink.MAV_RESULT_DENIED = 2 // Command PERMANENTLY DENIED
-mavlink.enums.MAV_RESULT_DENIED = {
-	 name: "MAV_RESULT_DENIED",
-	description:"Command PERMANENTLY DENIED"
-}
 mavlink.MAV_RESULT_UNSUPPORTED = 3 // Command UNKNOWN/UNSUPPORTED
-mavlink.enums.MAV_RESULT_UNSUPPORTED = {
-	 name: "MAV_RESULT_UNSUPPORTED",
-	description:"Command UNKNOWN/UNSUPPORTED"
-}
 mavlink.MAV_RESULT_FAILED = 4 // Command executed, but failed
-mavlink.enums.MAV_RESULT_FAILED = {
-	 name: "MAV_RESULT_FAILED",
-	description:"Command executed, but failed"
-}
 mavlink.MAV_RESULT_ENUM_END = 5 // 
-mavlink.enums.MAV_RESULT_ENUM_END = {
-	 name: "MAV_RESULT_ENUM_END",
-	description:""
-}
 
 // MAV_MISSION_RESULT
 mavlink.MAV_MISSION_ACCEPTED = 0 // mission accepted OK
-mavlink.enums.MAV_MISSION_ACCEPTED = {
-	 name: "MAV_MISSION_ACCEPTED",
-	description:"mission accepted OK"
-}
 mavlink.MAV_MISSION_ERROR = 1 // generic error / not accepting mission commands at all right now
-mavlink.enums.MAV_MISSION_ERROR = {
-	 name: "MAV_MISSION_ERROR",
-	description:"generic error / not accepting mission commands at all right now"
-}
 mavlink.MAV_MISSION_UNSUPPORTED_FRAME = 2 // coordinate frame is not supported
-mavlink.enums.MAV_MISSION_UNSUPPORTED_FRAME = {
-	 name: "MAV_MISSION_UNSUPPORTED_FRAME",
-	description:"coordinate frame is not supported"
-}
 mavlink.MAV_MISSION_UNSUPPORTED = 3 // command is not supported
-mavlink.enums.MAV_MISSION_UNSUPPORTED = {
-	 name: "MAV_MISSION_UNSUPPORTED",
-	description:"command is not supported"
-}
 mavlink.MAV_MISSION_NO_SPACE = 4 // mission item exceeds storage space
-mavlink.enums.MAV_MISSION_NO_SPACE = {
-	 name: "MAV_MISSION_NO_SPACE",
-	description:"mission item exceeds storage space"
-}
 mavlink.MAV_MISSION_INVALID = 5 // one of the parameters has an invalid value
-mavlink.enums.MAV_MISSION_INVALID = {
-	 name: "MAV_MISSION_INVALID",
-	description:"one of the parameters has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM1 = 6 // param1 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM1 = {
-	 name: "MAV_MISSION_INVALID_PARAM1",
-	description:"param1 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM2 = 7 // param2 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM2 = {
-	 name: "MAV_MISSION_INVALID_PARAM2",
-	description:"param2 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM3 = 8 // param3 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM3 = {
-	 name: "MAV_MISSION_INVALID_PARAM3",
-	description:"param3 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM4 = 9 // param4 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM4 = {
-	 name: "MAV_MISSION_INVALID_PARAM4",
-	description:"param4 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM5_X = 10 // x/param5 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM5_X = {
-	 name: "MAV_MISSION_INVALID_PARAM5_X",
-	description:"x/param5 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM6_Y = 11 // y/param6 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM6_Y = {
-	 name: "MAV_MISSION_INVALID_PARAM6_Y",
-	description:"y/param6 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_PARAM7 = 12 // param7 has an invalid value
-mavlink.enums.MAV_MISSION_INVALID_PARAM7 = {
-	 name: "MAV_MISSION_INVALID_PARAM7",
-	description:"param7 has an invalid value"
-}
 mavlink.MAV_MISSION_INVALID_SEQUENCE = 13 // received waypoint out of sequence
-mavlink.enums.MAV_MISSION_INVALID_SEQUENCE = {
-	 name: "MAV_MISSION_INVALID_SEQUENCE",
-	description:"received waypoint out of sequence"
-}
 mavlink.MAV_MISSION_DENIED = 14 // not accepting any mission commands from this communication partner
-mavlink.enums.MAV_MISSION_DENIED = {
-	 name: "MAV_MISSION_DENIED",
-	description:"not accepting any mission commands from this communication partner"
-}
 mavlink.MAV_MISSION_RESULT_ENUM_END = 15 // 
-mavlink.enums.MAV_MISSION_RESULT_ENUM_END = {
-	 name: "MAV_MISSION_RESULT_ENUM_END",
-	description:""
-}
 
 // MAV_SEVERITY
 mavlink.MAV_SEVERITY_EMERGENCY = 0 // System is unusable. This is a "panic" condition.
-mavlink.enums.MAV_SEVERITY_EMERGENCY = {
-	 name: "MAV_SEVERITY_EMERGENCY",
-	description:"System is unusable. This is a panic condition."
-}
 mavlink.MAV_SEVERITY_ALERT = 1 // Action should be taken immediately. Indicates error in non-critical
                         // systems.
-mavlink.enums.MAV_SEVERITY_ALERT = {
-	 name: "MAV_SEVERITY_ALERT",
-	description:"Action should be taken immediately. Indicates error in non-critical systems."
-}
 mavlink.MAV_SEVERITY_CRITICAL = 2 // Action must be taken immediately. Indicates failure in a primary
                         // system.
-mavlink.enums.MAV_SEVERITY_CRITICAL = {
-	 name: "MAV_SEVERITY_CRITICAL",
-	description:"Action must be taken immediately. Indicates failure in a primary system."
-}
 mavlink.MAV_SEVERITY_ERROR = 3 // Indicates an error in secondary/redundant systems.
-mavlink.enums.MAV_SEVERITY_ERROR = {
-	 name: "MAV_SEVERITY_ERROR",
-	description:"Indicates an error in secondary/redundant systems."
-}
 mavlink.MAV_SEVERITY_WARNING = 4 // Indicates about a possible future error if this is not resolved within
                         // a given timeframe. Example would be a low
                         // battery warning.
-mavlink.enums.MAV_SEVERITY_WARNING = {
-	 name: "MAV_SEVERITY_WARNING",
-	description:"Indicates about a possible future error if this is not resolved within a given timeframe. Example would be a low battery warning."
-}
 mavlink.MAV_SEVERITY_NOTICE = 5 // An unusual event has occured, though not an error condition. This
                         // should be investigated for the root cause.
-mavlink.enums.MAV_SEVERITY_NOTICE = {
-	 name: "MAV_SEVERITY_NOTICE",
-	description:"An unusual event has occured, though not an error condition. This should be investigated for the root cause."
-}
 mavlink.MAV_SEVERITY_INFO = 6 // Normal operational messages. Useful for logging. No action is required
                         // for these messages.
-mavlink.enums.MAV_SEVERITY_INFO = {
-	 name: "MAV_SEVERITY_INFO",
-	description:"Normal operational messages. Useful for logging. No action is required for these messages."
-}
 mavlink.MAV_SEVERITY_DEBUG = 7 // Useful non-operational messages that can assist in debugging. These
                         // should not occur during normal operation.
-mavlink.enums.MAV_SEVERITY_DEBUG = {
-	 name: "MAV_SEVERITY_DEBUG",
-	description:"Useful non-operational messages that can assist in debugging. These should not occur during normal operation."
-}
 mavlink.MAV_SEVERITY_ENUM_END = 8 // 
-mavlink.enums.MAV_SEVERITY_ENUM_END = {
-	 name: "MAV_SEVERITY_ENUM_END",
-	description:""
-}
 
 // message IDs
 mavlink.MAVLINK_MSG_ID_BAD_DATA = -1
@@ -2340,7 +1347,7 @@ computer clock of the main onboard computer.
 */
 mavlink.messages.system_time = function(time_unix_usec, time_boot_ms) {
 
-    this.format = '<QI';
+    this.format = '<dI';
     this.id = mavlink.MAVLINK_MSG_ID_SYSTEM_TIME;
     this.order_map = [0, 1];
     this.crc_extra = 137;
@@ -2372,7 +1379,7 @@ and UDP connections.
 */
 mavlink.messages.ping = function(time_usec, seq, target_system, target_component) {
 
-    this.format = '<QIBB';
+    this.format = '<dIBB';
     this.id = mavlink.MAVLINK_MSG_ID_PING;
     this.order_map = [0, 1, 2, 3];
     this.crc_extra = 237;
@@ -2668,7 +1675,7 @@ up (GPS frame).
 */
 mavlink.messages.gps_raw_int = function(time_usec, fix_type, lat, lon, alt, eph, epv, vel, cog, satellites_visible) {
 
-    //this.format = '<8xiiiHHHHBB';
+    this.format = '<diiiHHHHBB';
     this.id = mavlink.MAVLINK_MSG_ID_GPS_RAW_INT;
     this.order_map = [0, 8, 1, 2, 3, 4, 5, 6, 7, 9];
     this.crc_extra = 24;
@@ -2779,7 +1786,7 @@ data capture and system debugging.
 */
 mavlink.messages.raw_imu = function(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag) {
 
-    this.format = '<Qhhhhhhhhh';
+    this.format = '<dhhhhhhhhh';
     this.id = mavlink.MAVLINK_MSG_ID_RAW_IMU;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     this.crc_extra = 144;
@@ -2812,7 +1819,7 @@ should be the raw, UNSCALED ADC values.
 */
 mavlink.messages.raw_pressure = function(time_usec, press_abs, press_diff1, press_diff2, temperature) {
 
-    this.format = '<Qhhhh';
+    this.format = '<dhhhh';
     this.id = mavlink.MAVLINK_MSG_ID_RAW_PRESSURE;
     this.order_map = [0, 1, 2, 3, 4];
     this.crc_extra = 67;
@@ -4328,7 +3335,7 @@ throughput applications such as hardware in the loop simulations.
 */
 mavlink.messages.hil_state = function(time_usec, roll, pitch, yaw, rollspeed, pitchspeed, yawspeed, lat, lon, alt, vx, vy, vz, xacc, yacc, zacc) {
 
-    this.format = '<Qffffffiiihhhhhh';
+    this.format = '<dffffffiiihhhhhh';
     this.id = mavlink.MAVLINK_MSG_ID_HIL_STATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
     this.crc_extra = 183;
@@ -4366,7 +3373,7 @@ outputs
 */
 mavlink.messages.hil_controls = function(time_usec, roll_ailerons, pitch_elevator, yaw_rudder, throttle, aux1, aux2, aux3, aux4, mode, nav_mode) {
 
-    this.format = '<QffffffffBB';
+    this.format = '<dffffffffBB';
     this.id = mavlink.MAVLINK_MSG_ID_HIL_CONTROLS;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     this.crc_extra = 63;
@@ -4409,7 +3416,7 @@ receivers/transmitters might violate this specification.
 */
 mavlink.messages.hil_rc_inputs_raw = function(time_usec, chan1_raw, chan2_raw, chan3_raw, chan4_raw, chan5_raw, chan6_raw, chan7_raw, chan8_raw, chan9_raw, chan10_raw, chan11_raw, chan12_raw, rssi) {
 
-    this.format = '<QHHHHHHHHHHHHB';
+    this.format = '<dHHHHHHHHHHHHB';
     this.id = mavlink.MAVLINK_MSG_ID_HIL_RC_INPUTS_RAW;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     this.crc_extra = 54;
@@ -4443,7 +3450,7 @@ Optical flow from a flow sensor (e.g. optical mouse sensor)
 */
 mavlink.messages.optical_flow = function(time_usec, sensor_id, flow_x, flow_y, flow_comp_m_x, flow_comp_m_y, quality, ground_distance) {
 
-    this.format = '<QfffhhBB';
+    this.format = '<dfffhhBB';
     this.id = mavlink.MAVLINK_MSG_ID_OPTICAL_FLOW;
     this.order_map = [0, 6, 4, 5, 1, 2, 7, 3];
     this.crc_extra = 175;
@@ -4476,7 +3483,7 @@ mavlink.messages.optical_flow.prototype.pack = function() {
 */
 mavlink.messages.global_vision_position_estimate = function(usec, x, y, z, roll, pitch, yaw) {
 
-    this.format = '<Qffffff';
+    this.format = '<dffffff';
     this.id = mavlink.MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
     this.crc_extra = 102;
@@ -4509,7 +3516,7 @@ mavlink.messages.global_vision_position_estimate.prototype.pack = function() {
 */
 mavlink.messages.vision_position_estimate = function(usec, x, y, z, roll, pitch, yaw) {
 
-    this.format = '<Qffffff';
+    this.format = '<dffffff';
     this.id = mavlink.MAVLINK_MSG_ID_VISION_POSITION_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
     this.crc_extra = 158;
@@ -4539,7 +3546,7 @@ mavlink.messages.vision_position_estimate.prototype.pack = function() {
 */
 mavlink.messages.vision_speed_estimate = function(usec, x, y, z) {
 
-    this.format = '<Qfff';
+    this.format = '<dfff';
     this.id = mavlink.MAVLINK_MSG_ID_VISION_SPEED_ESTIMATE;
     this.order_map = [0, 1, 2, 3];
     this.crc_extra = 208;
@@ -4572,7 +3579,7 @@ mavlink.messages.vision_speed_estimate.prototype.pack = function() {
 */
 mavlink.messages.vicon_position_estimate = function(usec, x, y, z, roll, pitch, yaw) {
 
-    this.format = '<Qffffff';
+    this.format = '<dffffff';
     this.id = mavlink.MAVLINK_MSG_ID_VICON_POSITION_ESTIMATE;
     this.order_map = [0, 1, 2, 3, 4, 5, 6];
     this.crc_extra = 56;
@@ -4613,7 +3620,7 @@ The IMU readings in SI units in NED body frame
 */
 mavlink.messages.highres_imu = function(time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, abs_pressure, diff_pressure, pressure_alt, temperature, fields_updated) {
 
-    this.format = '<QfffffffffffffH';
+    this.format = '<dfffffffffffffH';
     this.id = mavlink.MAVLINK_MSG_ID_HIGHRES_IMU;
     this.order_map = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
     this.crc_extra = 93;
@@ -4779,7 +3786,7 @@ mavlink.messages.memory_vect.prototype.pack = function() {
 */
 mavlink.messages.debug_vect = function(name, time_usec, x, y, z) {
 
-    this.format = '<Qfff10s';
+    this.format = '<dfff10s';
     this.id = mavlink.MAVLINK_MSG_ID_DEBUG_VECT;
     this.order_map = [4, 0, 1, 2, 3];
     this.crc_extra = 49;
@@ -4949,8 +3956,8 @@ mavlink.map = {
         172: { format: '<BB96s', type: mavlink.messages.data96, order_map: [0, 1, 2], crc_extra: 22 },
         0: { format: '<IBBBBB', type: mavlink.messages.heartbeat, order_map: [1, 2, 3, 0, 4, 5], crc_extra: 50 },
         1: { format: '<IIIHHhHHHHHHb', type: mavlink.messages.sys_status, order_map: [0, 1, 2, 3, 4, 5, 12, 6, 7, 8, 9, 10, 11], crc_extra: 124 },
-        2: { format: '<QI', type: mavlink.messages.system_time, order_map: [0, 1], crc_extra: 137 },
-        4: { format: '<QIBB', type: mavlink.messages.ping, order_map: [0, 1, 2, 3], crc_extra: 237 },
+        2: { format: '<dI', type: mavlink.messages.system_time, order_map: [0, 1], crc_extra: 137 },
+        4: { format: '<dIBB', type: mavlink.messages.ping, order_map: [0, 1, 2, 3], crc_extra: 237 },
         5: { format: '<BBB25s', type: mavlink.messages.change_operator_control, order_map: [0, 1, 2, 3], crc_extra: 217 },
         6: { format: '<BBB', type: mavlink.messages.change_operator_control_ack, order_map: [0, 1, 2], crc_extra: 104 },
         7: { format: '<32s', type: mavlink.messages.auth_key, order_map: [0], crc_extra: 119 },
@@ -4962,8 +3969,8 @@ mavlink.map = {
         24: { format: '<diiiHHHHBB', type: mavlink.messages.gps_raw_int, order_map: [0, 8, 1, 2, 3, 4, 5, 6, 7, 9], crc_extra: 24 },
         25: { format: '<B20s20s20s20s20s', type: mavlink.messages.gps_status, order_map: [0, 1, 2, 3, 4, 5], crc_extra: 23 },
         26: { format: '<Ihhhhhhhhh', type: mavlink.messages.scaled_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], crc_extra: 170 },
-        27: { format: '<Qhhhhhhhhh', type: mavlink.messages.raw_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], crc_extra: 144 },
-        28: { format: '<Qhhhh', type: mavlink.messages.raw_pressure, order_map: [0, 1, 2, 3, 4], crc_extra: 67 },
+        27: { format: '<dhhhhhhhhh', type: mavlink.messages.raw_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], crc_extra: 144 },
+        28: { format: '<dhhhh', type: mavlink.messages.raw_pressure, order_map: [0, 1, 2, 3, 4], crc_extra: 67 },
         29: { format: '<Iffh', type: mavlink.messages.scaled_pressure, order_map: [0, 1, 2, 3], crc_extra: 115 },
         30: { format: '<Iffffff', type: mavlink.messages.attitude, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 39 },
         31: { format: '<Ifffffff', type: mavlink.messages.attitude_quaternion, order_map: [0, 1, 2, 3, 4, 5, 6, 7], crc_extra: 246 },
@@ -5008,20 +4015,20 @@ mavlink.map = {
         76: { format: '<fffffffHBBB', type: mavlink.messages.command_long, order_map: [8, 9, 7, 10, 0, 1, 2, 3, 4, 5, 6], crc_extra: 152 },
         77: { format: '<HB', type: mavlink.messages.command_ack, order_map: [0, 1], crc_extra: 143 },
         89: { format: '<Iffffff', type: mavlink.messages.local_position_ned_system_global_offset, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 231 },
-        90: { format: '<Qffffffiiihhhhhh', type: mavlink.messages.hil_state, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], crc_extra: 183 },
-        91: { format: '<QffffffffBB', type: mavlink.messages.hil_controls, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], crc_extra: 63 },
-        92: { format: '<QHHHHHHHHHHHHB', type: mavlink.messages.hil_rc_inputs_raw, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], crc_extra: 54 },
-        100: { format: '<QfffhhBB', type: mavlink.messages.optical_flow, order_map: [0, 6, 4, 5, 1, 2, 7, 3], crc_extra: 175 },
-        101: { format: '<Qffffff', type: mavlink.messages.global_vision_position_estimate, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 102 },
-        102: { format: '<Qffffff', type: mavlink.messages.vision_position_estimate, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 158 },
-        103: { format: '<Qfff', type: mavlink.messages.vision_speed_estimate, order_map: [0, 1, 2, 3], crc_extra: 208 },
-        104: { format: '<Qffffff', type: mavlink.messages.vicon_position_estimate, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 56 },
-        105: { format: '<QfffffffffffffH', type: mavlink.messages.highres_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], crc_extra: 93 },
+        90: { format: '<dffffffiiihhhhhh', type: mavlink.messages.hil_state, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], crc_extra: 183 },
+        91: { format: '<dffffffffBB', type: mavlink.messages.hil_controls, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], crc_extra: 63 },
+        92: { format: '<dHHHHHHHHHHHHB', type: mavlink.messages.hil_rc_inputs_raw, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], crc_extra: 54 },
+        100: { format: '<dfffhhBB', type: mavlink.messages.optical_flow, order_map: [0, 6, 4, 5, 1, 2, 7, 3], crc_extra: 175 },
+        101: { format: '<dffffff', type: mavlink.messages.global_vision_position_estimate, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 102 },
+        102: { format: '<dffffff', type: mavlink.messages.vision_position_estimate, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 158 },
+        103: { format: '<dfff', type: mavlink.messages.vision_speed_estimate, order_map: [0, 1, 2, 3], crc_extra: 208 },
+        104: { format: '<dffffff', type: mavlink.messages.vicon_position_estimate, order_map: [0, 1, 2, 3, 4, 5, 6], crc_extra: 56 },
+        105: { format: '<dfffffffffffffH', type: mavlink.messages.highres_imu, order_map: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], crc_extra: 93 },
         147: { format: '<HHHHHHhBb', type: mavlink.messages.battery_status, order_map: [7, 0, 1, 2, 3, 4, 5, 6, 8], crc_extra: 42 },
         148: { format: '<ffffffffB', type: mavlink.messages.setpoint_8dof, order_map: [8, 0, 1, 2, 3, 4, 5, 6, 7], crc_extra: 241 },
         149: { format: '<ffffffB', type: mavlink.messages.setpoint_6dof, order_map: [6, 0, 1, 2, 3, 4, 5], crc_extra: 15 },
         249: { format: '<HBB32s', type: mavlink.messages.memory_vect, order_map: [0, 1, 2, 3], crc_extra: 204 },
-        250: { format: '<Qfff10s', type: mavlink.messages.debug_vect, order_map: [4, 0, 1, 2, 3], crc_extra: 49 },
+        250: { format: '<dfff10s', type: mavlink.messages.debug_vect, order_map: [4, 0, 1, 2, 3], crc_extra: 49 },
         251: { format: '<If10s', type: mavlink.messages.named_value_float, order_map: [0, 2, 1], crc_extra: 170 },
         252: { format: '<Ii10s', type: mavlink.messages.named_value_int, order_map: [0, 2, 1], crc_extra: 44 },
         253: { format: '<B50s', type: mavlink.messages.statustext, order_map: [0, 1], crc_extra: 83 },
@@ -5099,8 +4106,7 @@ MAVLink.prototype.pushBuffer = function(data) {
     }
 }
 
-// Decode prefix, if it is present; otherwise, consume a character
-// and and continue parsing.
+// Decode prefix.  Elides the prefix.
 MAVLink.prototype.parsePrefix = function() {
 
     // Test for a message prefix.
@@ -5114,6 +4120,7 @@ MAVLink.prototype.parsePrefix = function() {
         throw new Error("Bad prefix ("+badPrefix+")");
 
     }
+
 }
 
 // Determine the length.  Leaves buffer untouched.
@@ -5126,7 +4133,7 @@ MAVLink.prototype.parseLength = function() {
 
 }
 
-// Input some data bytes, possibly returning a new message.
+// input some data bytes, possibly returning a new message
 MAVLink.prototype.parseChar = function(c) {
 
     var m;
@@ -5139,7 +4146,7 @@ MAVLink.prototype.parseChar = function(c) {
 
     } catch(e) {
 
-        this.log("Got a bad data message ("+e.message+")");
+       // w.info("Got a bad data message ("+e.message+")");
         this.total_receive_errors += 1;
         m = new mavlink.messages.bad_data(this.buf, e.message);
         
@@ -5162,15 +4169,11 @@ MAVLink.prototype.parsePayload = function() {
         try {
 
             var m = this.decode(mbuf);
-            
-            // After a successful decode, clean up the buffer and emit two events: one
-            // signalling a specific message (to permit monitoring for specific messages),
-            // another general message event.
             this.total_packets_received += 1;
             this.buf = this.buf.slice(this.expected_length);
             this.expected_length = 6;
-            this.emit(m.name, m);
             this.emit('message', m);
+            this.emit(m.name, m);
             return m;
 
         } catch(e) {
@@ -5183,7 +4186,7 @@ MAVLink.prototype.parsePayload = function() {
             this.expected_length = 6;
             
             // Log.
-            this.log(e);
+            //w.info(e);
 
             // bubble
             throw e;
@@ -5254,21 +4257,35 @@ MAVLink.prototype.decode = function(msgbuf) {
     // refs: (fmt, type, order_map, crc_extra) = mavlink.map[msgId]
     var decoder = mavlink.map[msgId];
 
+
+/*
+                # decode the checksum
+                try:
+                    crc, = struct.unpack('<H', msgbuf[-2:])
+                except struct.error as emsg:
+                    raise MAVError('Unable to unpack MAVLink CRC: %s' % emsg)
+                crc2 = mavutil.x25crc(msgbuf[1:-2])
+                if True: # using CRC extra 
+                    crc2.accumulate(chr(crc_extra))
+                if crc != crc2.crc:
+                    raise MAVError('invalid MAVLink CRC in msgID %u 0x%04x should be 0x%04x' % (msgId, crc, crc2.crc))
+*/
+
     // decode the checksum
     try {
-        var crc = jspack.Unpack('<H', msgbuf.slice(msgbuf.length - 2, msgbuf.length));
-        crc = crc[0];
-    }   
-    catch (e) {
+        var receivedChecksum = jspack.Unpack('<H', msgbuf.slice(msgbuf.length - 2));
+    } catch (e) {
         throw new Error("Unable to unpack MAVLink CRC: " + e.message);
     }
 
-    var crc2 = mavutil.x25Crc(msgbuf.slice(1, msgbuf.length -2));
-    crc2 = mavutil.x25Crc(''.charCodeAt(decoder.crc_extra), crc2);
-    /*
-    if ( crc != crc2 ) {
-        throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', 0x' + crc.toString(16) + ' should be 0x'+crc2.toString(16) );
-    }*/
+    var messageChecksum = mavutil.x25Crc(msgbuf.slice(1, msgbuf.length - 2));
+
+    // Assuming using crc_extra = True.  See the message.prototype.pack() function.
+    messageChecksum = mavutil.x25Crc([decoder.crc_extra], messageChecksum);
+    
+    if ( receivedChecksum != messageChecksum ) {
+        throw new Error('invalid MAVLink CRC in msgID ' +msgId+ ', got 0x' + receivedChecksum + ' checksum, calculated payload checkum as 0x'+messageChecksum );
+    }
 
     // Decode the payload and reorder the fields to match the order map.
     try {
@@ -5294,7 +4311,7 @@ MAVLink.prototype.decode = function(msgbuf) {
     }
     m.msgbuf = msgbuf;
     m.payload = msgbuf.slice(6);
-    m.crc = crc;
+    m.crc = receivedChecksum;
     m.header = new mavlink.header(msgId, mlen, seq, srcSystem, srcComponent);
     this.log(m);
     return m;
