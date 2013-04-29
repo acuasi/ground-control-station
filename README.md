@@ -19,7 +19,7 @@ sudo npm install -g nodemon
 After installing prerequisites, clone this project and install dependencies, then build runtime files with ```grunt```:
 
 ```
-git clone git@github.com:poker-flat/ground-control-station.git
+git clone git@github.com:acuasi/ground-control-station.git
 npm install
 grunt
 ```
