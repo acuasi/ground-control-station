@@ -1,4 +1,4 @@
-var mavlink = require("./assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
+var mavlink = require("mavlink_ardupilotmega_v1.0"),
 UavConnection = require("./assets/js/libs/uavConnection.js"),
 express = require('express'),
 routes = require('./routes'),

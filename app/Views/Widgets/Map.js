@@ -51,7 +51,7 @@ define(['backbone', 'leaflet'], function(Backbone, L) {
       // create a map in the "map" div, set the view to a given place and zoom
       this.map = L.map('mapWidget', {
         minZoom: 1,
-        maxZoom: 22
+        maxZoom: 24
       }).setView([64.9, -147.1], 16);
 
       this.myIcon = L.icon({

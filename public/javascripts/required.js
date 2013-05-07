@@ -1032,7 +1032,7 @@ define('Views/Widgets/Speed',['backbone', 'Templates'], function(Backbone, templ
 
     render: function() {
 
-      this.$el.html(template['speedWidget']({groundspeed: this.model.get('groundspeed')}));
+      this.$el.html(template['speedWidget']({groundspeed: Math.round(this.model.get('groundspeed'), 2)}));
     
     }
     
@@ -1235,7 +1235,7 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       // create a map in the "map" div, set the view to a given place and zoom
       this.map = L.map('mapWidget', {
         minZoom: 1,
-        maxZoom: 22
+        maxZoom: 24
       }).setView([64.9, -147.1], 16);
 
       this.myIcon = L.icon({

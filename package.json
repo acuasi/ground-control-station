@@ -26,6 +26,7 @@
     "underscore": "*",
     "winston": "*",
     "jade": "*",
+    "jspack": "",
     "less-middleware": "*",
     "winston": "*",
     "colors": "*",
