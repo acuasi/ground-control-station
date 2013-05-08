@@ -26,7 +26,7 @@ grunt
 
 ### Configuration
 
-Work in progress, you may need to specify the serial port in the ```config.json``` file at the root of the project (copy/paste the ```config.json.example``` file as a template) but it's changing very fast right now (1/14/2013).
+Work in progress, you need to specify the connection type in the ```config.json``` file at the root of the project (copy/paste the ```config.json.example``` file as a template), and update the relevant fields (host, port, serial device, etc).
 
 ### Running the project
 
@@ -117,6 +117,10 @@ Many things are dependent upon the build cycle, so you usually want to have this
 ```bash
 grunt && grunt watch
 ```
+
+#### Using SITL on a remote host
+
+TBD.  Here, need to outline directions on configuration for using remote MAVProxy/SITL via Vagrant, etc.
 
 ### Testing
 
