@@ -4,6 +4,54 @@ var SerialPort = require("serialport").SerialPort,
   nconf = require("nconf"),
   fs = require("fs");
 
+nconf.argv().env().file({ file: 'test/connection.test.config.json' });
+console.log(nconf.get('testing:serial:master'));
+console.log(nconf);
+
+/***
+We use `socat` to establish  a bidirectional serial connection for executing tests.
+
+on osx: brew install socat
+
+// mkdir $HOME/dev/
+// OSX: socat -d -d PTY,link=$HOME/dev/master,raw,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,ispeed=115200,ospeed=115200,echo=0 &
+// CentOS: socat -d -d PTY,link=$HOME/dev/master,raw,b115200,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,b115200,ispeed=115200,ospeed=115200,echo=0 &
+*/
+
+global.masterSerial = new SerialPort(nconf.get('testing:serial:master'), {
+  baudrate: 115200
+});
+
+describe('UAV Connection', function() {
+
+  it('can write messages to its connection', function() {});
+
+  describe('state manager', function() {
+    it('should attempt connecting as soon as it is invoked', function() {});
+    it('starts in the disconnected state', function() {});
+    it('transitions to "connecting" state after protocol (tcp, udp, serial) link is opened', function() {});
+    it('triggers a "connecting" event on itself when the connecting state is reached', function() {} );
+    it('transitions to "connected" state after confirming that the comms protocol is flowing', function() {});
+    it('triggers a "connected" event on itself when the connected state is reached', function() {} );
+    it('falls back to "connecting" state if protocol heartbeat is lost for 6 seconds', function() {});
+    it('falls back to "disconnected" state if the protocol connection is lost', function() {});
+    it('triggers a "disconnected" event on itself when the disconnected state is reached', function() {} );
+  });
+
+  describe('status information', function() {
+    it('exposes stats that the MAVLink protocol object maintains (bytes sent, errors, etc)', function() {} );
+  });
+
+});
+
+/** swamp for copy/paste
+
+var SerialPort = require("serialport").SerialPort,
+  mavlink = require("../../assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
+  sinon = require("sinon"),
+  nconf = require("nconf"),
+  fs = require("fs");
+
 nconf.argv().env().file({ file: 'config.json' });
 
 // mkdir $HOME/dev/
@@ -139,3 +187,5 @@ console.log(this.heartbeat.pack());
     this.serial.write(global.fixtures.serialStream);
   });
 });
+
+*/

@@ -63,42 +63,24 @@ var fetch_params = _.once(_.bind(function(done) {
 
 // This function changes the initial requested data stream to get all data, at a rate of 1hz
 var request_data_stream = _.once(_.bind(function(done) {
+  console.log('here')
   request = new mavlink.messages.request_data_stream(1, 1, mavlink.MAV_DATA_STREAM_ALL, 1, 1);
+  console.log('there')
   _.extend(request, {
     srcSystem: 255,
     srcComponent: 0,
     seq: 1
   });
+
   protocol.on('message', function(message) {
     console.log(message.name);
   }); 
+
   p = new Buffer(request.pack());
 
   console.log(p);
   connection.write(p);
 }, this));
-
-// let's fly
-var command = _.bind(function(done) {
-  c = new mavlink.messages.command_long(
-    mavlink.MAV_CMD_NAV_WAYPOINT,
-    5,
-    0,
-    0,
-     -35.362938,
-     149.165085,
-     1000
-  );
-    _.extend(c, {
-    srcSystem: 255,
-    srcComponent: 0,
-    seq: 2
-  });
-  p = new Buffer(c.pack());
-  console.log(p);
-  connection.write(p);
-
-}, this);
 
 // Stores the configuration values for the APM.
 var apmConfig = {};
@@ -197,9 +179,8 @@ var states = {
         
         console.log('connected, ensuring a timeout has not happened...');
         console.log('time since last heartbeat = ' + timeSinceLastHeartbeat);
-        command();
         if(timeSinceLastHeartbeat > 5000 || true === _.isNaN(timeSinceLastHeartbeat)) {
-          changeState(states.disconnected);
+          changeState(states.connecting);
           throw 'disconnected';
         }
       }

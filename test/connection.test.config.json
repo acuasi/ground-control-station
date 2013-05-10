@@ -1,0 +1,25 @@
+{
+
+  "connection" : "serial",
+
+  "tcp" : {
+    "host" : "172.16.76.100",
+    "port" : 5760
+  },
+
+  "udp" : {
+    "port" : 14553
+  },
+
+  "serial" : {
+    "device" : "~/dev/slave",
+    "baudrate" : 115200
+  },
+
+  "testing" : {
+    "serial" : {
+      "master" : "/Users/becrevensten/dev/master",
+      "slave" : "~/dev/slave"
+    }
+  }
+}

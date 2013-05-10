@@ -56,7 +56,7 @@ var server = http.createServer(app).listen(app.get('port'), function() {
 var everyone = nowjs.initialize(server);
 
 // Establish parser
-var mavlinkParser = new MAVLink(logger);
+var mavlinkParser = new mavlink(logger);
 
 // Establish connection management, start its heartbeat.
 var uavConnectionManager = new UavConnection.UavConnection(nconf, mavlinkParser);
