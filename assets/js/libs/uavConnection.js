@@ -24,6 +24,9 @@ var dataEventName = undefined;
 // state points to one of the objects defined below, determining what action to take on heartbeat
 var state = undefined;
 
+// stateName is the current state of the connection (name of state)
+var stateName = 'disconnected';
+
 // protocol is the parser for the incoming binary stream (MAVLink)
 var protocol = undefined;
 
@@ -63,9 +66,7 @@ var fetch_params = _.once(_.bind(function(done) {
 
 // This function changes the initial requested data stream to get all data, at a rate of 1hz
 var request_data_stream = _.once(_.bind(function(done) {
-  console.log('here')
   request = new mavlink.messages.request_data_stream(1, 1, mavlink.MAV_DATA_STREAM_ALL, 1, 1);
-  console.log('there')
   _.extend(request, {
     srcSystem: 255,
     srcComponent: 0,
@@ -88,8 +89,14 @@ var apmConfig = {};
 var states = {
     // The disconnected state represents when there is no socket connection
     disconnected: {
+      eventName: 'disconnected',
       heartbeat: function() {
-        var attachDataEventListener = true;
+
+        // Reset this because we've lost (or never had) the physical connection
+        lastHeartbeat = undefined;
+
+        // Request the protocol be reattached.
+        attachDataEventListener = true;
 
         console.log('trying to connect from disconnected state...');
 
@@ -103,11 +110,16 @@ var states = {
                 config.get('serial:device'),
                 { baudrate: config.get('serial:baudrate') }
               );
-              console.log(connection)
+
               connection.on('open', function() {
-                console.log('opened serial connection');
-                changeState(states.connecting)
-              })
+                changeState(states.connecting);
+              });
+
+              // If we lose the connection, try and re-establish immediately.
+              connection.on('close', function() {
+                changeState(states.disconnected);
+              });
+
               break;
 
             case 'udp':
@@ -147,23 +159,28 @@ var states = {
     // The connecting state attaches event handlers to the connection to establish the
     // flow of protocol data, and fetches the params from the APM.
     connecting: {
-        heartbeat: function() {
+      eventName: 'connecting',
+      heartbeat: function() {
 
           try {
             console.log('establishing MAVLink connection...');
 
             // If necessary, attach the message parser to the connection
             if(attachDataEventListener === true) {
-                connection.on(dataEventName, _.bind(function (msg) {
-                  protocol.parseBuffer(msg);
+              connection.on(dataEventName, _.bind(function (msg) {
+                protocol.parseBuffer(msg);
               }, this));
             }
-
-            // When the parameters have been read, move to the connected state.
-            fetch_params(function() {
-              request_data_stream();
+            
+            if(timeSinceLastHeartbeat < 5000 && true === _.isNumber(timeSinceLastHeartbeat) && false === _.isNaN(timeSinceLastHeartbeat)) {
               changeState(states.connected);
-            });
+            }
+              
+            // // When the parameters have been read, move to the connected state.
+            // fetch_params(function() {
+            //   request_data_stream();
+            //   changeState(states.connected);
+            // });
 
             attachDataEventListener = false;
             
@@ -175,13 +192,13 @@ var states = {
   
     // Connected state watches the MAVLink heartbeat, going into alarm if the heartbeat times out
     connected: {
+      eventName:'connected',
       heartbeat: function() {
         
         console.log('connected, ensuring a timeout has not happened...');
         console.log('time since last heartbeat = ' + timeSinceLastHeartbeat);
         if(timeSinceLastHeartbeat > 5000 || true === _.isNaN(timeSinceLastHeartbeat)) {
           changeState(states.connecting);
-          throw 'disconnected';
         }
       }
     }
@@ -205,17 +222,17 @@ util.inherits(UavConnection, events.EventEmitter);
 
 changeState = function(newState) {
   state = newState;
+  stateName = newState.eventName;
 }
 
  UavConnection.prototype.heartbeat = function() {
 
-  timeSinceLastHeartbeat = Date.now() - lastHeartbeat;
+  this.stateName = stateName;
+  this.timeSinceLastHeartbeat = timeSinceLastHeartbeat = Date.now() - lastHeartbeat;
 
-  try {
-    state.heartbeat();
-  } catch(e) {
-    this.emit(e);
-  }
+  this.emit(stateName);
+  state.heartbeat();
+
  }
 
 exports.UavConnection = UavConnection;

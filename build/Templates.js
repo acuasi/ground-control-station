@@ -204,7 +204,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div></div>');
 }
 return buf.join("");
 };
@@ -234,7 +234,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div><div id="commsWidget"></div>');
 }
 return buf.join("");
 };

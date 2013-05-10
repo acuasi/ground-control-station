@@ -28,6 +28,7 @@ describe('UAV Connection', function() {
 
   describe('state manager', function() {
     it('should attempt connecting as soon as it is invoked', function() {});
+    it('should continuously attempt to connect until it succeeds', function() {});
     it('starts in the disconnected state', function() {});
     it('transitions to "connecting" state after protocol (tcp, udp, serial) link is opened', function() {});
     it('triggers a "connecting" event on itself when the connecting state is reached', function() {} );
