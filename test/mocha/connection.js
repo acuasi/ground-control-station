@@ -84,16 +84,16 @@ describe('UAV Connection', function() {
 
         });
 
-        it('triggers a "connecting" event on itself when the connecting state is reached', function() {});
-        it('transitions to "connected" state after confirming that the comms protocol is flowing', function() {});
-        it('triggers a "connected" event on itself when the connected state is reached', function() {});
-        it('falls back to "connecting" state if protocol heartbeat is lost for 6 seconds', function() {});
-        it('falls back to "disconnected" state if the protocol connection is lost', function() {});
-        it('triggers a "disconnected" event on itself when the disconnected state is reached', function() {});
+        xit('triggers a "connecting" event on itself when the connecting state is reached', function() {});
+        xit('transitions to "connected" state after confirming that the comms protocol is flowing', function() {});
+        xit('triggers a "connected" event on itself when the connected state is reached', function() {});
+        xit('falls back to "connecting" state if protocol heartbeat is lost for 6 seconds', function() {});
+        xit('falls back to "disconnected" state if the protocol connection is lost', function() {});
+        xit('triggers a "disconnected" event on itself when the disconnected state is reached', function() {});
     });
 
     describe('status information', function() {
-        it('exposes stats that the MAVLink protocol object maintains (bytes sent, errors, etc)', function() {});
+        xit('exposes stats that the MAVLink protocol object maintains (bytes sent, errors, etc)', function() {});
     });
 
 });
