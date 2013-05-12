@@ -1,12 +1,105 @@
-var SerialPort = require("serialport").SerialPort,
-  mavlink = require("../../assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
-  sinon = require("sinon"),
-  nconf = require("nconf"),
-  fs = require("fs");
+var net = require('net'),
+    mavlink = require("mavlink_ardupilotmega_v1.0"),
+    sinon = require("sinon"),
+    nconf = require("nconf"),
+    UavConnection = require("../../assets/js/libs/uavConnection.js"),
+    should = require('should'),
+    fs = require("fs"),
+    winston = require("winston");
 
-nconf.argv().env().file({ file: 'test/connection.test.config.json' });
-console.log(nconf.get('testing:serial:master'));
-console.log(nconf);
+// Logger
+var logger = new(winston.Logger)({
+    transports: [
+        new(winston.transports.File)({
+            filename: 'mavlink.dev.log'
+        })
+    ]
+});
+
+nconf.argv().env().file({
+    file: 'test/connection.test.config.json'
+});
+
+describe('UAV Connection', function() {
+
+    // Set up a temporary TCP server for use with the UavConnection.
+    beforeEach(function() {
+        this.mavlinkParser = new mavlink(logger);
+        this.c = new UavConnection.UavConnection(nconf, this.mavlinkParser, logger);
+
+        this.server = net.createServer(function(c) {
+            c.pipe(c); // echo data between clients
+        });
+
+        this.server.listen(nconf.get('tcp:port'));
+    });
+
+    afterEach(function() {
+        this.server.close();
+    });
+
+    it('can write messages to its connection', function(done) {
+        var b = new Buffer([0xfe, 0x09, 0x03, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x08, 0x00, 0x00, 0x03, 0x9f, 0x5c])
+        this.server.on('connection', function(connection) {
+            connection.on('data', function(data) {
+                data.toString().should.equal(b.toString());
+                done();
+            })
+        })
+        var c = this.c; // assign to juggle scope below
+        // Only try to write once the connection is actually present, i.e. in the 'connecting' state
+        this.c.on('connecting', function() {
+            c.write(b);
+        });
+        this.c.start(); // attempt to connect
+    });
+
+    it('has a start function that starts the execution of the state machine', function() {
+        this.c.start();
+    });
+
+    describe('state machine', function() {
+
+        describe('"disconnected" state', function() {
+
+            it('triggers a "disconnected" event when entered', function(done) {
+                this.c.on('disconnected', function() {
+                    should.ok;
+                    done();
+                });
+                this.c.start();
+            });
+
+            it('is the starting point for the state machine', function() {
+                this.c.getState().should.equal('disconnected');
+            });
+
+            it('transitions to "connecting" state after protocol (tcp, udp, serial) link is opened', function(done) {
+                this.c.on('connecting', function() {
+                    should.ok;
+                    done();
+                });
+                this.c.start();
+            });
+
+        });
+
+        it('triggers a "connecting" event on itself when the connecting state is reached', function() {});
+        it('transitions to "connected" state after confirming that the comms protocol is flowing', function() {});
+        it('triggers a "connected" event on itself when the connected state is reached', function() {});
+        it('falls back to "connecting" state if protocol heartbeat is lost for 6 seconds', function() {});
+        it('falls back to "disconnected" state if the protocol connection is lost', function() {});
+        it('triggers a "disconnected" event on itself when the disconnected state is reached', function() {});
+    });
+
+    describe('status information', function() {
+        it('exposes stats that the MAVLink protocol object maintains (bytes sent, errors, etc)', function() {});
+    });
+
+});
+
+/** swamp for copy/paste
+
 
 /***
 We use `socat` to establish  a bidirectional serial connection for executing tests.
@@ -16,36 +109,6 @@ on osx: brew install socat
 // mkdir $HOME/dev/
 // OSX: socat -d -d PTY,link=$HOME/dev/master,raw,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,ispeed=115200,ospeed=115200,echo=0 &
 // CentOS: socat -d -d PTY,link=$HOME/dev/master,raw,b115200,ispeed=115200,ospeed=115200,echo=0 PTY,link=$HOME/dev/slave,raw,b115200,ispeed=115200,ospeed=115200,echo=0 &
-*/
-
-global.masterSerial = new SerialPort(nconf.get('testing:serial:master'), {
-  baudrate: 115200
-});
-
-describe('UAV Connection', function() {
-
-  it('can write messages to its connection', function() {});
-
-  describe('state manager', function() {
-    it('should attempt connecting as soon as it is invoked', function() {});
-    it('should continuously attempt to connect until it succeeds', function() {});
-    it('starts in the disconnected state', function() {});
-    it('transitions to "connecting" state after protocol (tcp, udp, serial) link is opened', function() {});
-    it('triggers a "connecting" event on itself when the connecting state is reached', function() {} );
-    it('transitions to "connected" state after confirming that the comms protocol is flowing', function() {});
-    it('triggers a "connected" event on itself when the connected state is reached', function() {} );
-    it('falls back to "connecting" state if protocol heartbeat is lost for 6 seconds', function() {});
-    it('falls back to "disconnected" state if the protocol connection is lost', function() {});
-    it('triggers a "disconnected" event on itself when the disconnected state is reached', function() {} );
-  });
-
-  describe('status information', function() {
-    it('exposes stats that the MAVLink protocol object maintains (bytes sent, errors, etc)', function() {} );
-  });
-
-});
-
-/** swamp for copy/paste
 
 var SerialPort = require("serialport").SerialPort,
   mavlink = require("../../assets/js/libs/mavlink_ardupilotmega_v1.0.js"),
