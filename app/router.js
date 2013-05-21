@@ -7,6 +7,7 @@ define([
   // Models
   "Models/Mission",
   "Models/Platform",
+  "Models/Connection",
 
   // Dependent views
   "Views/Mission"
@@ -15,6 +16,7 @@ define([
 function(app, now,
   Mission,
   Platform,
+  Connection,
   MissionView) {
 
   // Defining the application router, you can attach sub routers here.
@@ -28,8 +30,11 @@ function(app, now,
     mission: function() {
 
       var platform = this.platform = new Platform();
+      var connection = this.connection = new Connection();
+
       this.mission = new Mission({
-        platform: this.platform
+        platform: this.platform,
+        connection: this.connection
       });
 
       this.missionView = new MissionView({
@@ -44,8 +49,12 @@ function(app, now,
 
         now.updatePlatform = function(platformJson) {
           platform.set(platformJson);
-          console.log(platform.toJSON());
         };
+
+        now.updateConnection = function(connectionJson) {
+          connection.set(connectionJson);
+          console.log(connection.toJSON());
+        }
 
       });
 

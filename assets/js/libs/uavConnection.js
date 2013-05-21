@@ -6,235 +6,254 @@ This has two different layers of purpose:
 */
 
 var SerialPort = require("serialport").SerialPort,
-  util   = require('util'),
-  child = require("child_process"),
-  dgram = require("dgram"),
-  net = require('net'),
-  _ = require('underscore');
+    util = require('util'),
+    child = require("child_process"),
+    dgram = require("dgram"),
+    net = require('net'),
+    _ = require('underscore');
 
-// config is an nconf instance
-var config = undefined;
+// log is expected to be a winston instance; keep it in the shared global namespace for convenience.
+var log;
 
-// connection represents the socket-level connection through which MAVLink arrives
-var connection = undefined;
+// Incoming config is an nconf instance, already read in the server code.
+// Protocol Parser is a mavlink instance
+// log is a Winston logger, already configured + ready to use
 
-// name of the message the connection uses to signal that new data is ready to consume
-var dataEventName = undefined;
+function UavConnection(configObject, protocolParser, logObject) {
 
-// state points to one of the objects defined below, determining what action to take on heartbeat
-var state = undefined;
+    // config is an nconf instance
+    this.config = configObject;
 
-// protocol is the parser for the incoming binary stream (MAVLink)
-var protocol = undefined;
+    // connection represents the socket-level connection through which MAVLink arrives
+    this.connection = undefined;
 
-// this flag is set to true if the event listener must be reattached to the connection, in case
-// the connection itself was lost
-var attachDataEventListener = true;
+    // name of the message the connection uses to signal that new data is ready to consume
+    this.dataEventName = undefined;
 
-// Variables related to the timeout/health of the heartbeat
-var lastHeartbeat = undefined;
+    // name of current state of object
+    this.state = 'disconnected';
+
+    // protocol is the parser for the incoming binary stream (MAVLink)
+    this.protocol = protocolParser;
+
+    // this flag is set to true if the event listener must be reattached to the connection, in case
+    // the connection itself was lost
+    this.attachDataEventListener = true;
+
+    // Time of the last heartbeat packet was received (timestamp)
+    this.lastHeartbeat = undefined;
+
+    // Time elapsed since last heartbeat
+    this.timeSinceLastHeartbeat = undefined;
+
+    log = logObject;
+
+    // Establish some event bindings that don't work if bound inside the heartbeat callbacks
+    this.protocol.on('HEARTBEAT', _.bind(function(message) {
+        this.lastHeartbeat = Date.now();
+    }), this);
+
+    _.bindAll(this);
+
+};
+
+util.inherits(UavConnection, events.EventEmitter);
+
+UavConnection.prototype.changeState = function(newState) {
+    this.state = newState;
+    this.emit(this.state);
+    log.info('[UavConnection] Changing state to [' + this.state + ']');
+
+    // Invoke the new state by calling the function's name.
+    this.invokeState(this.state);
+}
+
+// The heartbeat function is invoked once per second and is kicked off by the start() function.
+// The point is to update some timing information and re-invoke whatever current state
+// the system is in to see if we need to change state/status.
+UavConnection.prototype.heartbeat = function() {
+  this.timeSinceLastHeartbeat = Date.now() - this.lastHeartbeat;
+  this.invokeState(this.state); 
+}
+
+// Convenience function to hide the awkward syntax
+UavConnection.prototype.invokeState = function(state) {
+  this[this.state]();
+};
+
+UavConnection.prototype.start = function() {
+    setInterval(this.heartbeat, 1000);
+    this.changeState('disconnected');
+}
+
+// Accessor for private variable (stateName)
+UavConnection.prototype.getState = function() {
+    return this.state;
+};
+
+UavConnection.prototype.disconnected = function() {
+
+    // Reset this because we've lost (or never had) the physical connection
+    this.lastHeartbeat = undefined;
+
+    // Request the protocol be reattached.
+    this.attachDataEventListener = true;
+
+    log.info('[UavConnection] Trying to connect from disconnected state...');
+
+    try {
+
+        switch (this.config.get('connection')) {
+            case 'serial':
+                this.dataEventName = 'data';
+                this.connection = new SerialPort(
+                    this.config.get('serial:device'), {
+                    baudrate: this.config.get('serial:baudrate')
+                });
+
+                this.connection.on('open', _.bind(function() {
+                    this.changeState('connecting');
+                }), this);
+
+                // If we lose the connection, try and re-establish immediately.
+                this.connection.on('close', _.bind(function() {
+                    this.changeState('disconnected');
+                }), this);
+                break;
+
+            case 'udp':
+                this.connection = dgram.createSocket("udp4");
+                this.dataEventName = 'message';
+
+                // When the socket confirms its listening, change state to try and collect MAVLink configuration
+                this.connection.on("listening", _.bind(function() {
+                    this.changeState(states.connecting)
+                }, this));
+
+                this.connection.bind(this.config.get('udp:port'));
+                break;
+
+            case 'tcp':
+                this.dataEventName = 'data';
+                this.connection = net.connect({
+                    port: this.config.get('tcp:port')
+                }, _.bind(function() {
+                    // 'connect' event listener
+                    log.info('[UavConnection] TCP connection established on port ' + this.config.get('tcp:port'));
+                    this.changeState('connecting');
+                }, this));
+
+                // We need to handle the 'error' event for TCP connections, otherwise its default behavior is to
+                // throw an exception, which may not be what is expected in the surrounding code.
+                this.connection.on('error', function(e) {
+                    log.info("[UavConnection] TCP connection error message: " + e);
+                })
+                break;
+
+            default:
+                log.info('Connection type not understood (' + this.config.get('connection') + ')');
+        }
+    } catch (e) {
+        log.info('error!');
+        console.log(e);
+    }
+}
+
+UavConnection.prototype.connecting = function() {
+    try {
+        log.info('establishing MAVLink connection...');
+
+        // If necessary, attach the message parser to the connection
+        if (this.attachDataEventListener === true) {
+            this.connection.on(this.dataEventName, _.bind(function(msg) {
+                this.protocol.parseBuffer(msg);
+            }, this));
+        }
+
+        if (this.timeSinceLastHeartbeat < 5000 && true === _.isNumber(this.timeSinceLastHeartbeat) && false === _.isNaN(this.timeSinceLastHeartbeat)) {
+            this.changeState('connected');
+        }
+
+        this.attachDataEventListener = false;
+
+    } catch (e) {
+        log.info(e);
+        throw (e);
+    }
+};
+
+UavConnection.prototype.connected = function() {
+
+    log.info('connected, ensuring a timeout has not happened...');
+    log.info('time since last heartbeat = ' + this.timeSinceLastHeartbeat);
+    if (this.timeSinceLastHeartbeat > 5000 || true === _.isNaN(this.timeSinceLastHeartbeat)) {
+        changeState('connecting');
+    }
+
+};
+
+UavConnection.prototype.write = function(data) {
+    switch (this.config.get('connection')) {
+        case 'tcp': // fallthrough
+        case 'serial':
+            this.connection.write(data);
+        case 'udp':
+            // special case, don't do anything.
+            break;
+    }
+}
+
+exports.UavConnection = UavConnection;
+
+/* Swamp for refactoring
+
+
+   these belong elsewhere:
 
 // This function is defined once in the larger scope so that it can be invoked directly a single time
 var fetch_params = _.once(_.bind(function(done) {
-  done();
-  console.log('Starting to fetch params...');
-  
-  // Fetch the params from the APM, wait to exit this state until finished.
-  param_request = new mavlink.messages.param_request_list(1, 1); // target system/component IDs
-  _.extend(param_request, {
-    srcSystem: 255,
-    srcComponent: 0
-  });
+done();
+log.info('Starting to fetch params...');
 
-  p = new Buffer(param_request.pack());
-  connection.write(p);
+// Fetch the params from the APM, wait to exit this state until finished.
+param_request = new mavlink.messages.param_request_list(1, 1); // target system/component IDs
+_.extend(param_request, {
+srcSystem: 255,
+srcComponent: 0
+});
 
-  // Listen for parameters
-  protocol.on('PARAM_VALUE', _.bind(function(message) {
-    apmConfig[message.param_id] = message.param_value;
-    if( _.keys(apmConfig).length == message.param_count ) {
-      console.log('...finished fetching parameters.');
-      console.log(apmConfig);
-      done();
-    }
-  }, this));
+p = new Buffer(param_request.pack());
+connection.write(p);
+
+// Listen for parameters
+protocol.on('PARAM_VALUE', _.bind(function(message) {
+apmConfig[message.param_id] = message.param_value;
+if( _.keys(apmConfig).length == message.param_count ) {
+log.info('...finished fetching parameters.');
+log.info(apmConfig);
+done();
+}
+}, this));
 
 }, this));
 
 // This function changes the initial requested data stream to get all data, at a rate of 1hz
 var request_data_stream = _.once(_.bind(function(done) {
-  request = new mavlink.messages.request_data_stream(1, 1, mavlink.MAV_DATA_STREAM_ALL, 1, 1);
-  _.extend(request, {
-    srcSystem: 255,
-    srcComponent: 0,
-    seq: 1
-  });
-  protocol.on('message', function(message) {
-    console.log(message.name);
-  }); 
-  p = new Buffer(request.pack());
+request = new mavlink.messages.request_data_stream(1, 1, mavlink.MAV_DATA_STREAM_ALL, 1, 1);
+_.extend(request, {
+srcSystem: 255,
+srcComponent: 0,
+seq: 1
+});
 
-  console.log(p);
-  connection.write(p);
+protocol.on('message', function(message) {
+log.info(message.name);
+}); 
+
+p = new Buffer(request.pack());
+
+log.info(p);
+connection.write(p);
 }, this));
 
-// let's fly
-var command = _.bind(function(done) {
-  c = new mavlink.messages.command_long(
-    mavlink.MAV_CMD_NAV_WAYPOINT,
-    5,
-    0,
-    0,
-     -35.362938,
-     149.165085,
-     1000
-  );
-    _.extend(c, {
-    srcSystem: 255,
-    srcComponent: 0,
-    seq: 2
-  });
-  p = new Buffer(c.pack());
-  console.log(p);
-  connection.write(p);
-
-}, this);
-
-// Stores the configuration values for the APM.
-var apmConfig = {};
-
-var states = {
-    // The disconnected state represents when there is no socket connection
-    disconnected: {
-      heartbeat: function() {
-        var attachDataEventListener = true;
-
-        console.log('trying to connect from disconnected state...');
-
-        try {
-
-          switch(config.get('connection')) {
-            case 'serial':
-              dataEventName = 'data';
-              var SerialPort = require("serialport").SerialPort
-              connection = new SerialPort(
-                config.get('serial:device'),
-                { baudrate: config.get('serial:baudrate') }
-              );
-              console.log(connection)
-              connection.on('open', function() {
-                console.log('opened serial connection');
-                changeState(states.connecting)
-              })
-              break;
-
-            case 'udp':
-
-              connection = dgram.createSocket("udp4");
-              dataEventName = 'message';
-
-              // When the socket confirms its listening, change state to try and collect MAVLink configuration
-              connection.on("listening", _.bind(function () {
-                var address = connection.address();
-                console.log("UDP connection established on " + address.address + ":" + address.port);
-                changeState(states.connecting)
-              }, this));
-
-              connection.bind(config.get('udp:port'));
-              break;
-
-              case 'tcp':
-                dataEventName = 'data';
-                connection = net.createConnection({port: config.get('tcp:port')}, _.bind(function() {
-                  // 'connect' event listener
-                  console.log('TCP connection established on 127.0.0.1:5760');
-                  changeState(states.connecting);
-                }, this));
-                break;
-
-            default:
-              console.log('Connection type not understood (' + config.get('connection')+')');
-          }
-        } catch(e) {
-          console.log(e);
-        }
-        
-      }
-    },
-  
-    // The connecting state attaches event handlers to the connection to establish the
-    // flow of protocol data, and fetches the params from the APM.
-    connecting: {
-        heartbeat: function() {
-
-          try {
-            console.log('establishing MAVLink connection...');
-
-            // If necessary, attach the message parser to the connection
-            if(attachDataEventListener === true) {
-                connection.on(dataEventName, _.bind(function (msg) {
-                  protocol.parseBuffer(msg);
-              }, this));
-            }
-
-            // When the parameters have been read, move to the connected state.
-            fetch_params(function() {
-              request_data_stream();
-              changeState(states.connected);
-            });
-
-            attachDataEventListener = false;
-            
-          } catch(e) {
-            console.log(e);
-          } 
-      }
-    },
-  
-    // Connected state watches the MAVLink heartbeat, going into alarm if the heartbeat times out
-    connected: {
-      heartbeat: function() {
-        
-        console.log('connected, ensuring a timeout has not happened...');
-        console.log('time since last heartbeat = ' + timeSinceLastHeartbeat);
-        command();
-        if(timeSinceLastHeartbeat > 5000 || true === _.isNaN(timeSinceLastHeartbeat)) {
-          changeState(states.disconnected);
-          throw 'disconnected';
-        }
-      }
-    }
- };
-
-// Incoming config is an nconf instance, already read in the server code.
-function UavConnection(configObject, protocolParser) {
-  config = configObject;
-  protocol = protocolParser;
-  state = states.disconnected;
-
-  // Establish some event bindings that don't work if bound inside the heartbeat callbacks
-  protocol.on('HEARTBEAT', function(message) {
-    lastHeartbeat = Date.now();
-  });
-
-  _.bindAll(this);
-};
-
-util.inherits(UavConnection, events.EventEmitter);
-
-changeState = function(newState) {
-  state = newState;
-}
-
- UavConnection.prototype.heartbeat = function() {
-
-  timeSinceLastHeartbeat = Date.now() - lastHeartbeat;
-
-  try {
-    state.heartbeat();
-  } catch(e) {
-    this.emit(e);
-  }
- }
-
-exports.UavConnection = UavConnection;
+*/

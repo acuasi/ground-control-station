@@ -28,6 +28,30 @@
     }
   }
 
+  #commsWidget {
+    z-index: 100;
+    position: absolute;
+    top: 200px;
+    left: 100px;
+    background-color: rgba(0, 0, 0, .75);
+    .value {
+      font-size: 30px;
+      font-weight: 500;
+    }
+    div {
+      padding: 1em;
+      .disconnected {
+        background-color: rgba(255, 0, 0, .75);
+      }
+      .connecting {
+        background-color: rgba(255, 128, 0, .75);
+      }
+      .connected {
+        background-color: rgba(0, 255, 0, .75);
+      }
+    }
+  }
+
   #widgets {  
     z-index: 100;
     position: absolute;

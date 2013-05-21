@@ -62,12 +62,39 @@ var mavlinkParser = new mavlink(logger);
 var uavConnectionManager = new UavConnection.UavConnection(nconf, mavlinkParser);
 uavConnectionManager.heartbeat();
 setInterval(uavConnectionManager.heartbeat, 1000);
-uavConnectionManager.on('disconnected', function() {
-  console.log('emergency, disconnected');
-})
+
+
 
 // Client integration code, TODO refactor away to elsewhere
 requirejs(["Models/Platform"], function(Platform) {
+
+
+var connection = {};
+
+uavConnectionManager.on('disconnected', function() {
+  connection = _.extend(connection, {
+    status: uavConnectionManager.stateName,
+    time_since_last_heartbeat: uavConnectionManager.timeSinceLastHeartbeat
+  });
+  everyone.now.updateConnection(connection);
+})
+
+uavConnectionManager.on('connecting', function() {
+  connection = _.extend(connection, {
+    status: uavConnectionManager.stateName,
+    time_since_last_heartbeat: uavConnectionManager.timeSinceLastHeartbeat
+  });
+everyone.now.updateConnection(connection);
+})
+
+uavConnectionManager.on('connected', function() {
+  connection = _.extend(connection, {
+    status: uavConnectionManager.stateName,
+    time_since_last_heartbeat: uavConnectionManager.timeSinceLastHeartbeat
+  });
+  everyone.now.updateConnection(connection);
+})
+
 
   var platform = {};
   

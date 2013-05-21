@@ -750,11 +750,6 @@ define('Models/Platform',['backbone'], function(Backbone) {
 
     },
 
-    initialize: function() {
-      this.on('change', function() {
-      }, this);
-    },
-
     validate: function(attrs) {
       attrs.lat /= 1e07;
       attrs.lon /= 1e07;
@@ -764,6 +759,20 @@ define('Models/Platform',['backbone'], function(Backbone) {
   });
 
   return Platform;
+  
+});
+define('Models/Connection',['backbone'], function(Backbone) {
+
+  var Connection = Backbone.Model.extend({
+
+    defaults: {
+      status: 'disconnected',
+      time_since_last_heartbeat: 0
+    }
+
+  });
+
+  return Connection;
   
 });
 define('Templates',[], function() {
@@ -972,7 +981,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div></div>');
 }
 return buf.join("");
 };
@@ -1002,7 +1011,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div><div id="commsWidget"></div>');
 }
 return buf.join("");
 };
@@ -1275,22 +1284,60 @@ define('Views/Widgets/Comms',['backbone', 'Templates'], function(Backbone, templ
     
     initialize: function() {
       _.bindAll(this);
-      this.model.on('change:drop_rate_comm', this.render);
-      this.model.on('change:errors_comm', this.render);
+      this.model.on('change:status', this.render);
+      this.model.on('change:time_since_last_heartbeat', this.render);
     },
 
     render: function() {
+      var hasRendered;
+
+      // Only draw this on initial page render.
+      if(true !== hasRendered) {
+
+        var heartbeatMessage = '';
+        if( this.model.get('time_since_last_heartbeat') > 5000 ) {
+          heartbeatMessage = ', disconnected for ' + this.model.get('time_since_last_heartbeat') + ' s';
+        } 
 
         this.$el.html(template['commsWidget'](
-            {
-                drop_rate_comm: this.model.get('drop_rate_comm'),
-                errors_comm: this.model.get('errors_comm')
-            }
+          {
+              time_since_last_heartbeat: heartbeatMessage,
+              drop_rate_comm: this.model.get('drop_rate_comm'),
+              errors_comm: this.model.get('errors_comm')
+          }
         ));
-    
+
+        $('#connected').hide();
+        $('#connecting').hide();
+
+        hasRendered = true;
+      }
+
+      // Rerender upon events.
+      switch(this.model.get('status')) {
+        case 'disconnected':
+          $('#comms .connected').hide();
+          $('#comms .connecting').hide();
+          $('#comms .disconnected').show();
+          break;
+
+        case 'connecting':
+          $('#comms .connected').hide();
+          $('#comms .connecting').show();
+          $('#comms .disconnected').hide();
+          break;
+
+        case 'connected':
+          $('#comms .connected').show();
+          $('#comms .connecting').hide();
+          $('#comms .disconnected').hide();
+        break;
+      }
+
     }
     
   });
+
   return CommsWidget;
 
 });
@@ -1494,7 +1541,9 @@ define('Views/Mission',['backbone', 'Templates',
       this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
       this.healthWidget = new HealthWidget({model: this.model.get('platform')});
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
-      this.commsWidget = new CommsWidget({model: this.model.get('platform')});
+
+      // Connection reflects information not entirely derived from the platform
+      this.commsWidget = new CommsWidget({model: this.model.get('connection')});
 
       // Render party
       this.speedWidget.render();
@@ -1505,8 +1554,6 @@ define('Views/Mission',['backbone', 'Templates',
       this.gpsWidget.render();
       this.commsWidget.render();
 
-      this.model.get('platform').on('change', function(e) {
-      });
     }
 
   });
@@ -1523,6 +1570,7 @@ define('router',[
   // Models
   "Models/Mission",
   "Models/Platform",
+  "Models/Connection",
 
   // Dependent views
   "Views/Mission"
@@ -1531,6 +1579,7 @@ define('router',[
 function(app, now,
   Mission,
   Platform,
+  Connection,
   MissionView) {
 
   // Defining the application router, you can attach sub routers here.
@@ -1544,8 +1593,11 @@ function(app, now,
     mission: function() {
 
       var platform = this.platform = new Platform();
+      var connection = this.connection = new Connection();
+
       this.mission = new Mission({
-        platform: this.platform
+        platform: this.platform,
+        connection: this.connection
       });
 
       this.missionView = new MissionView({
@@ -1560,8 +1612,12 @@ function(app, now,
 
         now.updatePlatform = function(platformJson) {
           platform.set(platformJson);
-          console.log(platform.toJSON());
         };
+
+        now.updateConnection = function(connectionJson) {
+          connection.set(connectionJson);
+          console.log(connection.toJSON());
+        }
 
       });
 

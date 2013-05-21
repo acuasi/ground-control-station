@@ -53,11 +53,6 @@ define(['backbone'], function(Backbone) {
 
     },
 
-    initialize: function() {
-      this.on('change', function() {
-      }, this);
-    },
-
     validate: function(attrs) {
       attrs.lat /= 1e07;
       attrs.lon /= 1e07;
