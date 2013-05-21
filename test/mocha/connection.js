@@ -31,6 +31,8 @@ describe('UAV Connection', function() {
             c.pipe(c); // echo data between clients
         });
 
+        this.heartbeatMessage = new Buffer([0xfe, 0x09, 0x03, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x08, 0x00, 0x00, 0x03, 0x9f, 0x5c])
+
         this.server.listen(nconf.get('tcp:port'));
     });
 
@@ -39,23 +41,92 @@ describe('UAV Connection', function() {
     });
 
     it('can write messages to its connection', function(done) {
-        var b = new Buffer([0xfe, 0x09, 0x03, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x08, 0x00, 0x00, 0x03, 0x9f, 0x5c])
+        var heartbeat = this.heartbeatMessage;
         this.server.on('connection', function(connection) {
             connection.on('data', function(data) {
-                data.toString().should.equal(b.toString());
+                data.toString().should.equal(heartbeat.toString());
                 done();
             })
         })
         var c = this.c; // assign to juggle scope below
         // Only try to write once the connection is actually present, i.e. in the 'connecting' state
         this.c.on('connecting', function() {
-            c.write(b);
+            c.write(heartbeat);
         });
         this.c.start(); // attempt to connect
     });
 
-    it('has a start function that starts the execution of the state machine', function() {
-        this.c.start();
+    describe('start function', function() {
+        it('starts the connection heartbeat, once per second', function() {
+            var clock = sinon.useFakeTimers();
+            var spy = sinon.spy(this.c, 'heartbeat');
+            this.c.start();
+            spy.called.should.be.false;
+            clock.tick(1000);
+            spy.calledOnce.should.be.true;
+        });
+        it('calls the "disconnected" state immediately', function() {
+            var spy = sinon.spy(this.c, 'disconnected');
+            this.c.start();
+            spy.called.should.be.true;
+        });
+    });
+
+    describe('connection heartbeat monitor', function() {
+        it("emits a 'heartbeat' event", function(done) {
+            this.c.on('heartbeat', function() {
+                should.ok;
+                done();
+            });
+            this.c.heartbeat();
+        });
+
+        it("updates the time since the last received packet heartbeat", function(done) {
+            var clock = sinon.useFakeTimers();
+
+            var heartbeat = this.heartbeatMessage;
+            var c = this.c;
+            // Send a heartbeat packet once the connection is listening
+            this.server.on('connection', function(connection) {
+
+                connection.write(heartbeat);
+                clock.tick(5000);
+
+            });
+
+            this.c.on('heartbeat', function() {
+                c.timeSinceLastHeartbeat.should.equal(2000);
+                done();
+            });
+            this.c.start();
+
+        });
+        it("invokes the current stage of the state machine", function() {
+            var spy = sinon.spy(this.c, 'disconnected');
+            spy.called.should.be.false;
+            this.c.heartbeat();
+            spy.called.should.be.true;
+        });
+    });
+
+    describe('packet heartbeat monitor', function() {
+        it('emits a heartbeat:packet event when it receives a heartbeat from the protocol handler', function(done) {
+
+            var heartbeat = this.heartbeatMessage;
+            // Send a heartbeat packet once the connection is listening
+            this.server.on('connection', function(connection) {
+                connection.write(heartbeat);
+            });
+            var c = this.c;
+            c.on('heartbeat:packet', function() {
+                //c.lastHeartbeat.should.equal(4);             
+                console.log(c.lastHeartbeat);
+                should.ok;
+                done();
+            });
+            c.start();
+
+        });
     });
 
     describe('state machine', function() {
@@ -84,12 +155,72 @@ describe('UAV Connection', function() {
 
         });
 
-        xit('triggers a "connecting" event on itself when the connecting state is reached', function() {});
-        xit('transitions to "connected" state after confirming that the comms protocol is flowing', function() {});
-        xit('triggers a "connected" event on itself when the connected state is reached', function() {});
-        xit('falls back to "connecting" state if protocol heartbeat is lost for 6 seconds', function() {});
-        xit('falls back to "disconnected" state if the protocol connection is lost', function() {});
-        xit('triggers a "disconnected" event on itself when the disconnected state is reached', function() {});
+        describe('"connecting" state', function() {
+            it('triggers a "connecting" event on itself when the connecting state is reached', function(done) {
+                this.c.on('connecting', function() {
+                    should.ok;
+                    done();
+                });
+                this.c.start();
+            });
+            it('emits a connecting:attached event when the protocol is attached to the data stream', function(done) {
+                this.c.on('connecting:attached', function() {
+                    should.ok;
+                    done();
+                });
+                this.c.start();
+            });
+
+            it("attaches the packet heartbeat monitor to the protocol connection", function(done) {
+                var c = this.c;
+                var spy = sinon.spy(c, 'updateHeartbeat');
+                spy.called.should.equal.false;
+                this.c.on('connecting:attached', function() {
+                    // Invoke the first listener on the protocol's heartbeat; this should be the
+                    // attached binding done by the 'connecting' state.  Check if it ran.
+                    c.protocol.listeners('HEARTBEAT')[0]();
+                    spy.called.should.equal(true);
+                    done();
+                })
+                this.c.start();
+            });
+
+            it('transitions to "connected" state after receiving a heartbeat packet', function(done) {
+
+                var heartbeat = this.heartbeatMessage;
+
+                // Send a heartbeat packet once the connection is listening
+                this.server.on('connection', function(connection) {
+                    connection.write(heartbeat);
+                });
+
+                this.c.on('connected', function() {
+                    should.ok;
+                    done();
+                });
+
+                this.c.start();
+
+            });
+            xit('falls back to "disconnected" state if the protocol connection is lost', function() {});
+
+        });
+
+        describe('"connected" state', function() {
+            xit('triggers a "connected" event on itself when the connected state is reached', function(done) {
+                this.c.on('connected', function() {
+                    should.ok;
+                    done();
+                });
+                this.c.start();
+            });
+
+            xit('falls back to "connecting" state if protocol heartbeat is lost for a configurable # of seconds', function() {});
+
+            it('falls back to "disconnected" state if the protocol connection is lost', function() {});
+
+        });
+
     });
 
     describe('status information', function() {

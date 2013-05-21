@@ -21,6 +21,8 @@ var log;
 
 function UavConnection(configObject, protocolParser, logObject) {
 
+    _.bindAll(this);
+
     // config is an nconf instance
     this.config = configObject;
 
@@ -48,13 +50,6 @@ function UavConnection(configObject, protocolParser, logObject) {
 
     log = logObject;
 
-    // Establish some event bindings that don't work if bound inside the heartbeat callbacks
-    this.protocol.on('HEARTBEAT', _.bind(function(message) {
-        this.lastHeartbeat = Date.now();
-    }), this);
-
-    _.bindAll(this);
-
 };
 
 util.inherits(UavConnection, events.EventEmitter);
@@ -63,8 +58,6 @@ UavConnection.prototype.changeState = function(newState) {
     this.state = newState;
     this.emit(this.state);
     log.info('[UavConnection] Changing state to [' + this.state + ']');
-
-    // Invoke the new state by calling the function's name.
     this.invokeState(this.state);
 }
 
@@ -73,22 +66,30 @@ UavConnection.prototype.changeState = function(newState) {
 // the system is in to see if we need to change state/status.
 UavConnection.prototype.heartbeat = function() {
   this.timeSinceLastHeartbeat = Date.now() - this.lastHeartbeat;
-  this.invokeState(this.state); 
+  this.emit(this.state);
+  this.emit('heartbeat');
+  this.invokeState(this.state);
 }
 
-// Convenience function to hide the awkward syntax
+// Convenience function to hide the awkward syntax.
 UavConnection.prototype.invokeState = function(state) {
   this[this.state]();
 };
 
 UavConnection.prototype.start = function() {
-    setInterval(this.heartbeat, 1000);
+    setInterval(_.bind(this.heartbeat, this), 1000);
     this.changeState('disconnected');
 }
 
 // Accessor for private variable (stateName)
 UavConnection.prototype.getState = function() {
     return this.state;
+};
+
+// Update the remote heartbeat's last timestamp
+UavConnection.prototype.updateHeartbeat = function() {
+  this.emit('heartbeat:packet');
+  this.lastHeartbeat = Date.now();
 };
 
 UavConnection.prototype.disconnected = function() {
@@ -111,14 +112,11 @@ UavConnection.prototype.disconnected = function() {
                     baudrate: this.config.get('serial:baudrate')
                 });
 
-                this.connection.on('open', _.bind(function() {
-                    this.changeState('connecting');
-                }), this);
+                // Once the connection is opened, move to a connecting state
+                this.connection.on('open', _.bind(this.changeState, this, 'connecting'));
 
                 // If we lose the connection, try and re-establish immediately.
-                this.connection.on('close', _.bind(function() {
-                    this.changeState('disconnected');
-                }), this);
+                this.connection.on('close', _.bind(this.changeState, this, 'disconnected'));
                 break;
 
             case 'udp':
@@ -126,16 +124,14 @@ UavConnection.prototype.disconnected = function() {
                 this.dataEventName = 'message';
 
                 // When the socket confirms its listening, change state to try and collect MAVLink configuration
-                this.connection.on("listening", _.bind(function() {
-                    this.changeState(states.connecting)
-                }, this));
-
+                this.connection.on("listening", _.bind(this.changeState, this, 'connecting'));
                 this.connection.bind(this.config.get('udp:port'));
                 break;
 
             case 'tcp':
                 this.dataEventName = 'data';
                 this.connection = net.connect({
+                    host: this.config.get('tcp:host'),
                     port: this.config.get('tcp:port')
                 }, _.bind(function() {
                     // 'connect' event listener
@@ -154,8 +150,7 @@ UavConnection.prototype.disconnected = function() {
                 log.info('Connection type not understood (' + this.config.get('connection') + ')');
         }
     } catch (e) {
-        log.info('error!');
-        console.log(e);
+        log.error(e);
     }
 }
 
@@ -163,17 +158,21 @@ UavConnection.prototype.connecting = function() {
     try {
         log.info('establishing MAVLink connection...');
 
-        // If necessary, attach the message parser to the connection
+        // If necessary, attach the message parser to the connection.
+        // This is only done the first time the connection reaches this state after first connecting,
+        // to avoid attaching too many callbacks.
         if (this.attachDataEventListener === true) {
             this.connection.on(this.dataEventName, _.bind(function(msg) {
                 this.protocol.parseBuffer(msg);
             }, this));
+
+            this.protocol.on('HEARTBEAT', this.updateHeartbeat);
+            this.emit('connecting:attached');
+
         }
 
-        if (this.timeSinceLastHeartbeat < 5000 && true === _.isNumber(this.timeSinceLastHeartbeat) && false === _.isNaN(this.timeSinceLastHeartbeat)) {
-            this.changeState('connected');
-        }
-
+        this.protocol.once('HEARTBEAT', _.bind(this.changeState, this, 'connected'));
+    
         this.attachDataEventListener = false;
 
     } catch (e) {
@@ -187,7 +186,7 @@ UavConnection.prototype.connected = function() {
     log.info('connected, ensuring a timeout has not happened...');
     log.info('time since last heartbeat = ' + this.timeSinceLastHeartbeat);
     if (this.timeSinceLastHeartbeat > 5000 || true === _.isNaN(this.timeSinceLastHeartbeat)) {
-        changeState('connecting');
+        this.changeState('connecting');
     }
 
 };

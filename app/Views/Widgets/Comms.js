@@ -1,14 +1,23 @@
-define(['backbone', 'Templates'], function(Backbone, template) {
+define(['backbone', 'Templates','now'], function(Backbone, template, now) {
   
   var CommsWidget = Backbone.View.extend({
     
     el: '#commsWidget',
     className: 'widget',
+    events: {
+      'click #loadParams': 'loadParameters'
+    },
     
     initialize: function() {
       _.bindAll(this);
       this.model.on('change:status', this.render);
       this.model.on('change:time_since_last_heartbeat', this.render);
+    },
+
+    loadParameters: function() {
+      now.ready(function() {
+        now.loadParams('hello there');
+      })
     },
 
     render: function() {

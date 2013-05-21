@@ -971,7 +971,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div>');
+buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div><div><span class="value">' + ((interp = voltage_battery) == null ? '' : interp) + '</span><span class="units">&nbsp;v</span></div><div><span class="value">' + ((interp = current_battery) == null ? '' : interp) + '</span><span class="units">&nbsp;A</span></div>');
 }
 return buf.join("");
 };
@@ -981,7 +981,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span><button id="loadParams">Load Parameters</button></div></div>');
 }
 return buf.join("");
 };
@@ -1275,17 +1275,26 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
   return MapWidget;
 
 });
-define('Views/Widgets/Comms',['backbone', 'Templates'], function(Backbone, template) {
+define('Views/Widgets/Comms',['backbone', 'Templates','now'], function(Backbone, template, now) {
   
   var CommsWidget = Backbone.View.extend({
     
     el: '#commsWidget',
     className: 'widget',
+    events: {
+      'click #loadParams': 'loadParameters'
+    },
     
     initialize: function() {
       _.bindAll(this);
       this.model.on('change:status', this.render);
       this.model.on('change:time_since_last_heartbeat', this.render);
+    },
+
+    loadParameters: function() {
+      now.ready(function() {
+        now.loadParams('hello there');
+      })
     },
 
     render: function() {
@@ -1464,15 +1473,19 @@ define('Views/Widgets/Battery',['backbone', 'Templates'], function(Backbone, tem
     initialize: function() {
 
       _.bindAll(this);
+      this.model.on('change:current_battery', this.render);
+      this.model.on('change:voltage_battery', this.render);
       this.model.on('change:battery_remaining', this.render);
 
     },
 
     render: function() {
-
+      
       this.$el.html(template['batteryWidget'](
         {
-          battery_remaining: this.model.get('battery_remaining')
+          battery_remaining: this.model.get('battery_remaining'),
+          voltage_battery: this.model.get('voltage_battery') / 1000,
+          current_battery: this.model.get('current_battery') / -100
         }
       ));
     

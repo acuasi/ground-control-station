@@ -194,7 +194,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div>');
+buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div><div><span class="value">' + ((interp = voltage_battery) == null ? '' : interp) + '</span><span class="units">&nbsp;v</span></div><div><span class="value">' + ((interp = current_battery) == null ? '' : interp) + '</span><span class="units">&nbsp;A</span></div>');
 }
 return buf.join("");
 };
@@ -204,7 +204,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span><button id="loadParams">Load Parameters</button></div></div>');
 }
 return buf.join("");
 };
