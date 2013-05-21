@@ -42,7 +42,7 @@ MavParams.prototype.mavset = function(mavlink, mavlinkParser, uavConnection, nam
     
     var sender = function() {
         console.log('Requesting parameter ['+name+'] be set to ['+value+']...');
-        mavlink.send(param_set, uavConnection);
+        mavlinkParser.send(param_set, uavConnection);
 
         handle = mavlinkParser.on('PARAM_VALUE', function(ack) {
             console.log('Got acknowledgement that parameter ['+ack.param_id+'] has been set to ['+ack.param_value+']');
