@@ -4297,9 +4297,10 @@ MAVLink.prototype.log = function(message) {
     }
 }
 
-MAVLink.prototype.send = function(mavmsg) {
+MAVLink.prototype.send = function(mavmsg, conn) {
         buf = mavmsg.pack(this);
-        this.file.write(buf);
+        conn
+        .write(buf);
         this.seq = (this.seq + 1) % 255;
         this.total_packets_sent +=1;
         this.total_bytes_sent += buf.length;

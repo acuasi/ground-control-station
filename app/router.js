@@ -41,11 +41,14 @@ function(app, now,
         model: this.mission
       });
 
-      this.missionView.render();
-
+      // Assign locally for calling once the Now connection is ready
+      var missionView = this.missionView;
+      
       // Handle message events as they are provided from the server
       // This won't scale =P
       now.ready(function(){
+
+        missionView.render();
 
         now.updatePlatform = function(platformJson) {
           platform.set(platformJson);

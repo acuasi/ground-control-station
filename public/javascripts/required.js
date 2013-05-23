@@ -981,7 +981,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span><button id="loadParams">Load Parameters</button></div></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div><div><button id="loadParams">Load Parameters</button><button id="loadMission">Load Mission</button><button id="startMission">Start Mission Wooo!</button></div></div>');
 }
 return buf.join("");
 };
@@ -1282,7 +1282,9 @@ define('Views/Widgets/Comms',['backbone', 'Templates','now'], function(Backbone,
     el: '#commsWidget',
     className: 'widget',
     events: {
-      'click #loadParams': 'loadParameters'
+      'click #loadParams': 'loadParameters',
+      'click #loadMission': 'loadMission',
+      'click #startMission': 'startMission'
     },
     
     initialize: function() {
@@ -1293,8 +1295,20 @@ define('Views/Widgets/Comms',['backbone', 'Templates','now'], function(Backbone,
 
     loadParameters: function() {
       now.ready(function() {
-        now.loadParams('hello there');
-      })
+        now.loadParams('Loading params...');
+      });
+    },
+
+    loadMission: function() {
+      now.ready(function() {
+        now.loadMission('Loading mission...');
+      });
+    },
+
+    startMission: function() {
+      now.ready(function() {
+        now.startMission('Starting mission...');
+      });
     },
 
     render: function() {
@@ -1617,11 +1631,14 @@ function(app, now,
         model: this.mission
       });
 
-      this.missionView.render();
-
+      // Assign locally for calling once the Now connection is ready
+      var missionView = this.missionView;
+      
       // Handle message events as they are provided from the server
       // This won't scale =P
       now.ready(function(){
+
+        missionView.render();
 
         now.updatePlatform = function(platformJson) {
           platform.set(platformJson);

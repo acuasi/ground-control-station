@@ -10,7 +10,8 @@ var mavlink = require("mavlink_ardupilotmega_v1.0"),
     nconf = require("nconf"),
     requirejs = require("requirejs"),
     dgram = require("dgram"),
-    winston = require("winston");
+    winston = require("winston"),
+    MavMission = require('./assets/js/libs/mavMission.js');
 
 requirejs.config({
     //Pass the top-level main.js/index.js require
@@ -65,6 +66,7 @@ var mavlinkParser = new mavlink(logger);
 
 // Establish connection management, start its heartbeat.
 var uavConnectionManager = new UavConnection.UavConnection(nconf, mavlinkParser, logger);
+mavlinkParser.setConnection(uavConnectionManager);
 uavConnectionManager.start();
 
 
@@ -77,10 +79,22 @@ everyone.now.loadParams = function(msg) {
     mavParams.mavset(mavlink, mavlinkParser, uavConnectionManager, 'name', 1.0);
 }
 
+everyone.now.loadMission = function(msg) {
+    var mm= new MavMission(mavlink, mavlinkParser, uavConnectionManager, logger);
+    mm.loadMission();
+}
+
+everyone.now.startMission = function(msg) {
+    //#self.mav.command_long_send(self.target_system, self.target_component,
+     //                          mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0)
+    var startMission = new mavlink.messages.command_long(mavlinkParser.srcSystem, mavlinkParser.srcComponent, mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0);
+    mavlinkParser.send(startMission);
+}
 
 // Client integration code, TODO refactor away to elsewhere
-requirejs(["Models/Platform"], function(Platform) {
+requirejs(["Models/Platform","now"], function(Platform, now) {
 
+// eat error for the moment, remove this soon!
     var connection = {};
 
     uavConnectionManager.on('disconnected', function() {

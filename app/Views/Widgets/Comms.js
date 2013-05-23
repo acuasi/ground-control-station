@@ -5,7 +5,9 @@ define(['backbone', 'Templates','now'], function(Backbone, template, now) {
     el: '#commsWidget',
     className: 'widget',
     events: {
-      'click #loadParams': 'loadParameters'
+      'click #loadParams': 'loadParameters',
+      'click #loadMission': 'loadMission',
+      'click #startMission': 'startMission'
     },
     
     initialize: function() {
@@ -16,8 +18,20 @@ define(['backbone', 'Templates','now'], function(Backbone, template, now) {
 
     loadParameters: function() {
       now.ready(function() {
-        now.loadParams('hello there');
-      })
+        now.loadParams('Loading params...');
+      });
+    },
+
+    loadMission: function() {
+      now.ready(function() {
+        now.loadMission('Loading mission...');
+      });
+    },
+
+    startMission: function() {
+      now.ready(function() {
+        now.startMission('Starting mission...');
+      });
     },
 
     render: function() {
