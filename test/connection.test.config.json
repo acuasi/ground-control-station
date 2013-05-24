@@ -3,8 +3,8 @@
   "connection" : "tcp",
 
   "tcp" : {
-    "host" : "127:0:0:1",
-    "port" : 14550
+    "host" : "localhost",
+    "port" : 14551
   },
 
   "udp" : {

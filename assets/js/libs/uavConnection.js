@@ -71,7 +71,7 @@ UavConnection.prototype.heartbeat = function() {
   this.invokeState(this.state);
 }
 
-// Convenience function to hide the awkward syntax.
+// Convenience function to make the meaning of the awkward syntax more clear.
 UavConnection.prototype.invokeState = function(state) {
   this[this.state]();
 };
