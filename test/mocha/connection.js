@@ -223,17 +223,10 @@ describe('UAV Connection', function() {
             });
 
             xit('falls back to "connecting" state if protocol heartbeat is lost for a configurable # of seconds', function() {});
-
             xit('falls back to "disconnected" state if the protocol connection is lost', function() {});
 
         });
-
     });
-
-    describe('status information', function() {
-        xit('exposes stats that the MAVLink protocol object maintains (bytes sent, errors, etc)', function() {});
-    });
-
 });
 
 /** swamp for copy/paste

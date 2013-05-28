@@ -12,19 +12,13 @@ var mavlink;
 // Reference to the instantiated mavlink object, for access to target system/component.
 var mavlinkParser;
 
-// Index of the next expected waypoint to send to/receive from the UAV
-var missionIndex = 0;
-
 // This really needs to not be here.
 var uavConnection;
 
 // Handler when the ArduPilot requests individual waypoints: upon receiving a request,
 // Send the next one.
 function missionRequestHandler(missionItemRequest) {
-	mavlinkParser.send(missionItems[missionIndex], uavConnection);
-	log.info(util.inspect(missionItemRequest));
-	log.info('Received mission item request, preparing to send mission item ['+missionIndex+']');
-	missionIndex++;
+	mavlinkParser.send(missionItems[missionItemRequest.seq], uavConnection);
 }
 
 function missionAckHandler(ack) {
@@ -45,13 +39,13 @@ MavMission = function(mavlinkProtocol, mavlinkProtocolInstance, uavConnectionObj
 	mavlink = mavlinkProtocol;
 	mavlinkParser = mavlinkProtocolInstance;
 	uavConnection = uavConnectionObject;
+
 }
+
+util.inherits(MavMission, events.EventEmitter);
 
 // http://qgroundcontrol.org/mavlink/waypoint_protocol
 MavMission.prototype.sendToPlatform = function() {
-
-	// reset index of mission items to send to platform
-	missionIndex = 0;
 
 	// send mission_count
 	var missionCount = new mavlink.messages.mission_count(mavlinkParser.srcSystem, mavlinkParser.srcComponent, missionItems.length);
@@ -59,21 +53,39 @@ MavMission.prototype.sendToPlatform = function() {
 
 	// attach mission_request handler, let it cook
 	mavlinkParser.on('MISSION_REQUEST', missionRequestHandler);
-	mavlinkParser.on('MISSION_ACK', missionAckHandler);
+	
+	var self = this;
+	// If the ack is OK, signal OK; if not, signal an error event
+	mavlinkParser.on('MISSION_ACK', function(ack) {
+		if(mavlink.MAV_MISSION_ACCEPTED === ack.type) {
+			self.emit('mission:loaded');
+		} else {
+			throw new Error('Dunno?')
+		}
+	});
 };
 
 // MissionItemMessage is a MAVLink MessageItem object
 MavMission.prototype.addMissionItem = function(missionItemMessage) {
-	missionItems.push(missionItemMessage);
+	if( _.isUndefined(missionItemMessage)) {
+		throw new Error('Undefined message item in MavMission.addMissionItem!');
+	}
+	missionItems[missionItemMessage.seq] = missionItemMessage;
 };
 
-MavMission.prototype.clearMissionItems = function(first_argument) {
+MavMission.prototype.clearMission = function(first_argument) {
 	missionItems = [];
+	var missionClearAll = new mavlink.messages.mission_clear_all(mavlinkParser.srcSystem, mavlinkParser.srcComponent);
+	mavlinkParser.send(missionClearAll);
 };
 
 MavMission.prototype.loadMission = function() {
 	loadMission(this);
 };
+
+MavMission.prototype.getMissionItems = function() {
+	return missionItems;
+}
 
 // Stub for initial development/testing
 loadMission = function(mission) {
