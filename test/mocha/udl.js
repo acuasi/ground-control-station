@@ -2,7 +2,7 @@
 Tests against interface, implementations of a UDL, UAV Domain Language
 */
 
-describe('UDL interface prototype', function() {
+describe.skip('UDL interface prototype', function() {
 	it('has a takeoff function', function() {} );
 	it('has a land function', function() {} );
 	it('has a arm function', function() {} );

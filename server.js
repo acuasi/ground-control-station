@@ -9,7 +9,6 @@ var mavlink = require("mavlink_ardupilotmega_v1.0"),
     path = require('path'),
     nconf = require("nconf"),
     requirejs = require("requirejs"),
-    dgram = require("dgram"),
     winston = require("winston"),
     MavMission = require('./assets/js/libs/mavMission.js');
 
@@ -85,8 +84,6 @@ everyone.now.loadMission = function(msg) {
 }
 
 everyone.now.startMission = function(msg) {
-    //#self.mav.command_long_send(self.target_system, self.target_component,
-     //                          mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0)
     var startMission = new mavlink.messages.command_long(mavlinkParser.srcSystem, mavlinkParser.srcComponent, mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0);
     mavlinkParser.send(startMission);
 }
