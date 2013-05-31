@@ -10,7 +10,7 @@ You need ```git```, ```node```, ```npm``` (distributed with node, usually), and 
 
 ```
 brew install git
-sudo npm install -g grunt_cli
+sudo npm install -g grunt-cli
 sudo npm install -g nodemon
 ```
 
