@@ -88,7 +88,6 @@ everyone.now.loadMission = function(msg) {
 everyone.now.startMission = function(msg) {
     var startMission = new mavlink.messages.command_long(mavlinkParser.srcSystem, mavlinkParser.srcComponent, mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0);
     mavlinkParser.send(startMission);
-    console.log(msg);
 }
 
 // Client integration code, TODO refactor away to elsewhere
@@ -205,8 +204,5 @@ requirejs(["Models/Platform","now"], function(Platform, now) {
         });
         everyone.now.updatePlatform(platform);
     });
-
-    mavlinkParser.on('message', function(m) {  console.log(m)}
-     );
 
 }); // end scope of requirejs
