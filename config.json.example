@@ -1,4 +1,15 @@
 {
+
+  "connection" : "tcp",
+
+  "tcp" : {
+    "host" : "127.0.0.1",
+    "port" : 5760
+  },
+
+  "udp" : {
+    "port" : 14550
+  },
   
   "serial" : {
     "device" : "/dev/tty.usbserial-A900XUV3",

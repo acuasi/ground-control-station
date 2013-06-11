@@ -26,7 +26,7 @@ grunt
 
 ### Configuration
 
-Work in progress, you may need to specify the serial port in the ```config.json``` file at the root of the project (copy/paste the ```config.json.example``` file as a template) but it's changing very fast right now (1/14/2013).
+Work in progress, you need to specify the connection type in the ```config.json``` file at the root of the project (copy/paste the ```config.json.example``` file as a template), and update the relevant fields (host, port, serial device, etc).
 
 ### Running the project
 
@@ -117,6 +117,16 @@ Many things are dependent upon the build cycle, so you usually want to have this
 ```bash
 grunt && grunt watch
 ```
+
+#### Using SITL on a remote host
+
+Assuming you're able to get the [SITL guide on this page](http://dev.ardupilot.com/software-in-the-loop-sitl/) running, here's how to connect this ground station to that SITL/JBSim instance pair.  For this setup, we won't have MAVProxy in the loop.  On the machine running the simulation, you need to ensure that you can access some TCP port (by default, ArduPilot will use 5760) from wherever the ground station is running.
+
+ 1. Start the ArduPlane simulator: ```/tmp/ArduPlane.build/ArduPlane.elf &```
+ 2. Start JSBSim: ```python ./ardupilot/Tools/autotest/jsbsim/runsim.py --home=-35.362938,149.165085,584,270 &```
+ 3. Change the config file for your ground station to be ```tcp```, and to connect to the correct IP/port on  the machine running the ArduPlane and JSBSim.
+ 4. Start the ground station: ```grunt && nodemon server.js```
+ 5. Open a web page to ```localhost:3000```
 
 ### Testing
 

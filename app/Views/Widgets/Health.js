@@ -8,28 +8,29 @@ define(['backbone', 'Templates'], function(Backbone, template) {
     initialize: function() {
 
       _.bindAll(this);
-      this.model.on('change:type', this.render);
-      this.model.on('change:autopilot', this.render);
-      this.model.on('change:base_model', this.render);
-      this.model.on('change:custom_mode', this.render);
-      this.model.on('change:system_status', this.render);
-      this.model.on('change:mavlink_version', this.render);
-
+      this.model.on('change:mode', this.render);
+      this.model.on('change:armed', this.render);
+      this.model.on('change:manual', this.render);
+      this.model.on('change:stabilize', this.render);
+      this.model.on('change:auto', this.render);
+      this.model.on('change:guided', this.render);
     },
 
     render: function() {
-
+        
         this.$el.html(template['healthWidget'](
             {
-                type: this.model.get('type'),
-                autopilot: this.model.get('autopilot'),
-                base_mode: this.model.get('base_mode'),
-                custom_mode: this.model.get('custom_mode'),
-                system_status: this.model.get('system_status'),
-                mavlink_version: this.model.get('mavlink_version')
+                stateMode: this.model.get('mode')
             }
         ));
-    
+        
+        if( true == this.model.get('armed')) {
+          this.$el.find('.flightModeArmed').show();
+          this.$el.find('.flightModeDisarmed').hide();
+        } else {
+           this.$el.find('.flightModeArmed').hide();
+           this.$el.find('.flightModeDisarmed').show();     
+        }
     }
     
   });

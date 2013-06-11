@@ -1,5 +1,8 @@
 #comms
-    span.units drop_rate &nbsp;
-    span.value !{drop_rate_comm} &nbsp;
-    span.units errors_comm &nbsp;
-    span.value !{errors_comm} &nbsp;
+	.disconnected Disconnected.
+	.connecting Connecting!{time_since_last_heartbeat}.
+	.connected Connected.
+	div
+		button#loadParams Load Parameters
+		button#loadMission Load Mission
+		button#startMission Start Mission Wooo!

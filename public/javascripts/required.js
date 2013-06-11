@@ -726,13 +726,13 @@ define('Models/Platform',['backbone'], function(Backbone) {
       rollspeed: undefined, // acceleration
       yawspeed: undefined, // acceleration
 
-      // Set by mavlink.HEARTBEAT packets
-      type: undefined,
-      autopilot: undefined,
-      base_mode: undefined,
-      custom_mode: undefined,
-      system_status: "no connection",
-      mavlink_version: undefined,
+      // Set by mavFlightMode interpreting a variety of packets
+      stateMode: undefined,
+      stateAuto: undefined,
+      stateGuided: undefined,
+      stateStabilize: undefined,
+      stateManual: undefined,
+      stateArmed: undefined,
 
       // Set by mavlink.SYS_STATUS packets
       voltage_battery: undefined,
@@ -750,11 +750,6 @@ define('Models/Platform',['backbone'], function(Backbone) {
 
     },
 
-    initialize: function() {
-      this.on('change', function() {
-      }, this);
-    },
-
     validate: function(attrs) {
       attrs.lat /= 1e07;
       attrs.lon /= 1e07;
@@ -764,6 +759,20 @@ define('Models/Platform',['backbone'], function(Backbone) {
   });
 
   return Platform;
+  
+});
+define('Models/Connection',['backbone'], function(Backbone) {
+
+  var Connection = Backbone.Model.extend({
+
+    defaults: {
+      status: 'disconnected',
+      time_since_last_heartbeat: 0
+    }
+
+  });
+
+  return Connection;
   
 });
 define('Templates',[], function() {
@@ -962,7 +971,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div>');
+buf.push('<h3>Battery</h3><div><span class="value">' + ((interp = battery_remaining) == null ? '' : interp) + '</span><span class="units">&nbsp;%</span></div><div><span class="value">' + ((interp = voltage_battery) == null ? '' : interp) + '</span><span class="units">&nbsp;v</span></div><div><span class="value">' + ((interp = current_battery) == null ? '' : interp) + '</span><span class="units">&nbsp;A</span></div>');
 }
 return buf.join("");
 };
@@ -972,7 +981,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div><button id="loadParams">Load Parameters</button><button id="loadMission">Load Mission</button><button id="startMission">Start Mission Wooo!</button></div></div>');
 }
 return buf.join("");
 };
@@ -992,7 +1001,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="type"><span class="units">type &nbsp;</span><span class="value">' + ((interp = type) == null ? '' : interp) + '</span></div><div id="autopilot"><span class="units">autopilot &nbsp;</span><span class="value">' + ((interp = autopilot) == null ? '' : interp) + '</span></div><div id="base_mode"><span class="units">base_mode &nbsp;</span><span class="value">' + ((interp = base_mode) == null ? '' : interp) + '</span></div><div id="custom_mode"><span class="units">custom_mode &nbsp;</span><span class="value">' + ((interp = custom_mode) == null ? '' : interp) + '</span></div><div id="system_status"><span class="units">system_status &nbsp;</span><span class="value">' + ((interp = system_status) == null ? '' : interp) + '</span></div><div id="mavlink_version"><span class="units">mavlink_version &nbsp;</span><span class="value">' + ((interp = mavlink_version) == null ? '' : interp) + '</span></div>');
+buf.push('<div class="flightMode">Flight Mode:&nbsp;<span>' + ((interp = stateMode) == null ? '' : interp) + '</span></div><div class="flightModeArmed">Armed</div><div class="flightModeDisarmed">Disarmed</div>');
 }
 return buf.join("");
 };
@@ -1002,7 +1011,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="commsWidget"></div><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="healthWidget" class="widget"></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
 }
 return buf.join("");
 };
@@ -1032,7 +1041,7 @@ define('Views/Widgets/Speed',['backbone', 'Templates'], function(Backbone, templ
 
     render: function() {
 
-      this.$el.html(template['speedWidget']({groundspeed: this.model.get('groundspeed')}));
+      this.$el.html(template['speedWidget']({groundspeed: Math.round(this.model.get('groundspeed'), 2)}));
     
     }
     
@@ -1235,7 +1244,7 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       // create a map in the "map" div, set the view to a given place and zoom
       this.map = L.map('mapWidget', {
         minZoom: 1,
-        maxZoom: 22
+        maxZoom: 24
       }).setView([64.9, -147.1], 16);
 
       this.myIcon = L.icon({
@@ -1266,31 +1275,92 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
   return MapWidget;
 
 });
-define('Views/Widgets/Comms',['backbone', 'Templates'], function(Backbone, template) {
+define('Views/Widgets/Comms',['backbone', 'Templates','now'], function(Backbone, template, now) {
   
   var CommsWidget = Backbone.View.extend({
     
     el: '#commsWidget',
     className: 'widget',
+    events: {
+      'click #loadParams': 'loadParameters',
+      'click #loadMission': 'loadMission',
+      'click #startMission': 'startMission'
+    },
     
     initialize: function() {
       _.bindAll(this);
-      this.model.on('change:drop_rate_comm', this.render);
-      this.model.on('change:errors_comm', this.render);
+      this.model.on('change:status', this.render);
+      this.model.on('change:time_since_last_heartbeat', this.render);
+    },
+
+    loadParameters: function() {
+      now.ready(function() {
+        now.loadParams('Loading params...');
+      });
+    },
+
+    loadMission: function() {
+      now.ready(function() {
+        now.loadMission('Loading mission...');
+      });
+    },
+
+    startMission: function() {
+      now.ready(function() {
+        now.startMission('Starting mission...');
+      });
     },
 
     render: function() {
+      var hasRendered;
+
+      // Only draw this on initial page render.
+      if(true !== hasRendered) {
+
+        var heartbeatMessage = '';
+        if( this.model.get('time_since_last_heartbeat') > 5000 ) {
+          heartbeatMessage = ', disconnected for ' + this.model.get('time_since_last_heartbeat') + ' s';
+        } 
 
         this.$el.html(template['commsWidget'](
-            {
-                drop_rate_comm: this.model.get('drop_rate_comm'),
-                errors_comm: this.model.get('errors_comm')
-            }
+          {
+              time_since_last_heartbeat: heartbeatMessage,
+              drop_rate_comm: this.model.get('drop_rate_comm'),
+              errors_comm: this.model.get('errors_comm')
+          }
         ));
-    
+
+        $('#connected').hide();
+        $('#connecting').hide();
+
+        hasRendered = true;
+      }
+
+      // Rerender upon events.
+      switch(this.model.get('status')) {
+        case 'disconnected':
+          $('#comms .connected').hide();
+          $('#comms .connecting').hide();
+          $('#comms .disconnected').show();
+          break;
+
+        case 'connecting':
+          $('#comms .connected').hide();
+          $('#comms .connecting').show();
+          $('#comms .disconnected').hide();
+          break;
+
+        case 'connected':
+          $('#comms .connected').show();
+          $('#comms .connecting').hide();
+          $('#comms .disconnected').hide();
+        break;
+      }
+
     }
     
   });
+
   return CommsWidget;
 
 });
@@ -1361,28 +1431,29 @@ define('Views/Widgets/Health',['backbone', 'Templates'], function(Backbone, temp
     initialize: function() {
 
       _.bindAll(this);
-      this.model.on('change:type', this.render);
-      this.model.on('change:autopilot', this.render);
-      this.model.on('change:base_model', this.render);
-      this.model.on('change:custom_mode', this.render);
-      this.model.on('change:system_status', this.render);
-      this.model.on('change:mavlink_version', this.render);
-
+      this.model.on('change:mode', this.render);
+      this.model.on('change:armed', this.render);
+      this.model.on('change:manual', this.render);
+      this.model.on('change:stabilize', this.render);
+      this.model.on('change:auto', this.render);
+      this.model.on('change:guided', this.render);
     },
 
     render: function() {
-
+        
         this.$el.html(template['healthWidget'](
             {
-                type: this.model.get('type'),
-                autopilot: this.model.get('autopilot'),
-                base_mode: this.model.get('base_mode'),
-                custom_mode: this.model.get('custom_mode'),
-                system_status: this.model.get('system_status'),
-                mavlink_version: this.model.get('mavlink_version')
+                stateMode: this.model.get('mode')
             }
         ));
-    
+        
+        if( true == this.model.get('armed')) {
+          this.$el.find('.flightModeArmed').show();
+          this.$el.find('.flightModeDisarmed').hide();
+        } else {
+           this.$el.find('.flightModeArmed').hide();
+           this.$el.find('.flightModeDisarmed').show();     
+        }
     }
     
   });
@@ -1417,15 +1488,19 @@ define('Views/Widgets/Battery',['backbone', 'Templates'], function(Backbone, tem
     initialize: function() {
 
       _.bindAll(this);
+      this.model.on('change:current_battery', this.render);
+      this.model.on('change:voltage_battery', this.render);
       this.model.on('change:battery_remaining', this.render);
 
     },
 
     render: function() {
-
+      
       this.$el.html(template['batteryWidget'](
         {
-          battery_remaining: this.model.get('battery_remaining')
+          battery_remaining: this.model.get('battery_remaining'),
+          voltage_battery: this.model.get('voltage_battery') / 1000,
+          current_battery: this.model.get('current_battery') / -100
         }
       ));
     
@@ -1494,7 +1569,9 @@ define('Views/Mission',['backbone', 'Templates',
       this.batteryWidget = new BatteryWidget({model: this.model.get('platform')});
       this.healthWidget = new HealthWidget({model: this.model.get('platform')});
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
-      this.commsWidget = new CommsWidget({model: this.model.get('platform')});
+
+      // Connection reflects information not entirely derived from the platform
+      this.commsWidget = new CommsWidget({model: this.model.get('connection')});
 
       // Render party
       this.speedWidget.render();
@@ -1505,8 +1582,6 @@ define('Views/Mission',['backbone', 'Templates',
       this.gpsWidget.render();
       this.commsWidget.render();
 
-      this.model.get('platform').on('change', function(e) {
-      });
     }
 
   });
@@ -1523,6 +1598,7 @@ define('router',[
   // Models
   "Models/Mission",
   "Models/Platform",
+  "Models/Connection",
 
   // Dependent views
   "Views/Mission"
@@ -1531,6 +1607,7 @@ define('router',[
 function(app, now,
   Mission,
   Platform,
+  Connection,
   MissionView) {
 
   // Defining the application router, you can attach sub routers here.
@@ -1544,24 +1621,33 @@ function(app, now,
     mission: function() {
 
       var platform = this.platform = new Platform();
+      var connection = this.connection = new Connection();
+
       this.mission = new Mission({
-        platform: this.platform
+        platform: this.platform,
+        connection: this.connection
       });
 
       this.missionView = new MissionView({
         model: this.mission
       });
 
-      this.missionView.render();
-
+      // Assign locally for calling once the Now connection is ready
+      var missionView = this.missionView;
+      
       // Handle message events as they are provided from the server
       // This won't scale =P
       now.ready(function(){
 
+        missionView.render();
+
         now.updatePlatform = function(platformJson) {
           platform.set(platformJson);
-          console.log(platform.toJSON());
         };
+
+        now.updateConnection = function(connectionJson) {
+          connection.set(connectionJson);
+        }
 
       });
 
