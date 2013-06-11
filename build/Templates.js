@@ -204,7 +204,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div id="details"><span class="units">drop_rate &nbsp;</span><span class="value">' + ((interp = drop_rate_comm) == null ? '' : interp) + ' &nbsp;</span><span class="units">errors_comm &nbsp;</span><span class="value">' + ((interp = errors_comm) == null ? '' : interp) + ' &nbsp;</span></div><div><button id="loadParams">Load Parameters</button><button id="loadMission">Load Mission</button><button id="startMission">Start Mission Wooo!</button></div></div>');
+buf.push('<div id="comms"><div class="disconnected">Disconnected.</div><div class="connecting">Connecting' + ((interp = time_since_last_heartbeat) == null ? '' : interp) + '.</div><div class="connected">Connected.</div><div><button id="loadParams">Load Parameters</button><button id="loadMission">Load Mission</button><button id="startMission">Start Mission Wooo!</button></div></div>');
 }
 return buf.join("");
 };
@@ -224,7 +224,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="type"><span class="units">type &nbsp;</span><span class="value">' + ((interp = type) == null ? '' : interp) + '</span></div><div id="autopilot"><span class="units">autopilot &nbsp;</span><span class="value">' + ((interp = autopilot) == null ? '' : interp) + '</span></div><div id="base_mode"><span class="units">base_mode &nbsp;</span><span class="value">' + ((interp = base_mode) == null ? '' : interp) + '</span></div><div id="custom_mode"><span class="units">custom_mode &nbsp;</span><span class="value">' + ((interp = custom_mode) == null ? '' : interp) + '</span></div><div id="system_status"><span class="units">system_status &nbsp;</span><span class="value">' + ((interp = system_status) == null ? '' : interp) + '</span></div><div id="mavlink_version"><span class="units">mavlink_version &nbsp;</span><span class="value">' + ((interp = mavlink_version) == null ? '' : interp) + '</span></div>');
+buf.push('<div class="flightMode">Flight Mode:&nbsp;<span>' + ((interp = stateMode) == null ? '' : interp) + '</span></div><div class="flightModeArmed">Armed</div><div class="flightModeDisarmed">Disarmed</div>');
 }
 return buf.join("");
 };
@@ -234,7 +234,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="batteryWidget" class="widget"></div><div id="debugWidget" class="widget"><h3>Debug Console</h3><div id="healthWidget"></div><div id="stateWidget"></div></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div><div id="commsWidget"></div>');
+buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="healthWidget" class="widget"></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
 }
 return buf.join("");
 };

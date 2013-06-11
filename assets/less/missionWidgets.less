@@ -1,11 +1,10 @@
 #missionView {
 
   .widget {
-    margin: 15px;
-    border-radius: @roundness;
-    background-color: rgba(0, 0, 0, .5);
-    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, .75);
-    padding: 1ex;
+    margin: 5px;
+    width: 15em;
+    text-align: left;
+    padding-right: 20px;
 
     h3 {
       font-weight: 400;
@@ -14,9 +13,25 @@
       padding: 0;
     }
 
+    .value {
+    padding-left: 1ex;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1);
+    font-size: 48pt;
+    }
+
+    .units {
+    color: #ff8;
+    text-shadow: 4px 4px #000;
+        }
+
+    h3 { 
+    display: none;
+    }
+
   }
 
   #gpsWidget {
+  display: none;
     z-index: 100;
     position: absolute;
     top: 10px;
@@ -30,24 +45,23 @@
 
   #commsWidget {
     z-index: 100;
-    position: absolute;
-    top: 200px;
-    left: 100px;
-    background-color: rgba(0, 0, 0, .75);
     .value {
-      font-size: 30px;
-      font-weight: 500;
+      font-size: 64pt;
+      font-weight: 400;
+      
     }
     div {
+      color: #fff;
+      font-weight: 400;
       padding: 1em;
       .disconnected {
-        background-color: rgba(255, 0, 0, .75);
+        background-color: rgba(255, 0, 0, .28);
       }
       .connecting {
-        background-color: rgba(255, 128, 0, .75);
+        background-color: rgba(255, 128, 0, .28);
       }
       .connected {
-        background-color: rgba(0, 255, 0, .75);
+        background-color: rgba(0, 255, 0, .28);
       }
     }
   }
@@ -55,7 +69,8 @@
   #widgets {  
     z-index: 100;
     position: absolute;
-    right: 0;
+    left: 0;
+    bottom: 0;
 
     #speedWidget, #altitudeWidget {
       .value {

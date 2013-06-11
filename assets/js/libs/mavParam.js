@@ -52,16 +52,17 @@ function MavParam(mavlinkParserObject, logger) {
 // name = param_name
 // value = value to send it
 MavParam.prototype.set = function(name, value, retries) {
+    
     // Set default value of 3 seconds -- TODO figure out if this is ever used in practice in the Python MAVProxy code?
     retries = typeof retries !== 'undefined' ? retries : 3000;
 
     // Build PARAM_SET message to send 
-    var param_set = new mavlink.messages.param_set(1, 2, name, value, 0); // extra zero = don't care about type
+    var param_set = new mavlink.messages.param_set(mavlinkParser.srcSystem, mavlinkParser.srcComponent, name, value, 0); // extra zero = don't care about type
 
     // Establish a handler to try and send the required packet every second until cancelled
     senderHandler[name] = setInterval( function() {
         log.info('Requesting parameter ['+name+'] be set to ['+value+']...');
-        mavlinkParser.send(param_set, uavConnection);
+        mavlinkParser.send(param_set);
     }, 1000);
 
     timeoutWatcher[name] = setTimeout(function() {
@@ -73,6 +74,18 @@ MavParam.prototype.set = function(name, value, retries) {
         
     }, retries);
 }
+
+MavParam.prototype.get = function(name) {
+    var index = -1; // this will use the name as the lookup method
+    var param_request_read = new mavlink.messages.param_request_read(mavlinkParser.srcSystem, mavlinkParser.srcComponent, name, index);
+    mavlinkParser.send(param_request_read);
+};
+
+MavParam.prototype.getAll = function() {
+    var param_request_list = new mavlink.messages.param_request_list(mavlinkParser.srcSystem, mavlinkParser.srcComponent);
+    mavlinkParser.send(param_request_list);
+};
+
 
 /*
  

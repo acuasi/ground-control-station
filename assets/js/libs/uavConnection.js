@@ -176,7 +176,7 @@ UavConnection.prototype.connecting = function() {
         this.attachDataEventListener = false;
 
     } catch (e) {
-        log.info(e);
+        log.info('Error!');
         throw (e);
     }
 };

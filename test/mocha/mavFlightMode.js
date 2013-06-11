@@ -13,7 +13,7 @@ etc.
 describe("MavFlightMode manager", function() {
     
     it("knows the current the flight mode of the MAV", function() {
-
+        
     });
 
     it("allows the MAV to be armed/disarmed", function() {
@@ -31,7 +31,5 @@ describe("MavFlightMode manager", function() {
     it("watches for command acknowledgements after any command", function() {
 
     });
-
-
 
 });

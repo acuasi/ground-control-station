@@ -33,6 +33,7 @@ describe('MAVLink parameter manager', function() {
         this.mavlinkParser = new mavlink(logger);
         this.c = new UavConnection.UavConnection(nconf, this.mavlinkParser, logger);
         this.mavlinkParser.setConnection(this.c);
+        debugger;
 
         this.server = net.createServer(function(c) {
             c.pipe(c); // echo data between clients
@@ -52,13 +53,13 @@ describe('MAVLink parameter manager', function() {
             self.localConnection = connection;
         });
 
-        var d = done;
-        this.c.on('connected', function() {
+        // _.once is so that the heartbeat doesn't cause the done() to be called multiple times for long-lasting tests
+        this.c.on('connected', _.once(function() {
             done();
-        });
+        }));
         this.c.start();
 
-        this.mavParam = new MavParam(this.mavlinkParser, mavlink, logger);
+        this.mavParam = new MavParam(this.mavlinkParser, logger);
     });
 
     afterEach(function() {
@@ -67,26 +68,56 @@ describe('MAVLink parameter manager', function() {
 
     describe('sets params on the UAV', function() {
 
-        it('sends a param_set message', function(done) {
-            this.localConnection.on('data', function(data) {
-                message = mavlink.decode(data);
-                console.log(message);
-            });
+        it.skip('sends a param_set message', function(done) {
+            this.timeout(3000); // change timeout for this test
+            var self = this;
+            this.localConnection.on('data', _.once(function(data) {
+                var message = self.mavlinkParser.decode(data);
+                message.name.should.equal('PARAM_SET'); // PARAM_SET message ID
+                message.param_value.should.equal(1);
+                message.param_id.should.equal('MAG_ENABLE');
+                done();
+            }));
             this.mavParam.set('MAG_ENABLE', 1.0);
         });
 
-        it('waits for the specified timeout interval for the corresponding ack (param_value echoed back at it)', function() {
+        it.skip('waits for the specified timeout interval for the corresponding ack (param_value echoed back at it)', function() {
 
         });
 
     });
 
-    it('can read a specific parameter', function() {
+    describe('reading params from the UAV', function() {
+        it('can read a single param from the platfom', function(done) {
+            var self = this;
+            this.localConnection.on('data', _.once(function(data) {
+                var message = self.mavlinkParser.decode(data);
+                message.name.should.equal('PARAM_REQUEST_READ'); // PARAM_SET message ID
+                message.param_id.should.equal('MAG_ENABLE');
+                done();
+            }));
+            this.mavParam.get('MAG_ENABLE');
 
-    });
+        } );
 
-    it('can read all parameters', function() {
+        describe('reading all params from the UAV', function() {
+            it('commands the UAV to start sending all params', function(done) {
 
+                var self = this;
+                this.localConnection.on('data', _.once(function(data) {
+                    var message = self.mavlinkParser.decode(data);
+                    message.name.should.equal('PARAM_REQUEST_LIST'); // PARAM_SET message ID
+                    done();
+                }));
+                this.mavParam.getAll();
+            });
+            it('listens for the total amount of parameters to expect from the platform', function() {
+
+            });
+            it('receives all parameters until the total expected # is read, then emits a params:loaded event', function() {
+
+            });
+        } );
     });
 
 

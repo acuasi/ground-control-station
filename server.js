@@ -10,6 +10,7 @@ var mavlink = require("mavlink_ardupilotmega_v1.0"),
     nconf = require("nconf"),
     requirejs = require("requirejs"),
     winston = require("winston"),
+    MavFlightMode = require("./assets/js/libs/mavFlightMode.js"),
     MavMission = require('./assets/js/libs/mavMission.js');
 
 requirejs.config({
@@ -68,6 +69,7 @@ var uavConnectionManager = new UavConnection.UavConnection(nconf, mavlinkParser,
 mavlinkParser.setConnection(uavConnectionManager);
 uavConnectionManager.start();
 
+var mavFlightMode = new MavFlightMode(mavlink, mavlinkParser, uavConnectionManager, logger);
 
 // MavParams are for handling loading parameters
 // Just hacking/playing code for now
@@ -75,7 +77,7 @@ var mavParams = new MavParams(logger);
 
 // User clicked 'load params'!
 everyone.now.loadParams = function(msg) {
-    mavParams.mavset(mavlink, mavlinkParser, uavConnectionManager, 'name', 1.0);
+    mavParams.set(mavlink, mavlinkParser, uavConnectionManager, 'name', 1.0);
 }
 
 everyone.now.loadMission = function(msg) {
@@ -86,6 +88,7 @@ everyone.now.loadMission = function(msg) {
 everyone.now.startMission = function(msg) {
     var startMission = new mavlink.messages.command_long(mavlinkParser.srcSystem, mavlinkParser.srcComponent, mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0);
     mavlinkParser.send(startMission);
+    console.log(msg);
 }
 
 // Client integration code, TODO refactor away to elsewhere
@@ -119,6 +122,11 @@ requirejs(["Models/Platform","now"], function(Platform, now) {
     })
 
     var platform = {};
+
+    mavFlightMode.on('change', function() {
+        platform = _.extend(platform, mavFlightMode.getState());
+        everyone.now.updatePlatform(platform);
+    });
 
     // This won't scale =P still
     // But it's closer to what we want to do.
@@ -198,5 +206,7 @@ requirejs(["Models/Platform","now"], function(Platform, now) {
         everyone.now.updatePlatform(platform);
     });
 
+    mavlinkParser.on('message', function(m) {  console.log(m)}
+     );
 
 }); // end scope of requirejs

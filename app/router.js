@@ -56,7 +56,6 @@ function(app, now,
 
         now.updateConnection = function(connectionJson) {
           connection.set(connectionJson);
-          console.log(connection.toJSON());
         }
 
       });

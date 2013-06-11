@@ -29,13 +29,13 @@ define(['backbone'], function(Backbone) {
       rollspeed: undefined, // acceleration
       yawspeed: undefined, // acceleration
 
-      // Set by mavlink.HEARTBEAT packets
-      type: undefined,
-      autopilot: undefined,
-      base_mode: undefined,
-      custom_mode: undefined,
-      system_status: "no connection",
-      mavlink_version: undefined,
+      // Set by mavFlightMode interpreting a variety of packets
+      stateMode: undefined,
+      stateAuto: undefined,
+      stateGuided: undefined,
+      stateStabilize: undefined,
+      stateManual: undefined,
+      stateArmed: undefined,
 
       // Set by mavlink.SYS_STATUS packets
       voltage_battery: undefined,

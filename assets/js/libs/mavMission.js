@@ -89,7 +89,7 @@ MavMission.prototype.getMissionItems = function() {
 
 // Stub for initial development/testing
 loadMission = function(mission) {
-	mission.clearMissionItems();
+	mission.clearMission();
 
 	_.each(missionItemsTesting, function(e, i, l) {
 		// target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z
