@@ -43,6 +43,7 @@ define(['backbone', 'leaflet'], function(Backbone, L) {
       this.map.panTo( LatLng );
       
       this.marker.setLatLng( LatLng );
+      this.marker.setIconAngle( this.model.get('heading'));
       
     },
 
@@ -61,7 +62,7 @@ define(['backbone', 'leaflet'], function(Backbone, L) {
           popupAnchor: [-3, -76]
       });
 
-      this.marker = L.marker([64.9, -147.1], {icon: this.myIcon}).addTo(this.map);
+      this.marker = L.marker([64.9, -147.1], {icon: this.myIcon, iconAngle: 0}).addTo(this.map);
 
       var bing = new L.BingLayer("ArSmVTJNY8ZXaAjsxCHf989sG9OqZW3Qf0t1SAdM43Rn9pZpFyWU1jfYv_FFQlLO", {
         zIndex: 0

@@ -1184,6 +1184,38 @@ This is needed to identify the correct path to find images for Leaflet.
 */
 L.Icon.Default.imagePath = '../stylesheets/images/';
 
+/*
+ * Based on comments by @runanet and @coomsie 
+ * https://github.com/CloudMade/Leaflet/issues/386
+ *
+ * Wrapping function is needed to preserve L.Marker.update function
+ */
+(function () {
+var _old_update = L.Marker.prototype.update;
+L.Marker.include({
+	update: function() {
+		this._icon.style[L.DomUtil.TRANSFORM] = "";
+		_old_update.apply(this, []);
+
+		if (this.options.iconAngle) {
+			var a = this.options.icon.options.iconAnchor;
+			var s = this.options.icon.options.iconSize;
+			a = L.point(s).divideBy(2)._subtract(L.point(a));
+			var transform = '';
+			transform += ' translate(' + -a.x + 'px, ' + -a.y + 'px)';
+			transform += ' rotate(' + this.options.iconAngle + 'deg)';
+			transform += ' translate(' + a.x + 'px, ' + a.y + 'px)';
+			this._icon.style[L.DomUtil.TRANSFORM] += transform;
+		}
+	},
+
+	setIconAngle: function (iconAngle) {
+		this.options.iconAngle = iconAngle;
+
+		if (this._map) this.update();
+	}
+});
+}());
 define("leaflet", (function (global) {
     return function () {
         var ret, fn;
@@ -1210,7 +1242,7 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
     render: function() {
       lat = this.model.get('lat') || 64.88317;
       lon = this.model.get('lon') || -147.6137;
-  console.log(this.model.toJSON());      
+
       if( false === this.hasRendered ) {
         // Do initial map setup
         this.renderLayout();
@@ -1236,6 +1268,7 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       this.map.panTo( LatLng );
       
       this.marker.setLatLng( LatLng );
+      this.marker.setIconAngle( this.model.get('heading'));
       
     },
 
@@ -1254,7 +1287,7 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
           popupAnchor: [-3, -76]
       });
 
-      this.marker = L.marker([64.9, -147.1], {icon: this.myIcon}).addTo(this.map);
+      this.marker = L.marker([64.9, -147.1], {icon: this.myIcon, iconAngle: 0}).addTo(this.map);
 
       var bing = new L.BingLayer("ArSmVTJNY8ZXaAjsxCHf989sG9OqZW3Qf0t1SAdM43Rn9pZpFyWU1jfYv_FFQlLO", {
         zIndex: 0
