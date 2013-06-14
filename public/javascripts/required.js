@@ -1213,6 +1213,7 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
         // Do initial map setup
         this.renderLayout();
         this.hasRendered = true;
+    
       }
 
       var LatLng = new L.LatLng(lat, lon);
@@ -1267,7 +1268,10 @@ define('Views/Widgets/Map',['backbone', 'leaflet'], function(Backbone, L) {
       $('#mapWidget').height($(window).height());
       $('#mapWidget').width($(window).width());
       this.map.invalidateSize(false); // force Leaflet resize, do not animate
-      $(window).resize($.proxy(function(e) { this.map.invalidateSize(false); }, this));
+      $(window).resize(_.debounce(_.bind(function() {
+        $('#mapWidget').width($(window).width()).height($(window).height());
+        this.map.invalidateSize();
+      }, this), 250))
 
     }
   });
