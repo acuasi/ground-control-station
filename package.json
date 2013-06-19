@@ -30,7 +30,8 @@
     "less-middleware": "*",
     "winston": "*",
     "colors": "*",
-    "requirejs": "*"
+    "requirejs": "*",
+    "q":"*"
   },
   "devDependencies": {
     "mocha": "",
