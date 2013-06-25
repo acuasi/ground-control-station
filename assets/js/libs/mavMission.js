@@ -91,7 +91,7 @@ MavMission.prototype.getMissionItems = function() {
 loadMission = function(mission) {
 	mission.clearMission();
 
-	_.each(missionItemsQuadTesting, function(e, i, l) {
+	_.each(soccerFieldFlight, function(e, i, l) {
 		// target_system, target_component, seq, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z
 		mi = new mavlink.messages.mission_item(
 			mavlinkParser.srcSystem,
@@ -114,6 +114,22 @@ loadMission = function(mission) {
 
 	mission.sendToPlatform();
 };
+
+// Flight plan for the UAF soccer field
+var soccerFieldFlight = [
+[0,1,0,16,0,0,0,0,64.854843,-147.835846,0.000000,1],
+[1,0,3,22,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,30.000000,1],
+[2,0,3,16,0.000000,0.000000,0.000000,0.000000,64.854864,-147.838436,30.000000,1],
+[3,0,3,16,0.000000,0.000000,0.000000,0.000000,64.854860,-147.837739,30.000000,1],
+[4,0,3,16,0.000000,0.000000,0.000000,0.000000,64.854851,-147.837170,30.000000,1],
+[5,0,3,16,0.000000,0.000000,0.000000,0.000000,64.854842,-147.836484,30.000000,1],
+[6,0,3,16,0.000000,0.000000,0.000000,0.000000,64.855129,-147.836452,30.000000,1],
+[7,0,3,16,0.000000,0.000000,0.000000,0.000000,64.855129,-147.837203,30.000000,1],
+[8,0,3,16,0.000000,0.000000,0.000000,0.000000,64.855138,-147.837771,30.000000,1],
+[9,0,3,16,0.000000,0.000000,0.000000,0.000000,64.855152,-147.838404,30.000000,1],
+[10,0,3,20,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1],
+
+];
 
 // Shim for testing mission
 var missionItemsTesting = [

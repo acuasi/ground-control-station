@@ -183,8 +183,6 @@ UavConnection.prototype.connecting = function() {
 
 UavConnection.prototype.connected = function() {
 
-    log.info('connected, ensuring a timeout has not happened...');
-    log.info('time since last heartbeat = ' + this.timeSinceLastHeartbeat);
     if (this.timeSinceLastHeartbeat > 5000 || true === _.isNaN(this.timeSinceLastHeartbeat)) {
         this.changeState('connecting');
     }

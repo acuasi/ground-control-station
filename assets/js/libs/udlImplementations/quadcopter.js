@@ -1,12 +1,17 @@
 var udlInterface = require('../udlInterface.js'),
 	mavlink = require('mavlink_ardupilotmega_v1.0'),
 	Q = require('q'),
-	jspack = require('jspack'),
+	jspack = require('jspack').jspack,
 	dgram = require('dgram');
 
-var sitlUdp = dgram.createSocket('udp4');
+var log; // populated when object is created, expects Winston log object
+var config; // set when object is instantiated, nconf instance
 
-function quadcopterUdl() {};
+function quadcopterUdl(logger, configObject) {
+	log = logger;
+	config = configObject;
+};
+
 util.inherits(quadcopterUdl, udlInterface);
 
 // MAVLink protocol implementation for parsing/sending messages over the wire
@@ -16,6 +21,7 @@ quadcopterUdl.prototype.setProtocol = function(protocolParser) {
 	protocol = protocolParser;
 };
 
+// If the sitl parameter is true, then this function will try and trigger a communications to the SITL UDP port.
 quadcopterUdl.prototype.takeoff = function() {
 	//param load ArduCopter.parm
 	//wp load mission2.txt
@@ -25,22 +31,33 @@ quadcopterUdl.prototype.takeoff = function() {
 	.then(this.setAutoMode)
 	.then(function() {
 		
-		console.log('sending RC override...')
+		log.info('Quadcopter UDL: sending takeoff command...')
+
+		if(true === config.get('sitl:active')) {
+			log.info('Quadcopter UDL: sending SITL command for takeoff...')
+
+			try {
+				var sitlUdp = dgram.createSocket('udp4');
+				var buf = new Buffer(jspack.Pack('<HHHHHHHH', [0, 0, 1510, 0, 0, 0, 0, 0])); // 1510 to RC3 launches the quad.
+				sitlUdp.send(buf, 0, buf.length, config.get('sitl:port'), config.get('sitl:host'), function(err, bytes) {
+					throw(err);
+				});
+			} catch(e) {
+				console.log(e);
+				log.error(e);
+			}
+
+		} else {
+
+			// This code is currently nonfunctional.  What we want to do is to trigger the
+			// "takeoff" by forcing an RC control override to RC3.
+			var rc_override = new mavlink.messages.rc_channels_override(1, 1, 0, 0, 1500, 0, 0, 0, 0, 0);
+			var rc_override_send = _.partial(_.bind(protocol.send, protocol), rc_override);
+			setInterval(rc_override_send, 50);
+
+		}
 		
-		// Hacked in place for SITL.
-		var buf = jspack.pack('<HHHHHHHH', [0, 0, 1510, 0, 0, 0, 0, 0]);
-		sitlUdp.send(buf, 0, buf.length, 5501, '172.16.76.100', function(err, bytes) {
-			console.log(err);
-			console.log(bytes);
-			console.log('I SENT IT')
-		});
-
-		console.log('got this far');
-
-		//var rc_override = new mavlink.messages.rc_channels_override(1, 1, 1520, -1, 1100, -1, -1, -1, -1, -1);
-		var rc_override = new mavlink.messages.rc_channels_override(1, 1, 1500, 1500, 1900, 1500, 1500, 1500, 1500, 1500);
-		var rc_override_send = _.partial(_.bind(protocol.send, protocol), rc_override);
-		setInterval(rc_override_send, 50);
+		
 		return deferred.resolve();
 	});
 
@@ -50,11 +67,16 @@ quadcopterUdl.prototype.takeoff = function() {
 
 quadcopterUdl.prototype.arm = function() {
 	var deferred = Q.defer();
-	console.log('arming!')
-
-	protocol.on('HEARTBEAT', function(msg) {
-		if(msg.base_mode & mavlink.MAV_MODE_FLAG_DECODE_POSITION_SAFETY) {
-			deferred.resolve();
+	log.info('Quadcopter UDL: arming quadcopter...');
+	
+	protocol.on('HEARTBEAT', function callback(msg) {
+		try {
+			if(msg.base_mode & mavlink.MAV_MODE_FLAG_DECODE_POSITION_SAFETY) {
+				protocol.removeListener('HEARTBEAT', callback);
+				deferred.resolve();
+			}
+		} catch(e) {
+			console.log(e);
 		}
 	});
 
@@ -77,14 +99,14 @@ quadcopterUdl.prototype.arm = function() {
 };
 
 quadcopterUdl.prototype.setAutoMode = function() {
-	console.log('setting auto mode!');
+	log.info('Quadcopter UDL: setting auto mode...');
 
 	var deferred = Q.defer();
 
 	try {
-		protocol.on('COMMAND_ACK', function(msg) {
+		protocol.on('COMMAND_ACK', function confirmAutoCommandAck(msg) {
 		if(true) {
-			console.log('YEP GOT IT AUTO MODE WOO')
+			protocol.removeListener('HEARTBEAT', confirmAutoCommandAck);
 			deferred.resolve();
 		}
 	});

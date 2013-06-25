@@ -72,7 +72,7 @@ uavConnectionManager.start();
 
 var mavFlightMode = new MavFlightMode(mavlink, mavlinkParser, uavConnectionManager, logger);
 
-var quad = new quadUdl();
+var quad = new quadUdl(logger, nconf);
 quad.setProtocol(mavlinkParser);
 
 // MavParams are for handling loading parameters
@@ -81,8 +81,7 @@ var mavParams = new MavParams(logger);
 
 // User clicked 'load params'!
 everyone.now.loadParams = function(msg) {
-    console.log('LOADING PARAMS')
-    mavParams.set(mavlink, mavlinkParser, uavConnectionManager, 'name', 1.0);
+    console.log('LOADING PARAMS');
 }
 
 everyone.now.loadMission = function(msg) {
@@ -94,10 +93,6 @@ everyone.now.loadMission = function(msg) {
 everyone.now.startMission = function(msg) {
     console.log('taking off');
     quad.takeoff();
-}
-
-everyone.now.whatever = function() {
-    console.log('WHATEVER?')
 }
 
 // Client integration code, TODO refactor away to elsewhere
