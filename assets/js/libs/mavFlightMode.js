@@ -24,6 +24,7 @@ util.inherits(MavFlightMode, events.EventEmitter);
 MavFlightMode.prototype.attachHandlers = function() {
 	var self = this;
 	mavlinkParser.on('HEARTBEAT', _.debounce(function(heartbeat) {
+
 		// This one will change to take more things into account than simply auto/non-auto, so just a basic sketch, here
 		newState.mode = ( mavlink.MAV_MODE_FLAG_AUTO_ENABLED & heartbeat.base_mode ) ? 'Auto' : 'Manual';
 

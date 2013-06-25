@@ -1,15 +1,15 @@
 {
-  "name": "pfrr-gcs",
-  "description": "Poker Flat Research Range GCS",
+  "name": "dapper",
+  "description": "DataMapper Ground Control Station",
   "version": "0.0.1",
-  "homepage": "https://github.com/poker-flat/ground-control-station",
+  "homepage": "https://github.com/acuasi/ground-control-station",
   "repository": {
     "type": "git",
-    "url": "git://github.com/poker-flat/ground-control-station.git"
+    "url": "git://github.com/acuasi/ground-control-station.git"
   },
-  "private": true,
+  "private": false,
   "bugs": {
-    "url": "https://github.com/poker-flat/ground-control-station/issues"
+    "url": "https://github.com/acuasi/ground-control-station/issues"
   },
   "engines": {
     "node": ">= 0.8.0"
@@ -30,7 +30,9 @@
     "less-middleware": "*",
     "winston": "*",
     "colors": "*",
-    "requirejs": "*"
+    "requirejs": "*",
+    "q":"*",
+    "mavlink_ardupilotmega_v1.0": "0.0.2"
   },
   "devDependencies": {
     "mocha": "",
@@ -48,5 +50,5 @@
     "grunt-contrib-less":"<0.4",
     "grunt-contrib-mincss":"<0.4"
   },
-  "keywords": []
+  "keywords": ["drone", "mavlink", "geospatial"]
 }

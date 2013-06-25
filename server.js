@@ -11,7 +11,8 @@ var mavlink = require("mavlink_ardupilotmega_v1.0"),
     requirejs = require("requirejs"),
     winston = require("winston"),
     MavFlightMode = require("./assets/js/libs/mavFlightMode.js"),
-    MavMission = require('./assets/js/libs/mavMission.js');
+    MavMission = require('./assets/js/libs/mavMission.js'),
+    quadUdl = require("./assets/js/libs/udlImplementations/quadcopter.js");
 
 requirejs.config({
     //Pass the top-level main.js/index.js require
@@ -71,23 +72,27 @@ uavConnectionManager.start();
 
 var mavFlightMode = new MavFlightMode(mavlink, mavlinkParser, uavConnectionManager, logger);
 
+var quad = new quadUdl(logger, nconf);
+quad.setProtocol(mavlinkParser);
+
 // MavParams are for handling loading parameters
 // Just hacking/playing code for now
 var mavParams = new MavParams(logger);
 
 // User clicked 'load params'!
 everyone.now.loadParams = function(msg) {
-    mavParams.set(mavlink, mavlinkParser, uavConnectionManager, 'name', 1.0);
+    console.log('LOADING PARAMS');
 }
 
 everyone.now.loadMission = function(msg) {
+    console.log('LOADING MISSION')
     var mm= new MavMission(mavlink, mavlinkParser, uavConnectionManager, logger);
     mm.loadMission();
 }
 
 everyone.now.startMission = function(msg) {
-    var startMission = new mavlink.messages.command_long(mavlinkParser.srcSystem, mavlinkParser.srcComponent, mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0);
-    mavlinkParser.send(startMission);
+    console.log('taking off');
+    quad.takeoff();
 }
 
 // Client integration code, TODO refactor away to elsewhere

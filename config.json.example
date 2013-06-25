@@ -11,6 +11,12 @@
     "port" : 14550
   },
   
+  "sitl" : {
+    "active" : false,
+    "host" : "172.16.76.100",
+    "port" : 5501
+  },
+  
   "serial" : {
     "device" : "/dev/tty.usbserial-A900XUV3",
     "baudrate" : 57600
