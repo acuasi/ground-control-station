@@ -58,9 +58,6 @@ define(['backbone', 'Templates',
       this.healthWidget = new HealthWidget({model: this.model.get('platform')});
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
 
-      // Connection reflects information not entirely derived from the platform
-      this.commsWidget = new CommsWidget({model: this.model.get('connection')});
-
       // Render party
       this.speedWidget.render();
       this.mapWidget.render();
@@ -68,7 +65,6 @@ define(['backbone', 'Templates',
       this.batteryWidget.render();
       this.healthWidget.render();
       this.gpsWidget.render();
-      this.commsWidget.render();
 
     }
 
