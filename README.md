@@ -34,7 +34,7 @@ Running the project has two parts: starting the node server process, and launchi
 
 ```bash
 nodemon server.js &
-grunt && grunt watch
+grunt
 ```
 
 ### Project architecture and structure

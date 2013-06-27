@@ -33,7 +33,7 @@ require([
       // Add a collection of tests
       describe("Speed widget", function() {
 
-        // Setup function -- will execute after every test
+        // Setup function -- will execute before every test
         beforeEach(function() {
 
           // Create a DOM element to render into
