@@ -9,6 +9,7 @@ require(['Models/Mission', 'Models/Platform', 'Views/Mission'], function(Mission
         platform: this.platform
       });
 
+      // Create a DIV for rendering the mission view into, so we can use the jquery selectors to find elements in the DOM.
       setFixtures(sandbox({id:'missionView'}));
       this.missionView = new MissionView({
         model: this.mission
@@ -31,15 +32,12 @@ require(['Models/Mission', 'Models/Platform', 'Views/Mission'], function(Mission
     });
 
     it('Renders its subviews', function() {
-      console.log(this.missionView);
       expect($('#speedWidget').html()).not.toBeUndefined();
-      expect($('#batteryWidget').html()).not.toBeUndefined();
       expect($('#altitudeWidget').html()).not.toBeUndefined();
       expect($('#mapWidget').html()).not.toBeUndefined();
       expect($('#commsWidget').html()).not.toBeUndefined();
       expect($('#gpsWidget').html()).not.toBeUndefined();
       expect($('#healthWidget').html()).not.toBeUndefined();
-      expect($('#stateWidget').html()).not.toBeUndefined();
     });
   });
 
