@@ -34,7 +34,7 @@ Running the project has two parts: starting the node server process, and launchi
 
 ```bash
 nodemon server.js &
-grunt && grunt watch
+grunt
 ```
 
 ### Project architecture and structure
@@ -139,7 +139,7 @@ The ```config.json.example``` file is used to configure Jenkins' runtime environ
 Some additional prerequsites may be required:
 
 ```
-npm install -g grunt
+npm install -g grunt-cli
 ```
 
 There's two different collections of test suites: ones that run on the server, and ones that run on the GUI/interface layer.  Mocha is used for the server-side tests, Jasmine for the GUI layer.
@@ -156,8 +156,4 @@ To run Mocha tests for xunit output (for CI/Jenkins):
 mocha --reporter xunit test/mocha
 ```
 
-Running client-side Jasmine tests through grunt:
-
-```bash
-grunt jasmine
-```
+To run client-side Jasmine tests, open a web browser and open the ```test/jasmine/index.html``` HTML page.
