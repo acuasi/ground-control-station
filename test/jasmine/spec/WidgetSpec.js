@@ -56,10 +56,6 @@ require([
           expect(isNaN(Number($('#speedWidget span.value').text()))).toBe(false);
         });
         
-        it("should render a numeric value in the span.value element", function() {
-          expect(isNaN(Number("1.34"))).toBe(false);
-        });
-
       });
 
       describe("Altitude widget", function() {
