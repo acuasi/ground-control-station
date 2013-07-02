@@ -55,12 +55,43 @@ require([
         it("should render a numeric value in the span.value element", function() {
           expect(isNaN(Number($('#speedWidget span.value').text()))).toBe(false);
         });
+        
+        it("should render a numeric value in the span.value element", function() {
+          expect(isNaN(Number("1.34"))).toBe(false);
+        });
 
       });
 
       describe("Altitude widget", function() {
 
         beforeEach(function() {
+
+          // Create a DOM element to render into
+          setFixtures(sandbox({id:'altitudeWidget'}));
+
+          // Create a 'platform' Backbone model, which the view observes
+          this.platform = new Platform();
+
+          // Create the view we want to test
+          this.altitudeWidget = new altitudeWidget({
+            model: this.platform
+          });
+
+          // Render to the sandbox div
+          this.altitudeWidget.render();
+
+        });
+
+        it("should render a numeric value in the span.value element", function() {
+          expect(isNaN(Number($('#altitudeWidget span.value').text()))).toBe(false);
+        });
+
+        it("should round value to 1 decimal place", function() {
+          var value = $('#altitudeWidget span.value').text();
+          var fractional = value.indexOf(".") + 1; // Start of fractional part
+          
+          expect(value).toContain('.');
+          expect(value.slice(fractional).length()).toEqual(1);
         });
 
       });
