@@ -53,7 +53,7 @@ require([
         });
 
         it("should render a numeric value in the span.value element", function() {
-          expect($('#speedWidget span.value').text()).toEqual('0');
+          expect(isNaN(Number($('#speedWidget span.value').text()))).toBe(false);
         });
 
       });
@@ -61,7 +61,6 @@ require([
       describe("Altitude widget", function() {
 
         beforeEach(function() {
-
         });
 
       });
