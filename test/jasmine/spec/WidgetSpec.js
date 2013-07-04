@@ -53,7 +53,7 @@ require([
         });
 
         it("should render a numeric value in the span.value element", function() {
-          expect(isNaN(Number($('#speedWidget span.value').text()))).toBe(false);
+          expect(isFinite(Number($('#speedWidget span.value').text()))).toBe(true);
         });
         
       });
@@ -77,17 +77,21 @@ require([
           this.altitudeWidget.render();
 
         });
+        
+        it("should render a valid number in the span.value element", function() {
+          var renderedValue = $('#altitudeWidget span.value').text();
 
-        it("should render a numeric value in the span.value element", function() {
-          expect(isNaN(Number($('#altitudeWidget span.value').text()))).toBe(false);
+          expect(renderedValue).not.toBe('');
+          expect(isFinite(Number(renderedValue))).toBe(true);
         });
 
         it("should round value to 1 decimal place", function() {
-          var value = $('#altitudeWidget span.value').text();
-          var fractional = value.indexOf(".") + 1; // Start of fractional part
+          var renderedValue = $('#altitudeWidget span.value').text();
+          var startOfFraction = renderedValue.indexOf(".") + 1;
+          var fraction = renderedValue.slice(startOfFraction);
           
-          expect(value).toContain('.');
-          expect(value.slice(fractional).length()).toEqual(1);
+          expect(renderedValue).toContain('.');
+          expect(fraction.length).toEqual(1);
         });
 
       });
