@@ -10,7 +10,8 @@ define(['backbone', 'Templates'], function(Backbone, template) {
       this.model.on("change:alt", this.render, this);
     },
     render: function() {
-      this.$el.html(template['altitudeWidget']({alt: this.model.get('alt')}));
+      this.$el.html(template['altitudeWidget'](
+        {alt: Number(this.model.get('alt')).toFixed(1)}));
     }
     
   });

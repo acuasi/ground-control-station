@@ -78,20 +78,44 @@ require([
 
         });
         
-        it("should render a valid number in the span.value element", function() {
-          var renderedValue = $('#altitudeWidget span.value').text();
+        it("should display the altitude in the span.value element", function() {
+          var renderedValue;
 
-          expect(renderedValue).not.toBe('');
-          expect(isFinite(Number(renderedValue))).toBe(true);
+          this.altitudeWidget.model.set('alt', 13.5);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('13.5');
+
+          this.altitudeWidget.model.set('alt', 10.5);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
         });
 
         it("should round value to 1 decimal place", function() {
-          var renderedValue = $('#altitudeWidget span.value').text();
-          var startOfFraction = renderedValue.indexOf(".") + 1;
-          var fraction = renderedValue.slice(startOfFraction);
-          
-          expect(renderedValue).toContain('.');
-          expect(fraction.length).toEqual(1);
+          var renderedValue;
+
+          this.altitudeWidget.model.set('alt', 10.50);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+
+          this.altitudeWidget.model.set('alt', 10.54);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+
+          this.altitudeWidget.model.set('alt', 10.55);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.6');
+
+          this.altitudeWidget.model.set('alt', 10.59);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.6');
+
+          this.altitudeWidget.model.set('alt', 10.549);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+
+          this.altitudeWidget.model.set('alt', 10);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.0');
         });
 
       });
