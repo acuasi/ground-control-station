@@ -56,7 +56,7 @@ define(['backbone'], function(Backbone) {
     validate: function(attrs) {
       attrs.lat /= 1e07;
       attrs.lon /= 1e07;
-      attrs.alt /=100;
+      attrs.alt /= 100;
     }
 
   });
