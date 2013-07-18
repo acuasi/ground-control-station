@@ -36,7 +36,15 @@ describe('UDL interface prototype', function() {
 
 	it('has an "enter autonomous mode" function', function() {
 		this.udl.setAutoMode.should.be.a.function;
-	} );
+	});
+
+	it('has a "fly to coordinates" function', function() {
+		this.udl.flyToPoint.should.be.a.function;
+	});
+
+	it('has a "loiter" function', function() {
+		this.udl.loiter.should.be.a.function;
+	});
 });
 
 describe('Quadcopter UDL implementation', function() {
@@ -46,5 +54,21 @@ describe('Quadcopter UDL implementation', function() {
 
 	it('commands the sequence to arm the quadcopter', function() {
 		this.quad.should.exist;
+	});
+
+	describe('fly to coordinates function', function() {
+
+		it('clears the current mission', function() {
+
+		});
+
+		it('creates a mission of a single waypoint', function() {
+
+		});
+
+		it('commands "start mission" to go to the new single waypoint', function() {
+
+		});
+
 	});
 })

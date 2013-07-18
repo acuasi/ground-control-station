@@ -59,7 +59,7 @@ define(['backbone', 'Templates',
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
 
       // Connection reflects information not entirely derived from the platform
-      this.commsWidget = new CommsWidget({model: this.model.get('connection')});
+      this.commsWidget = new CommsWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();

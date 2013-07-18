@@ -976,7 +976,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="healthWidget" class="widget"></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
+buf.push('<div id="widgets" class="navbar navbar-fixed-top"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="healthWidget" class="widget"></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
 }
 return buf.join("");
 };
@@ -1574,7 +1574,7 @@ define('Views/Mission',['backbone', 'Templates',
       this.gpsWidget = new GpsWidget({model: this.model.get('platform')});
 
       // Connection reflects information not entirely derived from the platform
-      this.commsWidget = new CommsWidget({model: this.model.get('connection')});
+      this.commsWidget = new CommsWidget({model: this.model.get('platform')});
 
       // Render party
       this.speedWidget.render();

@@ -234,7 +234,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="widgets"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="healthWidget" class="widget"></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
+buf.push('<div id="widgets" class="navbar navbar-fixed-top"><div id="speedWidget" class="widget"></div><div id="altitudeWidget" class="widget"></div><div id="commsWidget" class="widget"></div><div id="healthWidget" class="widget"></div></div><div id="mapWidget"></div><div id="gpsWidget" class="widget"></div>');
 }
 return buf.join("");
 };

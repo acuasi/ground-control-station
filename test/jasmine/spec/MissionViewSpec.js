@@ -1,5 +1,29 @@
 require(['Models/Mission', 'Models/Platform', 'Views/Mission'], function(Mission, Platform, MissionView) {
 
+  beforeEach(function() {
+
+    setFixtures(sandbox({id:'missionView'}));
+    this.platform = new Platform();
+    this.mission = new Mission({
+      platform: this.platform
+    });
+
+    this.missionView = new MissionView({
+      model: this.mission
+    });
+
+    this.missionView.render();
+  });
+
+  describe("Navigation Bar", function() {
+
+    it('should be visible', function() {
+      expect( $('.navbar.navbar-fixed-top' ) ).toBeVisible();
+    });
+
+  });
+/*
+
   describe("MissionView", function() {
     
     beforeEach(function() {
@@ -42,5 +66,5 @@ require(['Models/Mission', 'Models/Platform', 'Views/Mission'], function(Mission
       expect($('#stateWidget').html()).not.toBeUndefined();
     });
   });
-
+*/
 });

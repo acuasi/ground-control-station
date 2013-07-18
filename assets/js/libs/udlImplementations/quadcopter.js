@@ -49,12 +49,10 @@ quadcopterUdl.prototype.takeoff = function() {
 
 		} else {
 
-			// This code is currently nonfunctional.  What we want to do is to trigger the
-			// "takeoff" by forcing an RC control override to RC3.
-			var rc_override = new mavlink.messages.rc_channels_override(1, 1, 0, 0, 1500, 0, 0, 0, 0, 0);
-			var rc_override_send = _.partial(_.bind(protocol.send, protocol), rc_override);
-			setInterval(rc_override_send, 50);
+			var command_long = mavlink.messages.command_long(1, 1, mavlink.MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 0);
+			protocol.send(command_long);
 
+		
 		}
 		
 		
@@ -104,7 +102,23 @@ quadcopterUdl.prototype.setAutoMode = function() {
 	var deferred = Q.defer();
 
 	try {
-		protocol.on('COMMAND_ACK', function confirmAutoCommandAck(msg) {
+		protocol.on('HEARTBEAT', function confirmAutoCommandAck(msg) {
+		// todo: determine how to test that this is valid or not?
+		// instead check out this mapping (in mavutil;py):
+		// mode_mapping_acm = {
+		//     0 : 'STABILIZE',
+		//     1 : 'ACRO',
+		//     2 : 'ALT_HOLD',
+		//     3 : 'AUTO',
+		//     4 : 'GUIDED',
+		//     5 : 'LOITER',
+		//     6 : 'RTL',
+		//     7 : 'CIRCLE',
+		//     8 : 'POSITION',
+		//     9 : 'LAND',
+		//     10 : 'OF_LOITER',
+		//     11 : 'APPROACH'
+		//     }
 		if(true) {
 			protocol.removeListener('HEARTBEAT', confirmAutoCommandAck);
 			deferred.resolve();
@@ -118,6 +132,32 @@ quadcopterUdl.prototype.setAutoMode = function() {
 	var command_long = new mavlink.messages.command_long(1, 1, mavlink.MAV_CMD_MISSION_START, 0, 0, 0, 0, 0, 0, 0, 0);
 	protocol.send(command_long);
 	return deferred.promise;
+
+};
+
+// quadcopterUdl.prototype.loiter = function() {
+// 	log.info('Quadcopter UDL: setting loiter mode');
+
+// 	var deferred = q.defer();
+// 	try {
+// 		protocol.on('HEARTBEAT', function confirmLoiterMode(msg) {
+// 			console.log(msg);
+// 			// 5 is the magic number associated in MavProxy with the loiter mode -- need docs on this
+// 			if(msg.custom_mode === 5) {
+// 				protocol.removeListener('HEARTBEAT', confirmLoiterMode);
+// 				deferred.resolve();	
+// 			}
+			
+// 		}
+// 	}
+
+// 	var command_long = mavlink.messages.command_long(1, 1, mavlink.MAV_CMD_NAV_LOITER_UNLIM, 0, 0, 0, 0, 0, 0, 0, 0);
+// 	protocol.send(command_long);
+// 	return deferred.promise;
+// };
+
+quadcopterUdl.prototype.flyToPoint = function(lat, lon) {
+	var deferred = q.defer();
 
 };
 
