@@ -53,15 +53,69 @@ require([
         });
 
         it("should render a numeric value in the span.value element", function() {
-          expect($('#speedWidget span.value').text()).toEqual('0');
+          expect(isFinite(Number($('#speedWidget span.value').text()))).toBe(true);
         });
-
+        
       });
 
       describe("Altitude widget", function() {
 
         beforeEach(function() {
 
+          // Create a DOM element to render into
+          setFixtures(sandbox({id:'altitudeWidget'}));
+
+          // Create a 'platform' Backbone model, which the view observes
+          this.platform = new Platform();
+
+          // Create the view we want to test
+          this.altitudeWidget = new altitudeWidget({
+            model: this.platform
+          });
+
+          // Render to the sandbox div
+          this.altitudeWidget.render();
+
+        });
+        
+        it("should display the altitude in the span.value element", function() {
+          var renderedValue;
+
+          this.altitudeWidget.model.set('alt', 13.5);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('13.5');
+
+          this.altitudeWidget.model.set('alt', 10.5);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+        });
+
+        it("should round value to 1 decimal place", function() {
+          var renderedValue;
+
+          this.altitudeWidget.model.set('alt', 10.50);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+
+          this.altitudeWidget.model.set('alt', 10.54);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+
+          this.altitudeWidget.model.set('alt', 10.55);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.6');
+
+          this.altitudeWidget.model.set('alt', 10.59);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.6');
+
+          this.altitudeWidget.model.set('alt', 10.549);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.5');
+
+          this.altitudeWidget.model.set('alt', 10);
+          renderedValue = $('#altitudeWidget span.value').text();
+          expect(renderedValue).toBe('10.0');
         });
 
       });
