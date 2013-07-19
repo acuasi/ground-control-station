@@ -119,6 +119,37 @@ require([
         });
 
       });
+      
+      describe("Signal strength widget", function() {
+        
+        beforeEach(function() {
+        	// TODO: implement setup
+      	});
+      	
+      	it("should display a signal strength icon", function() {
+      		// TODO: implement test
+      	});
+      	
+      	it("should display 4-bars icon when signal strength >= 90%", function() {
+      		// TODO: implement test
+      	});
+      	
+      	it("should display 3-bars icon when 60% <= signal strength < 90%", function() {
+      		// TODO: implement test
+      	});
+      	
+      	it("should display 2-bars icon when 30% <= signal strength < 60%", function() {
+      		// TODO: implement test
+      	});
+      	
+      	it("should display 1-bar icon when 0% < signal strength < 30%", function() {
+      		// TODO: implement test
+      	});
+
+      	it("should display no-signal icon when signal strength = 0%", function() {
+      		// TODO: implement test
+      	});
+      });
 
     } 
 );
