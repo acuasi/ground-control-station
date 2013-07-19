@@ -12,7 +12,8 @@ define(['backbone', 'Templates'], function(Backbone, template) {
 
     render: function() {
 
-      this.$el.html(template['speedWidget']({groundspeed: Math.round(this.model.get('groundspeed'), 2)}));
+      this.$el.html(template['speedWidget'](
+        {groundspeed: Number(this.model.get('groundspeed')).toFixed(0)}));
     
     }
     
