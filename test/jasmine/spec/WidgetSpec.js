@@ -5,6 +5,7 @@ require([
 
   // Models
   'Models/Platform', // source file, referenced as Platform
+  'Models/RadioConnection',
 
   // Views
   'Views/Widgets/Altitude',
@@ -18,6 +19,7 @@ require([
   ], function(
     // Models
     Platform,  // the symbol by which the Models/Platform code will be seen as a module
+    RadioConnection,
 
     // Views
     altitudeWidget,
