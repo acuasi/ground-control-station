@@ -15,7 +15,8 @@ require([
   'Views/Widgets/Health',
   'Views/Widgets/Map',
   'Views/Widgets/Speed',
-  'Views/Widgets/State'
+  'Views/Widgets/State',
+  'Views/Widgets/SignalStrength'
   ], function(
     // Models
     Platform,  // the symbol by which the Models/Platform code will be seen as a module
@@ -29,7 +30,8 @@ require([
     healthWidget,
     mapWidget,
     speedWidget,
-    stateWidget
+    stateWidget,
+    signalStrengthWidget
     ) {
 
       // Add a collection of tests
@@ -122,8 +124,9 @@ require([
 
       });
       
+      // Signal strength widget shows the strength of the connection with the UAV
       describe("Signal strength widget", function() {
-        
+
         beforeEach(function() {
         	setFixtures(sandbox({id:'signalStrengthWidget'}));
         	
@@ -132,91 +135,90 @@ require([
         	this.signalStrength = new signalStrengthWidget({
         		model: this.connection
         	});
-        	
         	this.signalStrength.render();
       	});
 
       	it("should display no-signal icon when NOT connected", function() {
       		this.signalStrength.model.set('connected', false);
       		this.signalStrength.model.set('strength', 0);
-      		expect($('#signalStrength').src).toContain('no-signal.svg');
-      		expect($('#signalStrength').complete).toBe(true);
+      		expect($('#signalStrengthWidget img').attr('src')).toContain('no-signal.svg');
+      		expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
       		this.signalStrength.model.set('strength', 25);
-      		expect($('#signalStrength').src).toContain('no-signal.svg');
-      		expect($('#signalStrength').complete).toBe(true);
+      		expect($('#signalStrengthWidget img').attr('src')).toContain('no-signal.svg');
+      		expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
       		this.signalStrength.model.set('strength', 50);
-      		expect($('#signalStrength').src).toContain('no-signal.svg');
-      		expect($('#signalStrength').complete).toBe(true);
+      		expect($('#signalStrengthWidget img').attr('src')).toContain('no-signal.svg');
+      		expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
       		this.signalStrength.model.set('strength', 75);
-      		expect($('#signalStrength').src).toContain('no-signal.svg');
-      		expect($('#signalStrength').complete).toBe(true);
+      		expect($('#signalStrengthWidget img').attr('src')).toContain('no-signal.svg');
+      		expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
       		this.signalStrength.model.set('strength', 100);
-      		expect($('#signalStrength').src).toContain('no-signal.svg');
-      		expect($('#signalStrength').complete).toBe(true);
-      	});
+      		expect($('#signalStrengthWidget img').attr('src')).toContain('no-signal.svg');
+      		expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
+       	});
       	
       	describe("when connected:", function(){
 					it("should display 4-bars icon when signal strength >= 90%", function() {
 						this.signalStrength.model.set('connected', true);
 						this.signalStrength.model.set('strength', 90);
-						expect($('#signalStrength').src).toContain('4-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('4-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 100);
-						expect($('#signalStrength').src).toContain('4-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('4-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 					});
 					
 					it("should display 3-bars icon when 60% <= signal strength < 90%", function() {
 						this.signalStrength.model.set('connected', true);
 						this.signalStrength.model.set('strength', 89);
-						expect($('#signalStrength').src).toContain('3-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('3-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 75);
-						expect($('#signalStrength').src).toContain('3-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('3-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 60);
-						expect($('#signalStrength').src).toContain('3-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('3-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 					});
 					
 					it("should display 2-bars icon when 30% <= signal strength < 60%", function() {
 						this.signalStrength.model.set('connected', true);
 						this.signalStrength.model.set('strength', 59);
-						expect($('#signalStrength').src).toContain('2-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('2-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 45);
-						expect($('#signalStrength').src).toContain('2-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('2-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 30);
-						expect($('#signalStrength').src).toContain('2-bars.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('2-bars.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 					});
 					
 					it("should display 1-bar icon when 0% <= signal strength < 30%", function() {
 						this.signalStrength.model.set('connected', true);
 						this.signalStrength.model.set('strength', 29);
-						expect($('#signalStrength').src).toContain('1-bar.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('1-bar.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 15);
-						expect($('#signalStrength').src).toContain('1-bar.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('1-bar.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 
 						this.signalStrength.model.set('strength', 0);
-						expect($('#signalStrength').src).toContain('1-bar.svg');
-						expect($('#signalStrength').complete).toBe(true);
+						expect($('#signalStrengthWidget img').attr('src')).toContain('1-bar.svg');
+						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 					});
       	});
-      });
+     });
 
     } 
 );
