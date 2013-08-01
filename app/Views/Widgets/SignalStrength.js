@@ -34,7 +34,7 @@ define(['require', 'backbone', 'Templates'], function(require, Backbone, templat
     		else if(signalStrength >= 30) {
     			return imagesDir + "2-bars.svg";
     		}
-    		else if(signalStrength >= 0) {
+    		else {
     			return imagesDir + "1-bar.svg";
     		}
     	}
