@@ -52,10 +52,45 @@ require([
 
         });
 
-        it("should render a numeric value in the span.value element", function() {
-          expect(isFinite(Number($('#speedWidget span.value').text()))).toBe(true);
+        it("should display the speed in the span.value element", function() {
+          var renderedValue;
+          
+          this.speedWidget.model.set('groundspeed', 13);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('13');
+
+          this.speedWidget.model.set('groundspeed', 10);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('10');
         });
         
+        it("should round value to the nearest integer", function() {
+          var renderedValue;
+
+          this.speedWidget.model.set('groundspeed', 10.5);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('11');
+
+          this.speedWidget.model.set('groundspeed', 10.4);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('10');
+
+          this.speedWidget.model.set('groundspeed', 10.49);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('10');
+
+          this.speedWidget.model.set('groundspeed', 10.9);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('11');
+
+          this.speedWidget.model.set('groundspeed', 10.0);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('10');
+
+          this.speedWidget.model.set('groundspeed', 10);
+          renderedValue = $('#speedWidget span.value').text();
+          expect(renderedValue).toBe('10');
+        });
       });
 
       describe("Altitude widget", function() {
