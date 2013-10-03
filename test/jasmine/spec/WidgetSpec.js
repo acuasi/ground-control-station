@@ -253,7 +253,62 @@ require([
 						expect($('#signalStrengthWidget img').prop('complete')).toBe(true);
 					});
       	});
-     });
+      });
 
+
+      describe("Battery widget", function() {
+
+        beforeEach(function() {
+
+          // Create a DOM element to render into
+          setFixtures(sandbox({id:'batteryWidget'}));
+
+          // Create a 'platform' Backbone model, which the view observes
+          this.platform = new Platform();
+
+          // Create the view we want to test
+          this.batteryWidget = new batteryWidget({
+            model: this.platform
+          });
+
+          // Render to the sandbox div
+          this.batteryWidget.render();
+
+        });
+        
+        it("should display battery icon", function() {
+					expect($('#batteryWidget img').attr('src')).toContain('battery.svg');
+					expect($('#batteryWidget img').prop('complete')).toBe(true);
+        });
+        
+        it("should show popup when clicked", function() {
+        	$('#batteryWidget').trigger('click');
+        	expect($('batteryWidget a').next('div.popover').length).toBeTruthy();
+        });
+        
+        describe("Icon", function() {
+        
+       		it("should be green when charge == 100%", function() {
+       		});
+       
+       		it("should be yellow when charge == 50%", function() {
+       		});
+        
+					it("should be red when charge < 20%", function() {
+					});
+				});
+        
+        describe("Popup", function() {
+        	
+        	it("should display battery voltage", function() {
+        	});
+        	
+        	it("should display battery current", function() {
+        	});
+        	
+        	it("should display current charge as percent", function() {
+        	});
+        });
+      });
     } 
 );

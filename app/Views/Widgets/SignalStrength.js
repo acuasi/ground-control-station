@@ -12,7 +12,10 @@ define(['require', 'backbone', 'Templates'], function(require, Backbone, templat
  
     render: function() {
       this.$el.html(template['signalStrengthWidget'](
-        {icon: this.getIcon()}));
+        {
+        	icon: this.getIcon()
+        }
+      ));
     },
     
     getIcon: function() {
