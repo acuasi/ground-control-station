@@ -277,36 +277,70 @@ require([
         });
         
         it("should display battery icon", function() {
-					expect($('#batteryWidget img').attr('src')).toContain('battery.svg');
-					expect($('#batteryWidget img').prop('complete')).toBe(true);
-        });
-        
-        it("should show popup when clicked", function() {
-        	$('#batteryWidget').trigger('click');
-        	expect($('batteryWidget a').next('div.popover').length).toBeTruthy();
+					expect($('#batteryWidget a img#battery_image').attr('src')).toContain('battery.svg');
+					expect($('#batteryWidget a img#battery_image').prop('complete')).toBe(true);
         });
         
         describe("Icon", function() {
         
        		it("should be green when charge == 100%", function() {
+       			this.batteryWidget.model.set('battery_remaining', 100);
+       			expect($('#battery_indicator').css("fill")).toEqual(0x97d7a6);
        		});
        
-       		it("should be yellow when charge == 50%", function() {
+       		it("should be yellow when charge == 60%", function() {
+       			this.batteryWidget.model.set('battery_remaining', 60);
+       			expect($('#battery_indicator').css("fill")).toEqual(0xf8f77e);
        		});
         
-					it("should be red when charge < 20%", function() {
+					it("should be red when charge <= 30%", function() {
+       			this.batteryWidget.model.set('battery_remaining', 30);
+       			expect($('#battery_indicator').css("fill")).toEqual(0xd72822);
+       			this.batteryWidget.model.set('battery_remaining', 10);
+       			expect($('#battery_indicator').css("fill")).toEqual(0xd72822);
 					});
 				});
         
-        describe("Popup", function() {
+        describe("Tooltip", function() {
         	
+					beforeEach(function() {
+	
+        		$('#batteryWidget').trigger('click');
+	
+					});
+
+					it("should be shown when icon is clicked", function() {
+						expect($('#batteryWidget #battery_image').next('div.popover').length).toBeTruthy();
+					});
+        
         	it("should display battery voltage", function() {
+       			this.batteryWidget.model.set('voltage_battery', 50);
+        		expect($('#batteryWidget #battery_image')
+        			.next('div.popover div.popover-content'))
+        			.toContain('Voltage: ');
+        		expect($('#batteryWidget #battery_image')
+        			.next('div.popover div.popover-content span.value')
+        			.text()).toBe('50');
         	});
         	
         	it("should display battery current", function() {
+       			this.batteryWidget.model.set('current_battery', 50);
+        		expect($('#batteryWidget #battery_image')
+        			.next('div.popover div.popover-content'))
+        			.toContain('Current: ');
+        		expect($('#batteryWidget #battery_image')
+        			.next('div.popover div.popover-content span.value')
+        			.text()).toBe('50');
         	});
         	
         	it("should display current charge as percent", function() {
+       			this.batteryWidget.model.set('battery_remaining', 50);
+        		expect($('#batteryWidget #battery_image')
+        			.next('div.popover div.popover-content'))
+        			.toContain('Remaining: ');
+        		expect($('#batteryWidget #battery_image')
+        			.next('div.popover div.popover-content span.value')
+        			.text()).toBe('50');
         	});
         });
       });
